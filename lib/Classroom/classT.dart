@@ -54,7 +54,7 @@ class _toggleTState extends State<toggleT> {
         scrollDirection:Axis.vertical,
         child: Column(
           children: [
-            SizedBox(height: 10,),
+            SizedBox(height: 20,),
             ToggleButtons(
               direction: Axis.horizontal,
               onPressed: (int index){
