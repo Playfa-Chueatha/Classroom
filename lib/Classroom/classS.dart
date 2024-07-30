@@ -38,7 +38,7 @@ class _toggleTState extends State<toggleS> {
 
   int counter = 0;
 
-  List <bool> isSelected = [f,true,false,false];
+  List <bool> isSelected = [false,true,false,false];
 
   @override
   Widget build(BuildContext context) {
