@@ -150,6 +150,7 @@ class _FromState extends State<AddFrom> {
                 FilledButton(
                   onPressed: (){
                     bool pass = formKey.currentState!.validate();
+                  
                     if(pass){
                       sing_up();
                     }
