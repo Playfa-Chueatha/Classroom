@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_esclass_2/Classroom/menu_classT.dart';
 
 void  main()  => runApp(const ClassT());
 
@@ -36,10 +37,9 @@ class toggleT extends StatefulWidget {
 
 class _toggleTState extends State<toggleT> {
 
-  // List<String> label = ['หน้าหลัก','ห้องเรียน','งานที่มอบหมาย','รายชื่อนักเรียน'];
   int counter = 0;
 
-  List <bool> isSelected = [true,false,false,false];
+  List <bool> isSelected = [false,true,false,false];
 
   @override
   Widget build(BuildContext context) {
@@ -97,7 +97,7 @@ class _toggleTState extends State<toggleT> {
                       Container(
                       height: 1000,
                       width: 300,
-                      alignment: Alignment.topCenter,
+                      // alignment: Alignment.topCenter,
                       decoration: BoxDecoration(
                         color: Color.fromARGB(255, 147, 185, 221),
                         borderRadius: BorderRadius.only(
@@ -106,14 +106,47 @@ class _toggleTState extends State<toggleT> {
                         ),
                       ),
                       child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          SizedBox(height: 20,),
-                          
-
-
+                          // SizedBox(height: 20,),
+                          // Container(
+                          //   width: 280,
+                          //   height: 200,                            
+                          //   decoration: BoxDecoration(
+                          //     color: Colors.white,
+                          //     borderRadius: BorderRadius.only(
+                          //       topRight: Radius.circular(20),
+                          //       bottomRight: Radius.circular(20)
+                          //     ),
+                          //   ),
+                          // ),
+                          // SizedBox(height: 20),
+                          // Container(
+                          //   width: 280,
+                          //   height: 200,                            
+                          //   decoration: BoxDecoration(
+                          //     color: Colors.white,
+                          //     borderRadius: BorderRadius.only(
+                          //       topRight: Radius.circular(20),
+                          //       bottomRight: Radius.circular(20)
+                          //     ),
+                          //   ),
+                          // ),
+                          // SizedBox(height: 20),
+                          // Container(
+                          //   width: 280,
+                          //   height: 200,                            
+                          //   decoration: BoxDecoration(
+                          //     color: Colors.white,
+                          //     borderRadius: BorderRadius.only(
+                          //       topRight: Radius.circular(20),
+                          //       bottomRight: Radius.circular(20)
+                          //     ),
+                          //   ),
+                          // )
                         ],
-                      ),
-                      ),
+                  ),
+                ),
                       SizedBox(width: 50,),
 
 
@@ -144,7 +177,8 @@ class _toggleTState extends State<toggleT> {
                                     style: IconButton.styleFrom(
                                       backgroundColor: Color.fromARGB(255, 147, 185, 221),
                                       highlightColor: Color.fromARGB(255, 56, 105, 151),
-                                    ), 
+                                    ),
+                                    tooltip: 'เพิ่มประกาศ', 
                                   )
                                 ],
                               ),
@@ -200,10 +234,6 @@ class _toggleTState extends State<toggleT> {
                                 borderRadius: BorderRadius.circular(20)
                               ),
                             ),
-
-
-
-
                           ],
                         ),
                       ),
