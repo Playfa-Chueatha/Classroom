@@ -10,7 +10,6 @@ class Logint extends StatefulWidget {
 
 class _LogintState extends State<Logint> {
 
-    int _value = 1;
   final _formkey = GlobalKey<FormState>();
   // ignore: unused_field
   String _name = '';

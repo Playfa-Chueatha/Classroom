@@ -195,7 +195,7 @@ class _FormState extends State<AddForm> {
                 ),
                 FilledButton(
                   onPressed: (){
-                    _formkey.currentState!.validate();
+                    formKey.currentState!.validate();
                   },
                   style: FilledButton.styleFrom(
                     backgroundColor: Colors.green
