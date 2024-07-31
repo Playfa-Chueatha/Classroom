@@ -14,6 +14,7 @@ class AddForm extends StatefulWidget {
 
 class _FormState extends State<AddForm> {
   int _value = 1;
+
   final formKey = GlobalKey<FormState>();
 
   TextEditingController name = TextEditingController();
@@ -195,12 +196,16 @@ class _FormState extends State<AddForm> {
                 ),
                 FilledButton(
                   onPressed: (){
-                    _formkey.currentState!.validate();
+                    bool pass = formKey.currentState!.validate(); //ปุ่มบันทึกลงฐานข้อมูล
+                    if(pass){
+                      signUp();
+                    }
+                    Navigator.pushNamed(context, 'login');
                   },
                   style: FilledButton.styleFrom(
                     backgroundColor: Colors.green
                   ),
-                  child: const Text("สมัตรสมาชิก", style: TextStyle(fontSize: 20),)
+                  child: const Text("สมัครสมาชิก", style: TextStyle(fontSize: 20),)
                 ),
               ],
             ),

@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'dart:async';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 void  main()  => runApp(const Logint());
 class Logint extends StatefulWidget {
@@ -10,12 +13,35 @@ class Logint extends StatefulWidget {
 
 class _LogintState extends State<Logint> {
 
-    int _value = 1;
-  final _formkey = GlobalKey<FormState>();
-  // ignore: unused_field
-  String _name = '';
-  // ignore: unused_field
-  String _last = '';
+  final formKey = GlobalKey<FormState>();
+
+  TextEditingController pass = TextEditingController();
+  TextEditingController email = TextEditingController();
+
+  Future signIn() async {
+    String url = "http://192.168.1.102/classroom/login.php";
+    final response = await http.post(Uri.parse(url), body: {
+      'password': pass.text,
+      'email': email.text,
+    });
+    var data = json.decode(response.body);
+    if (data == "Error") {
+      Navigator.pushNamed(context, 'login');
+    } else {
+      Navigator.pushNamed(context, 'classT');
+    }
+  }
+
+  String? validateEmail(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'กรุณากรอก E-mail';
+    }
+    final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
+    if (!emailRegex.hasMatch(value)) {
+      return 'กรุณากรอก E-mail ที่ถูกต้อง';
+    }
+    return null;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +52,7 @@ class _LogintState extends State<Logint> {
 
           child: SingleChildScrollView(
             child: Form(
-              key: _formkey,
+              key: formKey,
               child: Container(
                 alignment: Alignment.center,
                 height: 750,
@@ -48,15 +74,8 @@ class _LogintState extends State<Logint> {
                         decoration: const InputDecoration(
                         label: Text("กรุณากรอกชื่อผู้ใช้", style: TextStyle(fontSize: 20),)
                         ),
-                        onSaved: (Valuue){
-                           _name=Valuue!;
-                        },
-                        validator: (value){
-                        if(value==null || value.isEmpty){
-                          return "กรุณากรอกชื่อผู้ใช้ของคุณ";
-                        }
-                        return null;
-                        }
+                        validator: validateEmail,
+                        controller: email,
                       ),
                     ),
 
@@ -66,21 +85,22 @@ class _LogintState extends State<Logint> {
                         decoration: const InputDecoration(
                         label: Text("กรุณากรอกรหัสผ่าน", style: TextStyle(fontSize: 20),)
                         ),
-                        onSaved: (Valuue){
-                           _name=Valuue!;
+                        validator: (val) {
+                          if (val!.isEmpty) {
+                            return 'กรุณากรอกรหัสผ่าน';
+                          }
+                          return null;
                         },
-                        validator: (value){
-                        if(value==null || value.isEmpty){
-                          return "กรุณากรอกรหัสผ่านของคุณ";
-                        }
-                        return null;
-                        }
+                        controller: pass,
                       ),
                     ),
-                  
                   FilledButton(
                     onPressed: (){
-                      _formkey.currentState!.validate();
+                      bool pass = formKey.currentState!.validate(); //ปุ่ม login
+                    if(pass){
+                      signIn();
+                    }
+                    Navigator.pop(context);
                     },
                     style: FilledButton.styleFrom(
                       backgroundColor: Color.fromARGB(255, 10, 82, 104),
