@@ -1,22 +1,54 @@
 import 'package:flutter/material.dart';
+import 'dart:async';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
-void  main()  => runApp(const AddFrom());
+void main() => runApp(const AddForm());
 
-class AddFrom extends StatefulWidget {
-  const AddFrom({super.key});
+class AddForm extends StatefulWidget {
+  const AddForm({super.key});
 
   @override
-  State<AddFrom> createState() => _FromState();
+  State<AddForm> createState() => _FormState();
 }
 
-class _FromState extends State<AddFrom> {
+class _FormState extends State<AddForm> {
   int _value = 1;
+  final formKey = GlobalKey<FormState>();
 
-  final _formkey = GlobalKey<FormState>();
-  // ignore: unused_field
-  String _name = '';
-  // ignore: unused_field
-  String _last = '';
+  TextEditingController name = TextEditingController();
+  TextEditingController surname = TextEditingController();
+  TextEditingController pass = TextEditingController();
+  TextEditingController email = TextEditingController();
+  String type = '1';
+
+  Future signUp() async {
+    String url = "http://192.168.1.102/classroom/register.php";
+    final response = await http.post(Uri.parse(url), body: {
+      'name': name.text,
+      'surname': surname.text,
+      'password': pass.text,
+      'email': email.text,
+      'type': type,
+    });
+    var data = json.decode(response.body);
+    if (data == "Error") {
+      Navigator.pushNamed(context, 'register');
+    } else {
+      Navigator.pushNamed(context, 'login');
+    }
+  }
+
+  String? validateEmail(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'กรุณากรอก E-mail';
+    }
+    final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
+    if (!emailRegex.hasMatch(value)) {
+      return 'กรุณากรอก E-mail ที่ถูกต้อง';
+    }
+    return null;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,97 +61,150 @@ class _FromState extends State<AddFrom> {
         //   centerTitle: true,
         // ),
         body: Padding(
-          padding: const EdgeInsets.fromLTRB(700,150,700,100),
+          padding: const EdgeInsets.fromLTRB(700, 150, 700, 100),
           child: Form(
-            key: _formkey,
+            key: formKey,
             child: Column(
               children: [
-                Text("สมัครสมาชิก", style: TextStyle(fontSize: 30),),
-                TextFormField(
-                  maxLength: 20,
-                  decoration: const InputDecoration(
-                    label: Text("กรุณาระบุชื่อจริง", style: TextStyle(fontSize: 20),)
-                  ),
-                  onSaved: (Valuue){
-                    _name=Valuue!;
-                  },
-                  validator: (value){
-                    if(value==null || value.isEmpty){
-                      return "กรุณาป้อนชื่อของคุณ";
-                    }
-                    return null;
-                  },
+                Text(
+                  "สมัครสมาชิก",
+                  style: TextStyle(fontSize: 30),
                 ),
                 TextFormField(
                   maxLength: 20,
                   decoration: const InputDecoration(
-                    label: Text("กรุณาระบุนามสกุล", style: TextStyle(fontSize: 20),)
+                    label: Text(
+                      "กรุณาระบุชื่อจริง",
+                      style: TextStyle(fontSize: 20),
+                    ),
                   ),
-                  onSaved: (Valuue){
-                    _last=Valuue!;
-                  },
-                  validator: (value){
-                    if(value==null || value.isEmpty){
-                      return "กรุณาระบุนามสกุล";
+                  validator: (val) {
+                    if (val == null || val.isEmpty) {
+                      return 'กรุณากรอกระบุชื่อจริง';
                     }
                     return null;
                   },
+                  controller: name,
+                ),
+                TextFormField(
+                  maxLength: 20,
+                  decoration: const InputDecoration(
+                    label: Text(
+                      "กรุณาระบุนามสกุล",
+                      style: TextStyle(fontSize: 20),
+                    ),
+                  ),
+                  validator: (val) {
+                    if (val == null || val.isEmpty) {
+                      return 'กรุณากรอกระบุนามสกุล';
+                    }
+                    return null;
+                  },
+                  controller: surname,
                 ),
                 TextFormField(
                   maxLength: 40,
                   decoration: const InputDecoration(
-                    label: Text("กรุณากรรอก E-mail", style: TextStyle(fontSize: 20),)
+                    label: Text(
+                      "กรุณากรอก E-mail",
+                      style: TextStyle(fontSize: 20),
+                    ),
                   ),
-                  validator: (value){
-                    if(value==null || value.isEmpty){
-                      return "กรุณาระบุนามสกุล";
+                  validator: validateEmail,
+                  controller: email,
+                ),
+                Row(
+                  children: [
+                    Text(
+                      "คุณเป็นนักเรียนหรือครู",
+                      style: TextStyle(fontSize: 20),
+                    )
+                  ],
+                ),
+                Row(
+                  children: [
+                    Radio(
+                      value: 1,
+                      groupValue: _value,
+                      onChanged: (value) {
+                        setState(() {
+                          _value = value!;
+                          type = value.toString();
+                        });
+                      },
+                    ),
+                    SizedBox(
+                      width: 20.0,
+                    ),
+                    Text("ครู"),
+                  ],
+                ),
+                Row(
+                  children: [
+                    Radio(
+                      value: 2,
+                      groupValue: _value,
+                      onChanged: (value) {
+                        setState(() {
+                          _value = value!;
+                          type = value.toString();
+                        });
+                      },
+                    ),
+                    SizedBox(
+                      width: 20.0,
+                    ),
+                    Text("นักเรียน"),
+                  ],
+                ),
+                TextFormField(
+                  maxLength: 20,
+                  decoration: const InputDecoration(
+                    label: Text(
+                      "กรุณากรอกรหัสผ่าน",
+                      style: TextStyle(fontSize: 20),
+                    ),
+                  ),
+                  validator: (val) {
+                    if (val!.isEmpty) {
+                      return 'กรุณากรอกรหัสผ่าน';
+                    }
+                    return null;
+                  },
+                  controller: pass,
+                ),
+                TextFormField(
+                  maxLength: 20,
+                  decoration: const InputDecoration(
+                    label: Text(
+                      "กรุณายืนยันรหัสผ่าน",
+                      style: TextStyle(fontSize: 20),
+                    ),
+                  ),
+                  validator: (val) {
+                    if (val!.isEmpty) {
+                      return 'กรุณากรอกยืนยันรหัสผ่าน';
+                    } else if (val != pass.text) {
+                      return 'รหัสผ่านไม่ตรงกัน';
                     }
                     return null;
                   },
                 ),
-                Row(children: [
-                  Text("คุณเป็นนักเรียนหรือครู", style: TextStyle(fontSize: 20),)
-                ],),
-                Row(children: [
-                  Radio(value: 1, groupValue: _value, onChanged: (value){
-                    setState(() {
-                      _value = value!;
-                    });
-                  },),
-                  SizedBox(width: 20.0,),
-                  Text("ครู"),
-                ],),
-                Row(children: [
-                  Radio(value: 2, groupValue: _value, onChanged: (value){
-                    setState(() {
-                      _value = value!;
-                    });
-                  },),
-                  SizedBox(width: 20.0,),
-                  Text("นักเรียน"),
-                ],),
-                TextFormField(
-                  maxLength: 20,
-                  decoration: const InputDecoration(
-                    label: Text("กรุณากรอกรหัสผ่าน", style: TextStyle(fontSize: 20),)
-                  ),
+                const SizedBox(
+                  height: 20,
                 ),
-                TextFormField(
-                  maxLength: 20,
-                  decoration: const InputDecoration(
-                    label: Text("กรุณายืนยันรหัสผ่าน", style: TextStyle(fontSize: 20),)
-                  ),
-                ),
-                const SizedBox(height: 20,),
                 FilledButton(
-                  onPressed: (){
-                    _formkey.currentState!.validate();
-                  },
-                  style: FilledButton.styleFrom(
-                    backgroundColor: Colors.green
-                  ),
-                  child: const Text("สมัตรสมาชิก", style: TextStyle(fontSize: 20),)
-                ),
+                    onPressed: () {
+                      bool pass = formKey.currentState!.validate();
+                      if (pass) {
+                        signUp();
+                      }
+                    },
+                    style: FilledButton.styleFrom(backgroundColor: Colors.green),
+                    child: const Text(
+                      "สมัครสมาชิก",
+                      style: TextStyle(fontSize: 20),
+                    )),
               ],
             ),
           ),
