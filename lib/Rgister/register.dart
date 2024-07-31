@@ -194,17 +194,14 @@ class _FormState extends State<AddForm> {
                   height: 20,
                 ),
                 FilledButton(
-                    onPressed: () {
-                      bool pass = formKey.currentState!.validate();
-                      if (pass) {
-                        signUp();
-                      }
-                    },
-                    style: FilledButton.styleFrom(backgroundColor: Colors.green),
-                    child: const Text(
-                      "สมัครสมาชิก",
-                      style: TextStyle(fontSize: 20),
-                    )),
+                  onPressed: (){
+                    _formkey.currentState!.validate();
+                  },
+                  style: FilledButton.styleFrom(
+                    backgroundColor: Colors.green
+                  ),
+                  child: const Text("สมัตรสมาชิก", style: TextStyle(fontSize: 20),)
+                ),
               ],
             ),
           ),
