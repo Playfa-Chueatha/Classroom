@@ -11,7 +11,6 @@ class ForgetPass extends StatefulWidget {
 
 class _ForgetState extends State<ForgetPass> {
 
-  int _value = 1;
   final _formkey = GlobalKey<FormState>();
   // ignore: unused_field
   String _name = '';
@@ -36,12 +35,13 @@ class _ForgetState extends State<ForgetPass> {
                 key: _formkey,
                 child: Column(
                   children: [
-                    SizedBox(height: 50),
+                    SizedBox(height: 50), 
                     Text("เปลี่ยนรหัสผ่าน", style: TextStyle(fontSize: 40)),
                     SizedBox(height: 70),
                     Container(
                       margin: EdgeInsets.fromLTRB(300,20,300,10),
                       child: TextFormField(
+                        
                         decoration: const InputDecoration(
                         label: Text("กรุณากรอกรหัสผ่านเดิม", style: TextStyle(fontSize: 20),)
                         ),
