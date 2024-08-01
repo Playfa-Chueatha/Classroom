@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 void main() => runApp(const add_work());
 
@@ -10,6 +11,7 @@ class add_work extends StatefulWidget {
 }
 
 class _add_workState extends State<add_work> {
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -42,10 +44,12 @@ class _add_workState extends State<add_work> {
                         height: 200,
                         width: 900,    
                         child: TextField(
+                          keyboardType: TextInputType.multiline,
+                          maxLines: 50,
                             decoration: InputDecoration(
                               border: OutlineInputBorder(),
-                              hintText: 'Enter a search term',
-                              contentPadding: EdgeInsets.symmetric(horizontal: 25,vertical: 160),
+                              hintText: 'เขียนอะไรหน่อย',
+                              contentPadding: EdgeInsets.symmetric(horizontal: 10,vertical: 20),
                               isCollapsed: true,
                               isDense: true,
                               filled: true,
@@ -170,34 +174,82 @@ class _add_workState extends State<add_work> {
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(20)
                         ),
-                      )
+                        child: Column(
+                          children: [
+                            SizedBox(height: 50),
+                            Row (
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                SizedBox(width: 50),
+                                Text("คะแนนเต็ม :  ", style: TextStyle(fontSize: 20)),
+                                SizedBox(
+                                  height: 30,
+                                  width: 100,
+                                  child: TextField(
+                                    maxLength: 3,
+                                    keyboardType: TextInputType.number,
+                                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                                    decoration: InputDecoration(
+                                      border: OutlineInputBorder(),
+                                      contentPadding: EdgeInsets.symmetric(horizontal: 10,vertical: 7),
+                                      counterText: "",
+                                      isCollapsed: true,
+                                      isDense: true,
+                                      filled: true,
+                                      fillColor: Colors.white,
+                                      enabledBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(10)
+                                      ),
+                                      focusedBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(10)
+                                      )
+                                    ),
+                                  ),
+                                )
+                              ]
+                            ),
+                            SizedBox(height: 10),
+                            Row (
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                SizedBox(width: 50),
+                                Text("วันที่ :            ", style: TextStyle(fontSize: 20)),
+                                SizedBox(
+                                  height: 30,
+                                  width: 100,
+                                  child: TextField(
+                                    decoration: const InputDecoration(
+                                      prefix: Icon(Icons.calendar_today),
+                                      isCollapsed: true,
+                                      isDense: true,
+                                      filled: true,
+                                      fillColor: Colors.white,
+                                      
+                                      
+                                      
+                                      )
+                                    ),
+                                    
+                                  )
+                              ]
+                            )
+                              ]
+                            )
+                        )
                     ],
+                            
+              
+                      
+                      )
                   ),
-                  //คะแนน
-              ),
-              // child: Column(
-              //   children: [
-              //     SizedBox(height: 50),
-              //     SizedBox(
-              //       height: 30,
-              //       width: 200,
-              //       child: TextField(
-              //         decoration: InputDecoration(
-              //           border: OutlineInputBorder(),
-              //               fillColor: Colors.white,
-              //               focusColor: Colors.white,
-              //               labelText: 'กรุณาใส่รหัส OTP ที่ส่งไปยังอีเมล์ของคุณ'
-              //         ),
-              //       ),
-              //     )
-              //   ],
-              // ),
-            
+                  
+                       
+              ),       
             ),
-          ),
+          )
           
-        ),
-      );
+        );
     
   }
 }
+

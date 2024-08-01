@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 
-void  main()  => runApp(const Logint());
-class Logint extends StatefulWidget {
-  const Logint({super.key});
+void  main()  => runApp(const Logins());
+class Logins extends StatefulWidget {
+  const Logins({super.key});
 
   @override
-  State<Logint> createState() => _LogintState();
+  State<Logins> createState() => _LogintState();
 }
 
-class _LogintState extends State<Logint> {
+class _LogintState extends State<Logins> {
 
   final _formkey = GlobalKey<FormState>();
   // ignore: unused_field
@@ -62,6 +62,7 @@ class _LogintState extends State<Logint> {
                   Container(
                       margin: EdgeInsets.fromLTRB(300,10,300,50),
                       child: TextFormField(
+                        obscureText: true,
                         decoration: const InputDecoration(
                         label: Text("กรุณากรอกรหัสผ่าน", style: TextStyle(fontSize: 20),)
                         ),

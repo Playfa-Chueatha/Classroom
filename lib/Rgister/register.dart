@@ -1,9 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_esclass_2/Login/loginT.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 void main() => runApp(const AddForm());
+
+class AddForm_Register extends StatelessWidget {
+  const AddForm_Register({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const MaterialApp(
+      title: 'ESclass_Register',
+      home: AddForm(),
+    );
+  }
+}
 
 class AddForm extends StatefulWidget {
   const AddForm({super.key});
@@ -53,9 +66,7 @@ class _FormState extends State<AddForm> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: "ESclass",
-      home: Scaffold(
+    return  Scaffold(
         // appBar: AppBar(
         //   title: const Text("สร้างชื่อผู้ใช้งาน"),
         //   backgroundColor: Color.fromARGB(255, 118, 232, 240),
@@ -74,6 +85,7 @@ class _FormState extends State<AddForm> {
                 TextFormField(
                   maxLength: 20,
                   decoration: const InputDecoration(
+                    counterText: "",
                     label: Text(
                       "กรุณาระบุชื่อจริง",
                       style: TextStyle(fontSize: 20),
@@ -90,6 +102,7 @@ class _FormState extends State<AddForm> {
                 TextFormField(
                   maxLength: 20,
                   decoration: const InputDecoration(
+                    counterText: "",
                     label: Text(
                       "กรุณาระบุนามสกุล",
                       style: TextStyle(fontSize: 20),
@@ -106,6 +119,7 @@ class _FormState extends State<AddForm> {
                 TextFormField(
                   maxLength: 40,
                   decoration: const InputDecoration(
+                    counterText: "",
                     label: Text(
                       "กรุณากรอก E-mail",
                       style: TextStyle(fontSize: 20),
@@ -160,7 +174,9 @@ class _FormState extends State<AddForm> {
                 ),
                 TextFormField(
                   maxLength: 20,
+                  obscureText: true,
                   decoration: const InputDecoration(
+                    counterText: "",
                     label: Text(
                       "กรุณากรอกรหัสผ่าน",
                       style: TextStyle(fontSize: 20),
@@ -176,7 +192,9 @@ class _FormState extends State<AddForm> {
                 ),
                 TextFormField(
                   maxLength: 20,
+                  obscureText: true,
                   decoration: const InputDecoration(
+                    counterText: "",
                     label: Text(
                       "กรุณายืนยันรหัสผ่าน",
                       style: TextStyle(fontSize: 20),
@@ -196,15 +214,17 @@ class _FormState extends State<AddForm> {
                 ),
                 FilledButton(
                   onPressed: (){
-<<<<<<< HEAD
                     bool pass = formKey.currentState!.validate(); //ปุ่มบันทึกลงฐานข้อมูล
                     if(pass){
                       signUp();
+
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const Login_T()));
                     }
-                    Navigator.pushNamed(context, 'login');
-=======
+                    
+
                     formKey.currentState!.validate();
->>>>>>> 64e45affaa4f2cd31007af78c8732b03945ca855
                   },
                   style: FilledButton.styleFrom(
                     backgroundColor: Colors.green
@@ -213,7 +233,6 @@ class _FormState extends State<AddForm> {
                 ),
               ],
             ),
-          ),
         ),
       ),
     );

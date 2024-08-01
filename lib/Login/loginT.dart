@@ -1,9 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_esclass_2/Classroom/classT.dart';
+import 'package:flutter_esclass_2/Forgetpassword/Forgetpass.dart';
+import 'package:flutter_esclass_2/Login/login.dart';
+import 'package:flutter_esclass_2/Rgister/register.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 void  main()  => runApp(const Logint());
+
+
+class Login_T extends StatelessWidget {
+  const Login_T({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Login_teacher',
+      home: Logint(),
+    );
+  }
+}
 class Logint extends StatefulWidget {
   const Logint({super.key});
 
@@ -13,7 +30,6 @@ class Logint extends StatefulWidget {
 
 class _LogintState extends State<Logint> {
 
-<<<<<<< HEAD
   final formKey = GlobalKey<FormState>();
 
   TextEditingController pass = TextEditingController();
@@ -43,27 +59,17 @@ class _LogintState extends State<Logint> {
     }
     return null;
   }
-=======
-  final _formkey = GlobalKey<FormState>();
-  // ignore: unused_field
-  String _name = '';
-  // ignore: unused_field
-  String _last = '';
->>>>>>> 64e45affaa4f2cd31007af78c8732b03945ca855
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Login_teacher',
-      home: Scaffold(
+    return Scaffold(
         body: Center(
-
           child: SingleChildScrollView(
             child: Form(
               key: formKey,
               child: Container(
                 alignment: Alignment.center,
-                height: 750,
+                height: 800,
                 width: 1000,
                 decoration: BoxDecoration(
                   color: Color.fromARGB(255, 147, 235, 241),
@@ -80,7 +86,8 @@ class _LogintState extends State<Logint> {
                       margin: EdgeInsets.fromLTRB(300,20,300,10),
                       child: TextFormField(
                         decoration: const InputDecoration(
-                        label: Text("กรุณากรอกชื่อผู้ใช้", style: TextStyle(fontSize: 20),)
+                          label: Text("กรุณากรอก E-mail", style: TextStyle(fontSize: 16)),
+                          prefixIcon: Icon(Icons.person,size: 30)
                         ),
                         validator: validateEmail,
                         controller: email,
@@ -90,8 +97,10 @@ class _LogintState extends State<Logint> {
                   Container(
                       margin: EdgeInsets.fromLTRB(300,10,300,50),
                       child: TextFormField(
+                        obscureText: true,
                         decoration: const InputDecoration(
-                        label: Text("กรุณากรอกรหัสผ่าน", style: TextStyle(fontSize: 20),)
+                        label: Text("กรุณากรอกรหัสผ่าน", style: TextStyle(fontSize: 16),),
+                        prefixIcon: Icon(Icons.lock,size: 30)
                         ),
                         validator: (val) {
                           if (val!.isEmpty) {
@@ -107,15 +116,45 @@ class _LogintState extends State<Logint> {
                       bool pass = formKey.currentState!.validate(); //ปุ่ม login
                     if(pass){
                       signIn();
+
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const ClassT()),
+                    );
                     }
-                    Navigator.pop(context);
+                    
                     },
                     style: FilledButton.styleFrom(
                       backgroundColor: Color.fromARGB(255, 10, 82, 104),
                     ),
                     child: const Text("เข้าสู่ระบบ", style: TextStyle(fontSize: 20),)
                   ),
-                    
+                  SizedBox(height: 90),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      TextButton(
+                      style: TextButton.styleFrom(
+                        foregroundColor: Color.fromARGB(255, 67, 132, 230)
+                      ),
+                      onPressed: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => AddForm_Register())).then((value) {
+                        },),// print Botton
+                        child: Text("สมัครสมาชิก", style: TextStyle(fontSize: 20),),),
+                      Icon(Icons.linear_scale),
+                      TextButton(
+                      style: TextButton.styleFrom(
+                        foregroundColor: Color.fromARGB(255, 238, 108, 115)
+                      ),
+                      onPressed: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => Forget())).then((value) {},),// print Botton
+                        child: Text("ลืมรหัสผ่าน", style: TextStyle(fontSize: 20),),),
+                    ],
+                  )
+                  
                   ],
                 ),
               ),
@@ -123,7 +162,6 @@ class _LogintState extends State<Logint> {
             
           ),
         ),
-        )
     );
   }
 }

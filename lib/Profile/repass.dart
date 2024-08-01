@@ -39,7 +39,7 @@ class _ForgetState extends State<ForgetPass> {
                     Text("เปลี่ยนรหัสผ่าน", style: TextStyle(fontSize: 40)),
                     SizedBox(height: 70),
                     Container(
-                      margin: EdgeInsets.fromLTRB(300,20,300,10),
+                      margin: EdgeInsets.fromLTRB(400,20,400,10),
                       child: TextFormField(
                         
                         decoration: const InputDecoration(
@@ -58,8 +58,9 @@ class _ForgetState extends State<ForgetPass> {
                     ),
 
                     Container(
-                      margin: EdgeInsets.fromLTRB(300,20,300,10),
+                      margin: EdgeInsets.fromLTRB(400,20,400,10),
                       child: TextFormField(
+                        obscureText: true,
                         decoration: const InputDecoration(
                         label: Text("กรุณากรอกรหัสผ่านใหม่", style: TextStyle(fontSize: 20),)
                         ),
@@ -76,8 +77,9 @@ class _ForgetState extends State<ForgetPass> {
                     ),
 
                     Container(
-                      margin: EdgeInsets.fromLTRB(300,20,300,50),
+                      margin: EdgeInsets.fromLTRB(400,20,400,50),
                       child: TextFormField(
+                        obscureText: true,
                         decoration: const InputDecoration(
                         label: Text("กรุณากรอกรหัสผ่านใหม่", style: TextStyle(fontSize: 20),)
                         ),
