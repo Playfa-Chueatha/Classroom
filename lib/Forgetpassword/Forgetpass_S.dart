@@ -1,6 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_esclass_2/Login/login.dart';
+import 'package:flutter_esclass_2/Login/loginS.dart';
+import 'package:flutter_esclass_2/Login/loginT.dart';
 
-void  main()  => runApp(const Forget());
+void  main()  => runApp(const Forgetpass_S());
+
+class Forgetpass_S extends StatelessWidget {
+  const Forgetpass_S({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Forget Password',
+      home: Forget(),
+    );
+  }
+}
 
 class Forget extends StatefulWidget {
   const Forget({super.key});
@@ -15,9 +30,7 @@ class _ForgetState extends State<Forget> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: "ForgetPass",
-      home: Scaffold(
+    return Scaffold(
         body: Center(
           child: Container(
             decoration: BoxDecoration(borderRadius: BorderRadius.circular(20),color: Color.fromARGB(255, 147, 235, 241)),
@@ -62,6 +75,7 @@ class _ForgetState extends State<Forget> {
                               onPressed: (){
                                 setState(() {
                                   _validate = _controler.text.isEmpty;
+
                                 });
                               },
                               style: FilledButton.styleFrom(
@@ -93,7 +107,9 @@ class _ForgetState extends State<Forget> {
                         height: 50,
                         child: FilledButton(
                           onPressed: (){
-                            print("สวัสดี");
+                            Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => const Login_S()));
                           },
                         style: FilledButton.styleFrom(
                           backgroundColor: Color.fromARGB(255, 10, 82, 104),
@@ -105,8 +121,7 @@ class _ForgetState extends State<Forget> {
                   ),
                 )
               ],
-            ),
-          ),          
+            ),          
         )
       ),          
     );

@@ -1,3 +1,4 @@
+import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
@@ -91,12 +92,10 @@ class _toggleTState extends State<toggleT> {
                   scrollDirection:Axis.horizontal,
                   child: Row(
                     children: [
-
-
                       //menu
                       Container(
                       height: 1000,
-                      width: 300,
+                      width: 400,
                       alignment: Alignment.topCenter,
                       decoration: BoxDecoration(
                         color: Color.fromARGB(255, 147, 185, 221),
@@ -129,10 +128,16 @@ class _toggleTState extends State<toggleT> {
                             SizedBox(height: 20,),
                             Container(
                               height: 50,
-                              width: 600,
+                              width: 700,
                               child: Row(
                                 children: [
-                                  SizedBox(width: 530,height: 50),
+                                  SizedBox(width: 300,height: 50),  
+                                  DropdownSearch(
+                                    popupProps: PopupProps.menu(
+                                      showSelectedItems: true,
+
+                                    ),
+                                  ),   
                                   IconButton(
                                     color: Color.fromARGB(255, 0, 0, 0),
                                     icon: const Icon(Icons.add),
@@ -148,7 +153,7 @@ class _toggleTState extends State<toggleT> {
                               ),
                             ),
                             
-                            Text("งานที่มอบหมาย", style: TextStyle(fontSize: 40),),
+                            Text("งานที่มอบหมาย", style: TextStyle(fontSize: 20),),
                             SizedBox(height: 20),
                             Container(
                               height: 100,
@@ -159,7 +164,7 @@ class _toggleTState extends State<toggleT> {
                               ),
                             ),
                             SizedBox(height: 50,),
-                            Text("งานที่เลยกำหนดแล้ว", style: TextStyle(fontSize: 40),),
+                            Text("งานที่เลยกำหนดแล้ว", style: TextStyle(fontSize: 20),),
                           ]
                         ),
                       ),
@@ -170,7 +175,7 @@ class _toggleTState extends State<toggleT> {
                       //งายที่มอบหมาย รายละเอียด
                       Container(
                         height: 1000,
-                        width: 750,
+                        width: 800,
                         alignment: Alignment.topCenter,
                         decoration: BoxDecoration(
                           color: Color.fromARGB(255, 152, 186, 218),
@@ -192,7 +197,7 @@ class _toggleTState extends State<toggleT> {
                           ],
                         ),
                       ),
-                      SizedBox(width: 1)
+                      SizedBox(width: 2)
                     ],
                   ),
                 )
