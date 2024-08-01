@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_esclass_2/Login/loginS.dart';
 import 'package:flutter_esclass_2/Login/loginT.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
-void main() => runApp(const AddForm());
+void main() => runApp(const AddForm_Register_S());
 
-class AddForm_Register extends StatelessWidget {
-  const AddForm_Register({super.key});
+class AddForm_Register_S extends StatelessWidget {
+  const AddForm_Register_S({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +27,6 @@ class AddForm extends StatefulWidget {
 }
 
 class _FormState extends State<AddForm> {
-  int _value = 1;
 
   final formKey = GlobalKey<FormState>();
 
@@ -67,12 +67,13 @@ class _FormState extends State<AddForm> {
   @override
   Widget build(BuildContext context) {
     return  Scaffold(
+      backgroundColor: Color.fromARGB(255, 147, 235, 241),
         // appBar: AppBar(
         //   title: const Text("สร้างชื่อผู้ใช้งาน"),
         //   backgroundColor: Color.fromARGB(255, 118, 232, 240),
         //   centerTitle: true,
         // ),
-        body: Padding(
+        body: SingleChildScrollView(
           padding: const EdgeInsets.fromLTRB(700, 150, 700, 100),
           child: Form(
             key: formKey,
@@ -82,6 +83,8 @@ class _FormState extends State<AddForm> {
                   "สมัครสมาชิก",
                   style: TextStyle(fontSize: 30),
                 ),
+                SizedBox(height: 10),
+                Image.asset('assets/images/นักเรียน2.png',height: 300),
                 TextFormField(
                   maxLength: 20,
                   decoration: const InputDecoration(
@@ -99,6 +102,7 @@ class _FormState extends State<AddForm> {
                   },
                   controller: name,
                 ),
+                SizedBox(height: 10),
                 TextFormField(
                   maxLength: 20,
                   decoration: const InputDecoration(
@@ -128,50 +132,50 @@ class _FormState extends State<AddForm> {
                   validator: validateEmail,
                   controller: email,
                 ),
-                Row(
-                  children: [
-                    Text(
-                      "คุณเป็นนักเรียนหรือครู",
-                      style: TextStyle(fontSize: 20),
-                    )
-                  ],
-                ),
-                Row(
-                  children: [
-                    Radio(
-                      value: 1,
-                      groupValue: _value,
-                      onChanged: (value) {
-                        setState(() {
-                          _value = value!;
-                          type = value.toString();
-                        });
-                      },
-                    ),
-                    SizedBox(
-                      width: 20.0,
-                    ),
-                    Text("ครู"),
-                  ],
-                ),
-                Row(
-                  children: [
-                    Radio(
-                      value: 2,
-                      groupValue: _value,
-                      onChanged: (value) {
-                        setState(() {
-                          _value = value!;
-                          type = value.toString();
-                        });
-                      },
-                    ),
-                    SizedBox(
-                      width: 20.0,
-                    ),
-                    Text("นักเรียน"),
-                  ],
-                ),
+                // Row(
+                //   children: [
+                //     Text(
+                //       "คุณเป็นนักเรียนหรือครู",
+                //       style: TextStyle(fontSize: 20),
+                //     )
+                //   ],
+                // ),
+                // Row(
+                //   children: [
+                //     Radio(
+                //       value: 1,
+                //       groupValue: _value,
+                //       onChanged: (value) {
+                //         setState(() {
+                //           _value = value!;
+                //           type = value.toString();
+                //         });
+                //       },
+                //     ),
+                //     SizedBox(
+                //       width: 20.0,
+                //     ),
+                //     Text("ครู"),
+                //   ],
+                // ),
+                // Row(
+                //   children: [
+                //     Radio(
+                //       value: 2,
+                //       groupValue: _value,
+                //       onChanged: (value) {
+                //         setState(() {
+                //           _value = value!;
+                //           type = value.toString();
+                //         });
+                //       },
+                //     ),
+                //     SizedBox(
+                //       width: 20.0,
+                //     ),
+                //     Text("นักเรียน"),
+                //   ],
+                // ),
                 TextFormField(
                   maxLength: 20,
                   obscureText: true,
@@ -210,27 +214,31 @@ class _FormState extends State<AddForm> {
                   },
                 ),
                 const SizedBox(
-                  height: 20,
+                  height: 30,
                 ),
-                FilledButton(
-                  onPressed: (){
+                SizedBox(
+                  height: 50,
+                  width: 150,
+                  child: FilledButton(
+                    onPressed: (){
                     bool pass = formKey.currentState!.validate(); //ปุ่มบันทึกลงฐานข้อมูล
                     if(pass){
                       signUp();
 
                     Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => const Login_T()));
+                        MaterialPageRoute(builder: (context) => const Login_S()));
                     }
                     
 
                     formKey.currentState!.validate();
                   },
                   style: FilledButton.styleFrom(
-                    backgroundColor: Colors.green
+                    backgroundColor: Color.fromARGB(255, 10, 82, 104),
                   ),
                   child: const Text("สมัครสมาชิก", style: TextStyle(fontSize: 20),)
-                ),
+                  ),
+                )
               ],
             ),
         ),

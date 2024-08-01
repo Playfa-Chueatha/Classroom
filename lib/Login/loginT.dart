@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_esclass_2/Classroom/classT.dart';
-import 'package:flutter_esclass_2/Forgetpassword/Forgetpass.dart';
+import 'package:flutter_esclass_2/Forgetpassword/Forgetpass_S.dart';
+import 'package:flutter_esclass_2/Forgetpassword/Forgetpass_T.dart';
 import 'package:flutter_esclass_2/Login/login.dart';
-import 'package:flutter_esclass_2/Rgister/register.dart';
+import 'package:flutter_esclass_2/Rgister/registerT.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
-void  main()  => runApp(const Logint());
+void  main()  => runApp(const Login_T());
 
 
 class Login_T extends StatelessWidget {
@@ -80,7 +81,7 @@ class _LogintState extends State<Logint> {
                     SizedBox(height: 50),
                     Text("Login",style: TextStyle(fontSize: 40)),
                     SizedBox(height: 30),
-                    Image.asset('assets/images/Profile.jpg',height: 200),
+                    Image.asset('assets/images/ครู.png',height: 200),
                     SizedBox(height: 50),
                     Container(
                       margin: EdgeInsets.fromLTRB(300,20,300,10),
@@ -140,7 +141,7 @@ class _LogintState extends State<Logint> {
                       ),
                       onPressed: () => Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => AddForm_Register())).then((value) {
+                        MaterialPageRoute(builder: (context) => AddForm_Register_T())).then((value) {
                         },),// print Botton
                         child: Text("สมัครสมาชิก", style: TextStyle(fontSize: 20),),),
                       Icon(Icons.linear_scale),
@@ -150,7 +151,7 @@ class _LogintState extends State<Logint> {
                       ),
                       onPressed: () => Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => Forget())).then((value) {},),// print Botton
+                        MaterialPageRoute(builder: (context) => Forgetpass_T())).then((value) {},),// print Botton
                         child: Text("ลืมรหัสผ่าน", style: TextStyle(fontSize: 20),),),
                     ],
                   )

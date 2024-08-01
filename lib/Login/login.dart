@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_esclass_2/Forgetpassword/Forgetpass.dart';
+import 'package:flutter_esclass_2/Forgetpassword/Forgetpass_S.dart';
 import 'package:flutter_esclass_2/Login/loginS.dart';
 import 'package:flutter_esclass_2/Login/loginT.dart';
 
@@ -34,9 +34,6 @@ class _Test_bState extends State<Test_b> {
       // floatingActionButton: FloatingActionButton(
       //   onPressed: (){}),
       
-      appBar: AppBar(
-        title: Text("Test"),
-      ),
       body: Center(
         child: Container(
             decoration: BoxDecoration(color: Color.fromARGB(255, 147, 235, 241),borderRadius: BorderRadius.circular(20)),
@@ -47,7 +44,7 @@ class _Test_bState extends State<Test_b> {
               children: [
                 SizedBox(height: 150,),
                 Text("Wellcome to ESclass", style: TextStyle(fontSize: 30)),
-                SizedBox(height: 200,),
+                SizedBox(height: 100),
                 Container (
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -55,8 +52,8 @@ class _Test_bState extends State<Test_b> {
                       Container(
                         child: Column(
                           children: [
-                            Image.asset("assets/images/ครู.png",width: 200, height: 100,),
-                            const SizedBox(height: 10,),
+                            Image.asset("assets/images/ครู.png",width: 200, height: 200,),
+                            const SizedBox(height: 30,),
                             FilledButton(
                               onPressed: (){
                                 Navigator.push(
@@ -70,11 +67,12 @@ class _Test_bState extends State<Test_b> {
                           ],
                         ),
                       ),
+                      SizedBox(width: 100),
                       Container(
                         child: Column(
                           children: [
-                            Image.asset("assets/images/นักเรียน.png",width: 200, height: 100,),
-                            const SizedBox(height: 10,),
+                            Image.asset("assets/images/นักเรียน.png",width: 200, height: 200,),
+                            const SizedBox(height: 30,),
                             FilledButton(
                               onPressed: (){
                                 Navigator.push(

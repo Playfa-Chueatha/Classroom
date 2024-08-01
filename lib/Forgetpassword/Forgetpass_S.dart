@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_esclass_2/Login/login.dart';
+import 'package:flutter_esclass_2/Login/loginS.dart';
 import 'package:flutter_esclass_2/Login/loginT.dart';
 
-void  main()  => runApp(const Forget());
+void  main()  => runApp(const Forgetpass_S());
 
-class Forgetpass extends StatelessWidget {
-  const Forgetpass({super.key});
+class Forgetpass_S extends StatelessWidget {
+  const Forgetpass_S({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -108,7 +109,7 @@ class _ForgetState extends State<Forget> {
                           onPressed: (){
                             Navigator.push(
                                   context,
-                                  MaterialPageRoute(builder: (context) => const Login_T()));
+                                  MaterialPageRoute(builder: (context) => const Login_S()));
                           },
                         style: FilledButton.styleFrom(
                           backgroundColor: Color.fromARGB(255, 10, 82, 104),
