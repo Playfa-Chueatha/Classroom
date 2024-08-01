@@ -13,7 +13,6 @@ class Logint extends StatefulWidget {
 
 class _LogintState extends State<Logint> {
 
-<<<<<<< HEAD
   final formKey = GlobalKey<FormState>();
 
   TextEditingController pass = TextEditingController();
@@ -43,13 +42,6 @@ class _LogintState extends State<Logint> {
     }
     return null;
   }
-=======
-  final _formkey = GlobalKey<FormState>();
-  // ignore: unused_field
-  String _name = '';
-  // ignore: unused_field
-  String _last = '';
->>>>>>> 64e45affaa4f2cd31007af78c8732b03945ca855
 
   @override
   Widget build(BuildContext context) {
@@ -104,18 +96,16 @@ class _LogintState extends State<Logint> {
                     ),
                   FilledButton(
                     onPressed: (){
-                      bool pass = formKey.currentState!.validate(); //ปุ่ม login
+                    bool pass = formKey.currentState!.validate(); //ปุ่ม login
                     if(pass){
                       signIn();
                     }
-                    Navigator.pop(context);
                     },
                     style: FilledButton.styleFrom(
                       backgroundColor: Color.fromARGB(255, 10, 82, 104),
                     ),
                     child: const Text("เข้าสู่ระบบ", style: TextStyle(fontSize: 20),)
                   ),
-                    
                   ],
                 ),
               ),
