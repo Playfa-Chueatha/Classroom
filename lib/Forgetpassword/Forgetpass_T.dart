@@ -111,6 +111,7 @@ class _ForgetState extends State<Forget> {
                                   context,
                                   MaterialPageRoute(builder: (context) => const Logint()));
                           },
+                          
                         style: FilledButton.styleFrom(
                           backgroundColor: Color.fromARGB(255, 10, 82, 104),
                           foregroundColor: Colors.white
