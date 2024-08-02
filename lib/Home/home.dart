@@ -1,8 +1,7 @@
-import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
+import 'package:dropdown_search/dropdown_search.dart';
 
-void  main()  => runApp(const AssignWork_class());
+void main() => runApp(const main_home());
 
 const List<Widget> Menu = [
   Text('หน้าหลัก'),
@@ -11,50 +10,30 @@ const List<Widget> Menu = [
   Text('รายชื่อนักเรียน'),
 ];
 
-class AssignWork_class extends StatelessWidget {
-  const AssignWork_class({super.key});
+class main_home extends StatelessWidget {
+  const main_home({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Assidn_work',
-      home: Ass_work(),
+      title: 'Home',
+      home: home(),
     );
   }
 }
 
-
-
-class Ass_work extends StatefulWidget {
-  const Ass_work({super.key});
+class home extends StatefulWidget {
+  const home({super.key});
 
   @override
-  State<Ass_work> createState() => _ClassTState();
+  State<home> createState() => _homeState();
 }
 
-class _ClassTState extends State<Ass_work> {
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: toggleT(),
-    );
-  }
-}
-
-class toggleT extends StatefulWidget {
-  const toggleT({super.key});
-
-  @override
-  State<toggleT> createState() => _toggleTState();
-}
-
-class _toggleTState extends State<toggleT> {
+class _homeState extends State<home> {
 
   int counter = 0;
 
-  List <bool> isSelected = [false,false,true,false];
+  List <bool> isSelected = [true,false,false,false];
 
   @override
   Widget build(BuildContext context) {
@@ -217,8 +196,9 @@ class _toggleTState extends State<toggleT> {
                 )
               ],
             )
-          ],
-        ),),
+          ]
+        )
+      ),
     );
   }
-}  
+}
