@@ -1,9 +1,27 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_esclass_2/Forgetpassword/Forgetpass_T.dart';
+import 'package:flutter_esclass_2/Home/homeT.dart';
+import 'package:flutter_esclass_2/Rgister/registerT.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 void  main()  => runApp(const Logint());
+
+class Login_T extends StatelessWidget {
+  const Login_T({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Login_teacher',
+      home: Logint(),
+    );
+  }
+}
+
+
+
 class Logint extends StatefulWidget {
   const Logint({super.key});
 
@@ -45,9 +63,7 @@ class _LogintState extends State<Logint> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Login_teacher',
-      home: Scaffold(
+    return Scaffold(
         body: Center(
 
           child: SingleChildScrollView(
@@ -55,7 +71,7 @@ class _LogintState extends State<Logint> {
               key: formKey,
               child: Container(
                 alignment: Alignment.center,
-                height: 750,
+                height: 800,
                 width: 1000,
                 decoration: BoxDecoration(
                   color: Color.fromARGB(255, 147, 235, 241),
@@ -66,7 +82,7 @@ class _LogintState extends State<Logint> {
                     SizedBox(height: 50),
                     Text("Login",style: TextStyle(fontSize: 40)),
                     SizedBox(height: 30),
-                    Image.asset('assets/images/Profile.jpg',height: 200),
+                    Image.asset('assets/images/ครู.png',height: 200),
                     SizedBox(height: 50),
                     Container(
                       margin: EdgeInsets.fromLTRB(300,20,300,10),
@@ -99,6 +115,11 @@ class _LogintState extends State<Logint> {
                     bool pass = formKey.currentState!.validate(); //ปุ่ม login
                     if(pass){
                       signIn();
+
+                      Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => const main_home_T()),
+                                );
                       
                     }
                     },
@@ -107,12 +128,37 @@ class _LogintState extends State<Logint> {
                     ),
                     child: const Text("เข้าสู่ระบบ", style: TextStyle(fontSize: 20),)
                   ),
+                  SizedBox(height: 90),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      TextButton(
+                      style: TextButton.styleFrom(
+                        foregroundColor: Color.fromARGB(255, 67, 132, 230)
+                      ),
+                      onPressed: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => AddForm_Register_T())).then((value) {
+                        },),// print Botton
+                        child: Text("สมัครสมาชิก", style: TextStyle(fontSize: 20),),),
+                      Icon(Icons.linear_scale),
+                      TextButton(
+                      style: TextButton.styleFrom(
+                        foregroundColor: Color.fromARGB(255, 238, 108, 115)
+                      ),
+                      onPressed: () => 
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => Forgetpass_T())).then((value) {},),// print Botton
+                        child: Text("ลืมรหัสผ่าน", style: TextStyle(fontSize: 20),),),
+                    ],
+                  )
                   ],
                 ),
               ),
             ),
             
-          ),
         ),
         )
     );

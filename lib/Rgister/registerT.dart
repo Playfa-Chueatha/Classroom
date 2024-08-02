@@ -1,9 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_esclass_2/Login/loginT.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
-void main() => runApp(const AddForm());
+void main() => runApp(const AddForm_Register_T());
+
+class AddForm_Register_T extends StatelessWidget {
+  const AddForm_Register_T({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'ESclass',
+      home: AddForm(),
+    );
+  }
+}
 
 class AddForm extends StatefulWidget {
   const AddForm({super.key});
@@ -13,7 +26,6 @@ class AddForm extends StatefulWidget {
 }
 
 class _FormState extends State<AddForm> {
-  int _value = 1;
 
   final formKey = GlobalKey<FormState>();
 
@@ -53,15 +65,9 @@ class _FormState extends State<AddForm> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: "ESclass",
-      home: Scaffold(
-        // appBar: AppBar(
-        //   title: const Text("สร้างชื่อผู้ใช้งาน"),
-        //   backgroundColor: Color.fromARGB(255, 118, 232, 240),
-        //   centerTitle: true,
-        // ),
-        body: Padding(
+    return Scaffold(
+      backgroundColor: Color.fromARGB(255, 147, 235, 241),
+        body: SingleChildScrollView(
           padding: const EdgeInsets.fromLTRB(700, 150, 700, 100),
           child: Form(
             key: formKey,
@@ -71,9 +77,12 @@ class _FormState extends State<AddForm> {
                   "สมัครสมาชิก",
                   style: TextStyle(fontSize: 30),
                 ),
+                SizedBox(height: 10),
+                Image.asset('assets/images/ครู2.png',height: 300),
                 TextFormField(
                   maxLength: 20,
                   decoration: const InputDecoration(
+                    counterText: "",
                     label: Text(
                       "กรุณาระบุชื่อจริง",
                       style: TextStyle(fontSize: 20),
@@ -87,9 +96,11 @@ class _FormState extends State<AddForm> {
                   },
                   controller: name,
                 ),
+                SizedBox(height: 10),
                 TextFormField(
                   maxLength: 20,
                   decoration: const InputDecoration(
+                    counterText: "",
                     label: Text(
                       "กรุณาระบุนามสกุล",
                       style: TextStyle(fontSize: 20),
@@ -103,9 +114,11 @@ class _FormState extends State<AddForm> {
                   },
                   controller: surname,
                 ),
+                SizedBox(height: 10),
                 TextFormField(
                   maxLength: 40,
                   decoration: const InputDecoration(
+                    counterText: "",
                     label: Text(
                       "กรุณากรอก E-mail",
                       style: TextStyle(fontSize: 20),
@@ -114,53 +127,55 @@ class _FormState extends State<AddForm> {
                   validator: validateEmail,
                   controller: email,
                 ),
-                Row(
-                  children: [
-                    Text(
-                      "คุณเป็นนักเรียนหรือครู",
-                      style: TextStyle(fontSize: 20),
-                    )
-                  ],
-                ),
-                Row(
-                  children: [
-                    Radio(
-                      value: 1,
-                      groupValue: _value,
-                      onChanged: (value) {
-                        setState(() {
-                          _value = value!;
-                          type = value.toString();
-                        });
-                      },
-                    ),
-                    SizedBox(
-                      width: 20.0,
-                    ),
-                    Text("ครู"),
-                  ],
-                ),
-                Row(
-                  children: [
-                    Radio(
-                      value: 2,
-                      groupValue: _value,
-                      onChanged: (value) {
-                        setState(() {
-                          _value = value!;
-                          type = value.toString();
-                        });
-                      },
-                    ),
-                    SizedBox(
-                      width: 20.0,
-                    ),
-                    Text("นักเรียน"),
-                  ],
-                ),
+                // Row(
+                //   children: [
+                //     Text(
+                //       "คุณเป็นนักเรียนหรือครู",
+                //       style: TextStyle(fontSize: 20),
+                //     )
+                //   ],
+                // ),
+                // Row(
+                //   children: [
+                //     Radio(
+                //       value: 1,
+                //       groupValue: _value,
+                //       onChanged: (value) {
+                //         setState(() {
+                //           _value = value!;
+                //           type = value.toString();
+                //         });
+                //       },
+                //     ),
+                //     SizedBox(
+                //       width: 20.0,
+                //     ),
+                //     Text("ครู"),
+                //   ],
+                // ),
+                // Row(
+                //   children: [
+                //     Radio(
+                //       value: 2,
+                //       groupValue: _value,
+                //       onChanged: (value) {
+                //         setState(() {
+                //           _value = value!;
+                //           type = value.toString();
+                //         });
+                //       },
+                //     ),
+                //     SizedBox(
+                //       width: 20.0,
+                //     ),
+                //     Text("นักเรียน"),
+                //   ],
+                // ),
                 TextFormField(
                   maxLength: 20,
+                  obscureText: true,
                   decoration: const InputDecoration(
+                    counterText: "",
                     label: Text(
                       "กรุณากรอกรหัสผ่าน",
                       style: TextStyle(fontSize: 20),
@@ -176,7 +191,9 @@ class _FormState extends State<AddForm> {
                 ),
                 TextFormField(
                   maxLength: 20,
+                  obscureText: true,
                   decoration: const InputDecoration(
+                    counterText: "",
                     label: Text(
                       "กรุณายืนยันรหัสผ่าน",
                       style: TextStyle(fontSize: 20),
@@ -192,25 +209,34 @@ class _FormState extends State<AddForm> {
                   },
                 ),
                 const SizedBox(
-                  height: 20,
+                  height: 30,
                 ),
-                FilledButton(
-                  onPressed: (){
+                SizedBox(
+                  height: 50,
+                  width: 150,
+                  child: FilledButton(
+                    onPressed: (){
                     bool pass = formKey.currentState!.validate(); //ปุ่มบันทึกลงฐานข้อมูล
                     if(pass){
                       signUp();
+
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const Login_T()));
                     }
-                    Navigator.pushNamed(context, 'login');
+                    
+
+                    formKey.currentState!.validate();
                   },
                   style: FilledButton.styleFrom(
-                    backgroundColor: Colors.green
+                    backgroundColor: Color.fromARGB(255, 10, 82, 104),
                   ),
                   child: const Text("สมัครสมาชิก", style: TextStyle(fontSize: 20),)
-                ),
+                  ),
+                )           
               ],
             ),
           ),
-        ),
       ),
     );
   }

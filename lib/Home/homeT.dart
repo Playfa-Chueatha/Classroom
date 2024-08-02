@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_esclass_2/Classroom/calssT_boday.dart';
-import 'package:flutter_esclass_2/Home/homeT.dart';
+import 'package:flutter_esclass_2/Classroom/classT.dart';
+import 'package:flutter_esclass_2/Home/homT_body.dart';
 import 'package:flutter_esclass_2/Login/login.dart';
 import 'package:flutter_esclass_2/Score/Score_T.dart';
 import 'package:flutter_esclass_2/work/assign_work_T.dart';
 
-void  main()  => runApp(const ClassT());
+void main() => runApp(const main_home_T());
 
 // const List<Widget> Menu = [
 //   Text('หน้าหลัก'),
@@ -14,62 +14,56 @@ void  main()  => runApp(const ClassT());
 //   Text('รายชื่อนักเรียน'),
 // ];
 
-class ClassT extends StatefulWidget {
-  const ClassT({super.key});
-
-  @override
-  State<ClassT> createState() => _ClassTState();
-}
-
-class _ClassTState extends State<ClassT> {
+class main_home_T extends StatelessWidget {
+  const main_home_T({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: Class_T(),
+      title: 'Home',
+      home: home(),
     );
   }
 }
 
-class Class_T extends StatefulWidget {
-  const Class_T({super.key});
+class home extends StatefulWidget {
+  const home({super.key});
 
   @override
-  State<Class_T> createState() => _toggleTState();
+  State<home> createState() => _homeState();
 }
 
-class _toggleTState extends State<Class_T> {
+class _homeState extends State<home> {
+
+  int counter = 0;
 
 
-
-  // List <bool> isSelected = [false,true,false,false];
+  // List <bool> isSelected = [true,false,false,false];
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Color.fromARGB(255, 195, 238, 250),
+    return Scaffold( 
       appBar: AppBar(
-        title: Text('ES Class'),
         backgroundColor: Color.fromARGB(255, 152, 186, 218),
+        title: Text('ES Class'),
         actions: <Widget>[
           IconButton(
+            style: IconButton.styleFrom(
+                highlightColor: Color.fromARGB(255, 170, 205, 238),
+                 backgroundColor: Color.fromARGB(255, 96, 152, 204),      
+              ),
               onPressed: (){
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => const main_home_T()),);
               }, 
               icon: const Icon(Icons.home),
-              style: IconButton.styleFrom(
-                highlightColor: Color.fromARGB(255, 170, 205, 238),      
-              ),
               tooltip: 'หน้าหลัก',      
           ),
           IconButton(
             style: IconButton.styleFrom(
-              highlightColor: Color.fromARGB(255, 170, 205, 238),
-              backgroundColor: Color.fromARGB(255, 96, 152, 204)
-            ),
+                highlightColor: Color.fromARGB(255, 170, 205, 238),      
+              ),
             onPressed: (){
               Navigator.push(
                   context,
@@ -120,9 +114,9 @@ class _toggleTState extends State<Class_T> {
           SizedBox(width: 50)
         ],
       ),
-     
 
-     body: Class_T_body(),
+
+      body: Body_home(),
     );
   }
 }

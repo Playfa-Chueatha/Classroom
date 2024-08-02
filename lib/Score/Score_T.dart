@@ -1,54 +1,33 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_esclass_2/Classroom/calssT_boday.dart';
+import 'package:flutter_esclass_2/Classroom/classT.dart';
 import 'package:flutter_esclass_2/Home/homeT.dart';
 import 'package:flutter_esclass_2/Login/login.dart';
-import 'package:flutter_esclass_2/Score/Score_T.dart';
+import 'package:flutter_esclass_2/Score/Score_T_body.dart';
 import 'package:flutter_esclass_2/work/assign_work_T.dart';
 
-void  main()  => runApp(const ClassT());
-
-// const List<Widget> Menu = [
-//   Text('หน้าหลัก'),
-//   Text('ห้องเรียน'),
-//   Text('งานที่มอบหมาย'),
-//   Text('รายชื่อนักเรียน'),
-// ];
-
-class ClassT extends StatefulWidget {
-  const ClassT({super.key});
-
-  @override
-  State<ClassT> createState() => _ClassTState();
-}
-
-class _ClassTState extends State<ClassT> {
+class ScoreT extends StatelessWidget {
+  const ScoreT({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: Class_T(),
+      title: 'list_Student',
+      home: Score_T(),
     );
   }
 }
 
-class Class_T extends StatefulWidget {
-  const Class_T({super.key});
+class Score_T extends StatefulWidget {
+  const Score_T({super.key});
 
   @override
-  State<Class_T> createState() => _toggleTState();
+  State<Score_T> createState() => _Score_TState();
 }
 
-class _toggleTState extends State<Class_T> {
-
-
-
-  // List <bool> isSelected = [false,true,false,false];
-
+class _Score_TState extends State<Score_T> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color.fromARGB(255, 195, 238, 250),
       appBar: AppBar(
         title: Text('ES Class'),
         backgroundColor: Color.fromARGB(255, 152, 186, 218),
@@ -68,7 +47,7 @@ class _toggleTState extends State<Class_T> {
           IconButton(
             style: IconButton.styleFrom(
               highlightColor: Color.fromARGB(255, 170, 205, 238),
-              backgroundColor: Color.fromARGB(255, 96, 152, 204)
+              
             ),
             onPressed: (){
               Navigator.push(
@@ -95,7 +74,8 @@ class _toggleTState extends State<Class_T> {
 
           IconButton(
             style: IconButton.styleFrom(
-                highlightColor: Color.fromARGB(255, 170, 205, 238),      
+                highlightColor: Color.fromARGB(255, 170, 205, 238),
+                backgroundColor: Color.fromARGB(255, 96, 152, 204),      
               ),
             onPressed: (){
               Navigator.push(
@@ -120,9 +100,8 @@ class _toggleTState extends State<Class_T> {
           SizedBox(width: 50)
         ],
       ),
-     
 
-     body: Class_T_body(),
+      body: Score_T_body(),
     );
   }
 }

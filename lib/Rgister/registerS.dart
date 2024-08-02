@@ -68,11 +68,6 @@ class _FormState extends State<AddForm> {
   Widget build(BuildContext context) {
     return  Scaffold(
       backgroundColor: Color.fromARGB(255, 147, 235, 241),
-        // appBar: AppBar(
-        //   title: const Text("สร้างชื่อผู้ใช้งาน"),
-        //   backgroundColor: Color.fromARGB(255, 118, 232, 240),
-        //   centerTitle: true,
-        // ),
         body: SingleChildScrollView(
           padding: const EdgeInsets.fromLTRB(700, 150, 700, 100),
           child: Form(
@@ -120,6 +115,7 @@ class _FormState extends State<AddForm> {
                   },
                   controller: surname,
                 ),
+                SizedBox(height: 10),
                 TextFormField(
                   maxLength: 40,
                   decoration: const InputDecoration(

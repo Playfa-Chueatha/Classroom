@@ -1,79 +1,57 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_esclass_2/Classroom/calssT_boday.dart';
-import 'package:flutter_esclass_2/Home/homeT.dart';
+import 'package:flutter_esclass_2/Classroom/classS.dart';
+import 'package:flutter_esclass_2/Home/homeS.dart';
 import 'package:flutter_esclass_2/Login/login.dart';
-import 'package:flutter_esclass_2/Score/Score_T.dart';
-import 'package:flutter_esclass_2/work/assign_work_T.dart';
+import 'package:flutter_esclass_2/work/asign_work_S.dart';
 
-void  main()  => runApp(const ClassT());
-
-// const List<Widget> Menu = [
-//   Text('หน้าหลัก'),
-//   Text('ห้องเรียน'),
-//   Text('งานที่มอบหมาย'),
-//   Text('รายชื่อนักเรียน'),
-// ];
-
-class ClassT extends StatefulWidget {
-  const ClassT({super.key});
-
-  @override
-  State<ClassT> createState() => _ClassTState();
-}
-
-class _ClassTState extends State<ClassT> {
+class Score_S extends StatelessWidget {
+  const Score_S({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: Class_T(),
+      title: 'My Score',
+      home: ScoreS(),
     );
   }
 }
 
-class Class_T extends StatefulWidget {
-  const Class_T({super.key});
+class ScoreS extends StatefulWidget {
+  const ScoreS({super.key});
 
   @override
-  State<Class_T> createState() => _toggleTState();
+  State<ScoreS> createState() => _ScoreSState();
 }
 
-class _toggleTState extends State<Class_T> {
-
-
-
-  // List <bool> isSelected = [false,true,false,false];
-
+class _ScoreSState extends State<ScoreS> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color.fromARGB(255, 195, 238, 250),
       appBar: AppBar(
         title: Text('ES Class'),
+        centerTitle: true,
         backgroundColor: Color.fromARGB(255, 152, 186, 218),
         actions: <Widget>[
           IconButton(
+            style: IconButton.styleFrom(
+                highlightColor: Color.fromARGB(255, 170, 205, 238),     
+              ),
               onPressed: (){
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const main_home_T()),);
+                  MaterialPageRoute(builder: (context) => const main_home_S()),);
               }, 
               icon: const Icon(Icons.home),
-              style: IconButton.styleFrom(
-                highlightColor: Color.fromARGB(255, 170, 205, 238),      
-              ),
               tooltip: 'หน้าหลัก',      
           ),
           IconButton(
             style: IconButton.styleFrom(
-              highlightColor: Color.fromARGB(255, 170, 205, 238),
-              backgroundColor: Color.fromARGB(255, 96, 152, 204)
-            ),
+                highlightColor: Color.fromARGB(255, 170, 205, 238),      
+              ),
             onPressed: (){
               Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const ClassT()),
+                  MaterialPageRoute(builder: (context) => const ClassS()),
               );
             }, 
             icon: const Icon(Icons.class_outlined),
@@ -87,23 +65,24 @@ class _toggleTState extends State<Class_T> {
             onPressed: (){
               Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const AssignWork_class_T()),);
+                  MaterialPageRoute(builder: (context) => const AssignWork_class_S()),);
             }, 
             icon: const Icon(Icons.edit_document),
-            tooltip: 'งานที่มอบหมาย',
+            tooltip: 'งานที่ได้รับ',
           ),
 
           IconButton(
             style: IconButton.styleFrom(
-                highlightColor: Color.fromARGB(255, 170, 205, 238),      
+                highlightColor: Color.fromARGB(255, 170, 205, 238),
+                backgroundColor: Color.fromARGB(255, 96, 152, 204),      
               ),
             onPressed: (){
               Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const ScoreT()),);
+                  MaterialPageRoute(builder: (context) => const Score_S()),);
             }, 
             icon: const Icon(Icons.list_alt),
-            tooltip: 'รายชื่อนักเรียน',
+            tooltip: 'คะแนนของฉัน',
           ),
           IconButton(
             style: IconButton.styleFrom(
@@ -120,9 +99,6 @@ class _toggleTState extends State<Class_T> {
           SizedBox(width: 50)
         ],
       ),
-     
-
-     body: Class_T_body(),
     );
   }
 }

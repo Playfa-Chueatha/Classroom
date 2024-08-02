@@ -1,83 +1,24 @@
 import 'package:flutter/material.dart';
-import 'package:dropdown_search/dropdown_search.dart';
 
-void main() => runApp(const main_home());
-
-const List<Widget> Menu = [
-  Text('หน้าหลัก'),
-  Text('ห้องเรียน'),
-  Text('งานที่มอบหมาย'),
-  Text('รายชื่อนักเรียน'),
-];
-
-class main_home extends StatelessWidget {
-  const main_home({super.key});
+class Home_S_body extends StatefulWidget {
+  const Home_S_body({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Home',
-      home: home(),
-    );
-  }
+  State<Home_S_body> createState() => _Home_S_bodyState();
 }
 
-class home extends StatefulWidget {
-  const home({super.key});
-
-  @override
-  State<home> createState() => _homeState();
-}
-
-class _homeState extends State<home> {
+class _Home_S_bodyState extends State<Home_S_body> {
 
   int counter = 0;
-
-  List <bool> isSelected = [true,false,false,false];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color.fromARGB(255, 195, 238, 250),
-      appBar: AppBar(
-        title: Text('ES Class'),
-        centerTitle: true,
-        backgroundColor: Color.fromARGB(255, 152, 186, 218),
-      ),
       body: SingleChildScrollView(
         scrollDirection:Axis.vertical,
         child: Column(
           children: [
             SizedBox(height: 10,),
-            ToggleButtons(
-              direction: Axis.horizontal,
-              onPressed: (int index){
-                setState(() {
-                  // for (int i = 0; 1 < isSelected.length;
-                  // i++){
-                  //   isSelected[i] = i == index;
-                  // } 
-                  for (int buttonIndex = 0; buttonIndex < isSelected.length; buttonIndex++) {
-                    if (buttonIndex == index) {
-                      isSelected[buttonIndex] = true;
-                  } else {
-                      isSelected[buttonIndex] = false;
-                    }
-              }
-                });
-              },
-              borderRadius: const BorderRadius.all(Radius.circular(8)),
-              selectedBorderColor: Color.fromARGB(255, 152, 186, 218),
-              selectedColor: Colors.white,
-              fillColor: Color.fromARGB(255, 152, 186, 218),
-              color: Colors.black,
-              constraints: const BoxConstraints(
-                minHeight: 40,
-                minWidth: 150
-              ),
-              isSelected: isSelected,
-              children: Menu, 
-              ),
             Column(
               children: [
                 SizedBox(height: 30),
@@ -118,19 +59,7 @@ class _homeState extends State<home> {
                         
                         child: Column(
                           children: [
-                            SizedBox(height: 20,),
-                            Container(
-                              height: 50,
-                              width: 700,
-                              child: Row(
-                                children: [
-                                  SizedBox(width: 300,height: 50),  
-                                  DropdownSearch(
-                                    popupProps: PopupProps.menu(
-                                      showSelectedItems: true,
-
-                                    ),
-                                  ),   
+                            SizedBox(height: 20,),   
                                   IconButton(
                                     color: Color.fromARGB(255, 0, 0, 0),
                                     icon: const Icon(Icons.add),
@@ -193,12 +122,10 @@ class _homeState extends State<home> {
                       SizedBox(width: 2)
                     ],
                   ),
-                )
               ],
             )
-          ]
         )
-      ),
-    );
+      );
+    
   }
 }

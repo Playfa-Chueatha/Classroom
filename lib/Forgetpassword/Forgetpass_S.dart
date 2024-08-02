@@ -107,9 +107,9 @@ class _ForgetState extends State<Forget> {
                         height: 50,
                         child: FilledButton(
                           onPressed: (){
-                            Navigator.push(
-                                  context,
-                                  MaterialPageRoute(builder: (context) => const Login_S()));
+                            // Navigator.push(
+                            //       context,
+                            //       MaterialPageRoute(builder: (context) => const Re_forget_S()));
                           },
                         style: FilledButton.styleFrom(
                           backgroundColor: Color.fromARGB(255, 10, 82, 104),
@@ -127,3 +127,4 @@ class _ForgetState extends State<Forget> {
     );
   }
 }
+

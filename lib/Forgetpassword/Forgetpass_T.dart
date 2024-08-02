@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_esclass_2/Login/login.dart';
 import 'package:flutter_esclass_2/Login/loginT.dart';
+import 'package:flutter_esclass_2/Rgister/registerT.dart';
 
 void  main()  => runApp(const Forgetpass_T());
 
@@ -106,11 +107,11 @@ class _ForgetState extends State<Forget> {
                         height: 50,
                         child: FilledButton(
                           onPressed: (){
-                            Navigator.push(
-                                  context,
-                                  MaterialPageRoute(builder: (context) => const Logint()));
+                            // Navigator.push(
+                            //       context,
+                            //       MaterialPageRoute(builder: (context) => const Logint()));
                           },
-                          
+
                         style: FilledButton.styleFrom(
                           backgroundColor: Color.fromARGB(255, 10, 82, 104),
                           foregroundColor: Colors.white

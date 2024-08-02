@@ -1,7 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-void main() => runApp(const add_work());
+void main() => runApp(const add_wprk_T());
+
+class add_wprk_T extends StatelessWidget {
+  const add_wprk_T({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Addwork',
+      home: add_work(),
+    );
+  }
+}
 
 class add_work extends StatefulWidget {
   const add_work({super.key});
@@ -14,9 +26,7 @@ class _add_workState extends State<add_work> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Addwork',
-      home: Scaffold(
+    return Scaffold(
         appBar: AppBar(
           title: Text("มอบหมายงาน"),
           centerTitle: true,
@@ -236,20 +246,12 @@ class _add_workState extends State<add_work> {
                               ]
                             )
                         )
-                    ],
-                            
-              
-                      
-                      )
-                  ),
-                  
-                       
+                    ],                                                              
+                      )                                       
               ),       
             ),
-          )
-          
-        );
-    
+          )        
+        );  
   }
 }
 
