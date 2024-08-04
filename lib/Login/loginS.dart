@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_esclass_2/Forgetpassword/Forgetpass_S.dart';
+import 'package:flutter_esclass_2/Home/homeS.dart';
 import 'package:flutter_esclass_2/Rgister/registerS.dart';
 
 void  main()  => runApp(const Login_S());
@@ -91,7 +92,11 @@ class _LogintState extends State<Logins> {
                   
                   FilledButton(
                     onPressed: (){
-                      _formkey.currentState!.validate();
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => const main_home_S()),
+                      );
+                      
                     },
                     style: FilledButton.styleFrom(
                       backgroundColor: Color.fromARGB(255, 10, 82, 104),

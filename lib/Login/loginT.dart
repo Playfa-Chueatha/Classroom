@@ -87,8 +87,10 @@ class _LogintState extends State<Logint> {
                     Container(
                       margin: EdgeInsets.fromLTRB(300,20,300,10),
                       child: TextFormField(
+                
                         decoration: const InputDecoration(
-                        label: Text("กรุณากรอกชื่อผู้ใช้", style: TextStyle(fontSize: 20),)
+                          prefix: Icon(Icons.person_outline_outlined),
+                          label: Text("กรุณากรอกชื่อผู้ใช้", style: TextStyle(fontSize: 20),)
                         ),
                         validator: validateEmail,
                         controller: email,
@@ -98,8 +100,10 @@ class _LogintState extends State<Logint> {
                   Container(
                       margin: EdgeInsets.fromLTRB(300,10,300,50),
                       child: TextFormField(
+                        obscureText: true,
                         decoration: const InputDecoration(
-                        label: Text("กรุณากรอกรหัสผ่าน", style: TextStyle(fontSize: 20),)
+                          prefix: Icon(Icons.lock),
+                          label: Text("กรุณากรอกรหัสผ่าน", style: TextStyle(fontSize: 20),)
                         ),
                         validator: (val) {
                           if (val!.isEmpty) {

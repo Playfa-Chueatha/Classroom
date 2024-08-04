@@ -1,12 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_esclass_2/Login/login.dart';
 import 'package:flutter_esclass_2/Login/loginT.dart';
-<<<<<<< HEAD
 import 'package:flutter_esclass_2/Rgister/registerT.dart';
-=======
 import "package:http/http.dart" as http;
->>>>>>> 25a5d8826b364b0238fdaa581b80efccf2c5cb18
-
 void  main()  => runApp(const Forgetpass_T());
 
 class Forgetpass_T extends StatelessWidget {
