@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_esclass_2/Classroom/calssT_boday.dart';
 import 'package:flutter_esclass_2/Home/homeT.dart';
 import 'package:flutter_esclass_2/Login/login.dart';
+import 'package:flutter_esclass_2/Model/Chat.dart';
+import 'package:flutter_esclass_2/Profile/ProfileT.dart';
 import 'package:flutter_esclass_2/Score/Score_T.dart';
 import 'package:flutter_esclass_2/work/assign_work_T.dart';
 
@@ -50,26 +52,44 @@ class _toggleTState extends State<Class_T> {
     return Scaffold(
       backgroundColor: Color.fromARGB(255, 195, 238, 250),
       appBar: AppBar(
-        title: Text('ES Class'),
+        title: Text('Eduelite'),
         backgroundColor: Color.fromARGB(255, 152, 186, 218),
         actions: <Widget>[
           IconButton(
+            onPressed: (){
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const Profile_T()),);            
+            }, 
+            icon: Image.asset("assets/images/ครู.png"),
+            iconSize: 30,
+          ),
+          Container(
+            height: 45,
+            decoration: BoxDecoration(
+              color: Color.fromARGB(255, 71, 136, 190),
+              borderRadius: BorderRadius.circular(20)
+
+            ),
+            child: Row(
+              children: [
+                IconButton(
+            style: IconButton.styleFrom(
+                highlightColor: Color.fromARGB(255, 170, 205, 238)      
+              ),
               onPressed: (){
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => const main_home_T()),);
               }, 
               icon: const Icon(Icons.home),
-              style: IconButton.styleFrom(
-                highlightColor: Color.fromARGB(255, 170, 205, 238),      
-              ),
               tooltip: 'หน้าหลัก',      
           ),
           IconButton(
             style: IconButton.styleFrom(
-              highlightColor: Color.fromARGB(255, 170, 205, 238),
-              backgroundColor: Color.fromARGB(255, 96, 152, 204)
-            ),
+                highlightColor: Color.fromARGB(255, 170, 205, 238),
+                backgroundColor: Color.fromARGB(255, 96, 152, 204),      
+              ),
             onPressed: (){
               Navigator.push(
                   context,
@@ -90,7 +110,7 @@ class _toggleTState extends State<Class_T> {
                   MaterialPageRoute(builder: (context) => const AssignWork_class_T()),);
             }, 
             icon: const Icon(Icons.edit_document),
-            tooltip: 'งานที่มอบหมาย',
+            tooltip: 'งานที่ได้รับ',
           ),
 
           IconButton(
@@ -100,10 +120,22 @@ class _toggleTState extends State<Class_T> {
             onPressed: (){
               Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const ScoreT()),);
+                  MaterialPageRoute(builder: (context) => const Score_T()),);
             }, 
             icon: const Icon(Icons.list_alt),
             tooltip: 'รายชื่อนักเรียน',
+          ),
+              ],
+            ),
+          ),
+          IconButton(
+            onPressed: (){
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const Chat_classs()),);
+            }, 
+            icon: Icon(Icons.chat),
+            tooltip: 'สนทนา',
           ),
           IconButton(
             style: IconButton.styleFrom(

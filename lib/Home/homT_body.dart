@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_esclass_2/Home/Todolist.dart';
+import 'package:flutter_esclass_2/Home/calendar.dart';
+import 'package:flutter_esclass_2/Home/menu.dart';
+import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class Body_home extends StatefulWidget {
@@ -10,8 +14,6 @@ class Body_home extends StatefulWidget {
 
 class _Body_homeState extends State<Body_home> {
 
-
-DateTime today = DateTime.now();
 
   @override
   Widget build(BuildContext context) {
@@ -41,11 +43,7 @@ DateTime today = DateTime.now();
                           bottomRight: Radius.circular(20)
                         ),
                       ),
-                      child: Column(
-                        children: [
-                          SizedBox(height: 20,),
-                        ],
-                      ),
+                      child:Menuu_class(),
                       ),
                       SizedBox(width: 50,),
 
@@ -54,7 +52,6 @@ DateTime today = DateTime.now();
                       Container(
                       height: 1000,
                       width: 1440,
-                      // alignment: Alignment.topCenter,
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(20)
@@ -68,22 +65,16 @@ DateTime today = DateTime.now();
                               width: 1440,
                               child: Row(
                                 children: [
-                                  SizedBox(width: 1370,height: 50),  
-                                  // DropdownSearch(
-                                  //   popupProps: PopupProps.menu(
-                                  //     showSelectedItems: true,
-
-                                  //   ),
-                                  // ),   
+                                  SizedBox(width: 1370,height: 50),    
                                   IconButton(
                                     color: Color.fromARGB(255, 0, 0, 0),
                                     icon: const Icon(Icons.add),
                                     iconSize: 30,
                                     onPressed: (){
-                                      // Navigator.push(
-                                      //   context,
-                                      //   MaterialPageRoute(builder: (context) => const main_home_T()),
-                                      // );
+                                      showDialog(
+                                        context: context, 
+                                        builder: (BuildContext context) => Alert_addtodo(),
+                                      );
                                     },
                                     style: IconButton.styleFrom(
                                       backgroundColor: Color.fromARGB(255, 147, 185, 221),
@@ -91,25 +82,25 @@ DateTime today = DateTime.now();
                                     ),
                                     tooltip: 'เพิ่มกิจกรรม', 
                                   ),
-
-
-                                  
+                                 
                                 ],
                               ),
                               
                             ),
+
+                            //calender
+                            Container(
+                                height: 400,
+                                width: 1300,
+                                child: Calendar_Home(),
+                            ),
+                            SizedBox(width: 30,),
                           ]
+                          
                         ),
                       ),
-                      Container(
-                          height: 800,
-                          width: 1000,
-                          child: TableCalendar(
-                              focusedDay: today, 
-                              firstDay: DateTime.utc(2024, 01, 01), 
-                              lastDay: DateTime.utc(2030, 11, 31 )),
-                      ),
-                      SizedBox(width: 30,),
+                      SizedBox(width: 30)
+                      
                     ],
                   ),
                 )

@@ -4,6 +4,8 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_esclass_2/Classroom/classT.dart';
 import 'package:flutter_esclass_2/Home/homeT.dart';
 import 'package:flutter_esclass_2/Login/login.dart';
+import 'package:flutter_esclass_2/Model/Chat.dart';
+import 'package:flutter_esclass_2/Profile/ProfileT.dart';
 import 'package:flutter_esclass_2/Score/Score_T.dart';
 import 'package:flutter_esclass_2/work/asign_work_T_body.dart';
 
@@ -43,26 +45,43 @@ class _ClassTState extends State<Ass_work> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('ES Class'),
+        title: Text('Eduelite'),
         backgroundColor: Color.fromARGB(255, 152, 186, 218),
         actions: <Widget>[
           IconButton(
+            onPressed: (){
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const Profile_T()),);            
+            }, 
+            icon: Image.asset("assets/images/ครู.png"),
+            iconSize: 30,
+          ),
+          Container(
+            height: 45,
+            decoration: BoxDecoration(
+              color: Color.fromARGB(255, 71, 136, 190),
+              borderRadius: BorderRadius.circular(20)
+
+            ),
+            child: Row(
+              children: [
+                IconButton(
+            style: IconButton.styleFrom(
+                highlightColor: Color.fromARGB(255, 170, 205, 238)      
+              ),
               onPressed: (){
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => const main_home_T()),);
               }, 
               icon: const Icon(Icons.home),
-              style: IconButton.styleFrom(
-                highlightColor: Color.fromARGB(255, 170, 205, 238),      
-              ),
               tooltip: 'หน้าหลัก',      
           ),
           IconButton(
             style: IconButton.styleFrom(
-              highlightColor: Color.fromARGB(255, 170, 205, 238),
-              
-            ),
+                highlightColor: Color.fromARGB(255, 170, 205, 238),   
+              ),
             onPressed: (){
               Navigator.push(
                   context,
@@ -75,8 +94,8 @@ class _ClassTState extends State<Ass_work> {
 
           IconButton(
             style: IconButton.styleFrom(
-                backgroundColor: Color.fromARGB(255, 96, 152, 204),
-                highlightColor: Color.fromARGB(255, 170, 205, 238),      
+                highlightColor: Color.fromARGB(255, 170, 205, 238),  
+                backgroundColor: Color.fromARGB(255, 96, 152, 204),    
               ),
             onPressed: (){
               Navigator.push(
@@ -84,7 +103,7 @@ class _ClassTState extends State<Ass_work> {
                   MaterialPageRoute(builder: (context) => const AssignWork_class_T()),);
             }, 
             icon: const Icon(Icons.edit_document),
-            tooltip: 'งานที่มอบหมาย',
+            tooltip: 'งานที่ได้รับ',
           ),
 
           IconButton(
@@ -94,10 +113,22 @@ class _ClassTState extends State<Ass_work> {
             onPressed: (){
               Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const ScoreT()),);
+                  MaterialPageRoute(builder: (context) => const Score_T()),);
             }, 
             icon: const Icon(Icons.list_alt),
             tooltip: 'รายชื่อนักเรียน',
+          ),
+              ],
+            ),
+          ),
+          IconButton(
+            onPressed: (){
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const Chat_classs()),);
+            }, 
+            icon: Icon(Icons.chat),
+            tooltip: 'สนทนา',
           ),
           IconButton(
             style: IconButton.styleFrom(

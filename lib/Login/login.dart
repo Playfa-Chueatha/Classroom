@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_esclass_2/Forgetpassword/Forgetpass_S.dart';
+import 'package:flutter_esclass_2/Home/homeS.dart';
+import 'package:flutter_esclass_2/Home/homeT.dart';
 import 'package:flutter_esclass_2/Login/loginS.dart';
 import 'package:flutter_esclass_2/Login/loginT.dart';
 
@@ -42,8 +44,9 @@ class _Test_bState extends State<Test_b> {
             margin: EdgeInsets.all(40),
             child: Column(
               children: [
-                SizedBox(height: 150,),
-                Text("Wellcome to ESclass", style: TextStyle(fontSize: 30)),
+                SizedBox(height: 50),
+                Image.asset("assets/images/Eduelite.png",height: 150,width: 150),
+                Text("Wellcome to Eduelite", style: TextStyle(fontSize: 30)),
                 SizedBox(height: 100),
                 Container (
                   child: Row(
@@ -67,7 +70,8 @@ class _Test_bState extends State<Test_b> {
                           ],
                         ),
                       ),
-                      SizedBox(width: 100),
+
+                      SizedBox(width: 200),
                       Container(
                         child: Column(
                           children: [
@@ -90,17 +94,33 @@ class _Test_bState extends State<Test_b> {
                     ],
                   ),
                 ),
-                // SizedBox(height: 150,),
-                // TextButton(
-                //   style: TextButton.styleFrom(
-                //     foregroundColor: Color.fromARGB(255, 10, 82, 104)
-                //   ),
-                //   onPressed: () => Navigator.push(
-                //     context,
-                //     MaterialPageRoute(builder: (context) => Forget())).then((value) {
-                //       print('Back from to me');
-                //     },),// print Botton
-                //   child: Text("ลืมรหัสผ่าน", style: TextStyle(fontSize: 20),),),
+
+
+
+
+
+                //เอาไว้ทดสอบขี้เกียจlogin
+                SizedBox(height: 20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    IconButton(
+                      onPressed: (){
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => const main_home_T()),);
+                      }, 
+                      icon: Icon(Icons.person_outline)),
+                      SizedBox(width: 300),
+                      IconButton(
+                      onPressed: (){
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => const main_home_S()),);
+                      }, 
+                      icon: Icon(Icons.person_outline))
+                  ],
+                )
               ],
             )   
           )

@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_esclass_2/Home/Todolist.dart';
+import 'package:flutter_esclass_2/Home/calendar.dart';
+import 'package:flutter_esclass_2/Home/menu.dart';
 
 class Home_S_body extends StatefulWidget {
   const Home_S_body({super.key});
@@ -14,6 +17,7 @@ class _Home_S_bodyState extends State<Home_S_body> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color.fromARGB(255, 195, 238, 250),
       body: SingleChildScrollView(
         scrollDirection:Axis.vertical,
         child: Column(
@@ -38,20 +42,14 @@ class _Home_S_bodyState extends State<Home_S_body> {
                           bottomRight: Radius.circular(20)
                         ),
                       ),
-                      child: Column(
-                        children: [
-                          SizedBox(height: 20,),
-                        ],
-                      ),
+                      child:Menuu_class(),
                       ),
                       SizedBox(width: 50,),
 
-
-                      //งานที่มอบหมาย
+                      //calender
                       Container(
                       height: 1000,
-                      width: 600,
-                      // alignment: Alignment.topCenter,
+                      width: 1440,
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(20)
@@ -59,67 +57,47 @@ class _Home_S_bodyState extends State<Home_S_body> {
                         
                         child: Column(
                           children: [
-                            SizedBox(height: 20,),   
+                            SizedBox(height: 20), 
+                            Container(
+                              height: 50,
+                              width: 1440,
+                              child: Row(
+                                children: [
+                                  SizedBox(width: 1370,height: 50),
                                   IconButton(
                                     color: Color.fromARGB(255, 0, 0, 0),
                                     icon: const Icon(Icons.add),
                                     iconSize: 30,
-                                    onPressed: (){},
+                                    onPressed: (){
+                                      showDialog(
+                                        context: context, 
+                                        builder: (BuildContext context) => Alert_addtodo(),
+                                      );
+                                    },
                                     style: IconButton.styleFrom(
                                       backgroundColor: Color.fromARGB(255, 147, 185, 221),
                                       highlightColor: Color.fromARGB(255, 56, 105, 151),
                                     ),
-                                    tooltip: 'มอบหมายงาน', 
+                                    tooltip: 'เพิ่มกิจกรรม', 
+                                  ),
+                                ]
+                              )
+                            ),
+                                  Container(
+                                      height: 400,
+                                      width: 1300,
+                                      child: Calendar_Home(),
                                   ),
                                 ],
                               ),
                             ),
+                            SizedBox(width: 30)
                             
-                            Text("งานที่มอบหมาย", style: TextStyle(fontSize: 20),),
-                            SizedBox(height: 20),
-                            Container(
-                              height: 100,
-                              width: 500,
-                              decoration: BoxDecoration(
-                                color: Color.fromARGB(255, 147, 185, 221),
-                                borderRadius: BorderRadius.circular(20)
-                              ),
-                            ),
-                            SizedBox(height: 50,),
-                            Text("งานที่เลยกำหนดแล้ว", style: TextStyle(fontSize: 20),),
                           ]
                         ),
                       ),
-                      SizedBox(width: 50,),
 
-
-
-                      //งายที่มอบหมาย รายละเอียด
-                      Container(
-                        height: 1000,
-                        width: 800,
-                        alignment: Alignment.topCenter,
-                        decoration: BoxDecoration(
-                          color: Color.fromARGB(255, 152, 186, 218),
-                          borderRadius: BorderRadius.circular(20)
-                        ),
-                        child: Column(
-                          children: [
-                            SizedBox(height: 50,),
-                            Text("งานที่มอบหมาย", style: TextStyle(fontSize: 30),),
-                            Container(
-                              alignment: Alignment.center,
-                              height: 400,
-                              width: 700,
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(20)
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      SizedBox(width: 2)
+                      
                     ],
                   ),
               ],
