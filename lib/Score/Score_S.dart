@@ -4,6 +4,7 @@ import 'package:flutter_esclass_2/Home/homeS.dart';
 import 'package:flutter_esclass_2/Login/login.dart';
 import 'package:flutter_esclass_2/Model/Chat.dart';
 import 'package:flutter_esclass_2/Profile/ProfileS.dart';
+import 'package:flutter_esclass_2/Score/Score_S_body.dart';
 import 'package:flutter_esclass_2/work/asign_work_S.dart';
 
 class Score_S extends StatelessWidget {
@@ -30,8 +31,7 @@ class _ScoreSState extends State<ScoreS> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('ES Class'),
-        centerTitle: true,
+        title: Text('Eduelite'),
         backgroundColor: Color.fromARGB(255, 152, 186, 218),
         actions: <Widget>[
           IconButton(
@@ -131,6 +131,7 @@ class _ScoreSState extends State<ScoreS> {
           SizedBox(width: 50)
         ],
       ),
+      body: Score_S_body(),
     );
   }
 }

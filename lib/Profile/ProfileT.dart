@@ -87,7 +87,7 @@ class _ProfileState extends State<Profile> {
                           ],
                           image: DecorationImage(
                           image: AssetImage(
-                            "assets/images/Profile.jpg"
+                            "assets/images/ครู.png"
                           ))
                       ),
                     ),
@@ -96,31 +96,40 @@ class _ProfileState extends State<Profile> {
 
                     SizedBox(
                       height: 50,
-                      width: 50,
+                      width: 150,
                       child: FilledButton(
                           onPressed: (){},
                           style: FilledButton.styleFrom(
                               backgroundColor: Color.fromARGB(255, 10, 82, 104)
                           ), 
-                          child: Text("แก้ไขข้อมูล", style: TextStyle(fontSize: 20)),),
+                          child: Text("แก้ไขโปรไฟล์", style: TextStyle(fontSize: 20)),),
                   ),
                   SizedBox(height: 50),
                   Container(
                           height: 700,
                           width: 1200,
                           decoration: BoxDecoration(
-                            color: Colors.black,
+                            color: const Color.fromARGB(255, 255, 255, 255),
                             borderRadius: BorderRadius.circular(20)
                           ),
                           child: Column(
                             children: [
-                              Text("ชื่อ-นามสกุล(ภาษาไทย):"),
-                              // Text('ชื่อ-นามสกุล(ภาษาอังกฤษ):'),
-                              // Text('ครูประจำชั้นมัธยมศึกษาปีที่:'),
-                              // Text('ห้อง:'),
-                              // Text('เบอร์โทร:'),
-                              // Text('E-mail:'),
-                              // Text('วิชาที่สอน:'),
+                              Container(
+                                margin: EdgeInsets.fromLTRB(200, 50, 0, 50),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                                  children: [
+                                    Text("ชื่อ-นามสกุล(ภาษาไทย):"),
+                                    Text('ชื่อ-นามสกุล(ภาษาอังกฤษ):'),
+                                    Text('ครูประจำชั้นมัธยมศึกษาปีที่:'),
+                                    Text('ห้อง:'),
+                                    Text('เบอร์โทร:'),
+                                    Text('E-mail:'),
+                                    Text('วิชาที่สอน:'),
+                                  ],
+                                ),
+                              )
+                              
                             ],
                           ),
                   ),

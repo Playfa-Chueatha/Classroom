@@ -1,6 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_esclass_2/Classroom/announce_class.dart';
+import 'package:flutter_esclass_2/Home/menu.dart';
 import 'package:flutter_esclass_2/work/add_work.dart';
 
 class Class_T_body extends StatefulWidget {
@@ -23,35 +24,6 @@ int counter = 0;
         child: Column(
           children: [
             SizedBox(height: 10,),
-            // ToggleButtons(
-            //   direction: Axis.horizontal,
-            //   onPressed: (int index){
-            //     setState(() {
-            //       // for (int i = 0; 1 < isSelected.length;
-            //       // i++){
-            //       //   isSelected[i] = i == index;
-            //       // } 
-            //       for (int buttonIndex = 0; buttonIndex < isSelected.length; buttonIndex++) {
-            //         if (buttonIndex == index) {
-            //           isSelected[buttonIndex] = true;
-            //       } else {
-            //           isSelected[buttonIndex] = false;
-            //         }
-            //   }
-            //     });
-            //   },
-            //   borderRadius: const BorderRadius.all(Radius.circular(8)),
-            //   selectedBorderColor: Color.fromARGB(255, 152, 186, 218),
-            //   selectedColor: Colors.white,
-            //   fillColor: Color.fromARGB(255, 152, 186, 218),
-            //   color: Colors.black,
-            //   constraints: const BoxConstraints(
-            //     minHeight: 40,
-            //     minWidth: 150
-            //   ),
-            //   isSelected: isSelected,
-            //   children: Menu, 
-            //   ),
             Column(
               children: [
                 SizedBox(height: 30),
@@ -64,8 +36,7 @@ int counter = 0;
                       //menu
                       Container(
                       height: 1000,
-                      width: 300,
-                      // alignment: Alignment.topCenter,
+                      width: 400,
                       decoration: BoxDecoration(
                         color: Color.fromARGB(255, 147, 185, 221),
                         borderRadius: BorderRadius.only(
@@ -73,51 +44,8 @@ int counter = 0;
                           bottomRight: Radius.circular(20)
                         ),
                       ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          SizedBox(height: 20,),
-                          Container(
-                            width: 280,
-                            height: 200,                            
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.only(
-                                topRight: Radius.circular(20),
-                                bottomRight: Radius.circular(20)
-                              ),
-                            ),
-                          ),
-                          SizedBox(height: 20),
-                          Container(
-                            width: 280,
-                            height: 200,                            
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.only(
-                                topRight: Radius.circular(20),
-                                bottomRight: Radius.circular(20)
-                              ),
-                            ),
-                          ),
-                          SizedBox(height: 20),
-                          Container(
-                            width: 280,
-                            height: 200,                            
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.only(
-                                topRight: Radius.circular(20),
-                                bottomRight: Radius.circular(20)
-                              ),
-                            ),
-                          ),
-                          IconButton(
-                            onPressed: (){}, 
-                            icon: Icon(Icons.logout,size: 50))
-                        ],
-                  ),
-                ),
+                    child:Menuu_class(),//menu.dart,
+                      ),
                       SizedBox(width: 50,),
 
 
@@ -179,7 +107,7 @@ int counter = 0;
                       //งายที่มอบหมาย
                       Container(
                         height: 1000,
-                        width: 760,
+                        width: 650,
                         alignment: Alignment.topCenter,
                         decoration: BoxDecoration(
                           color: Color.fromARGB(255, 152, 186, 218),
@@ -190,7 +118,7 @@ int counter = 0;
                             Row(
                               mainAxisAlignment: MainAxisAlignment.end,
                               children: [
-                                SizedBox(width: 670,height: 80),
+                                SizedBox(width: 560,height: 80),
                                 IconButton(
                                   onPressed: (){
                                     Navigator.push(
@@ -206,7 +134,7 @@ int counter = 0;
                             Container(
                               alignment: Alignment.center,
                               height: 400,
-                              width: 700,
+                              width: 600,
                               decoration: BoxDecoration(
                                 color: Colors.white,
                                 borderRadius: BorderRadius.circular(20)
@@ -217,7 +145,7 @@ int counter = 0;
                             Container(
                               alignment: Alignment.center,
                               height: 400,
-                              width: 700,
+                              width: 600,
                               decoration: BoxDecoration(
                                 color: Colors.white,
                                 borderRadius: BorderRadius.circular(20)
@@ -226,7 +154,7 @@ int counter = 0;
                           ],
                         ),
                       ),
-                      SizedBox(width: 10)
+                      SizedBox(width: 20)
                     ],
                   ),
                 )

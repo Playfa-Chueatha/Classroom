@@ -45,6 +45,7 @@ class _CalendarPage extends State<CalendarPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       body: TableCalendar(
         locale: 'th_Th',
         firstDay: kFirstDay,
@@ -54,6 +55,7 @@ class _CalendarPage extends State<CalendarPage> {
         //เปลี่ยนเป็น พ.ศ.
          headerStyle: HeaderStyle(
             titleTextStyle: TextStyle(fontSize: 18),
+            titleCentered: true,
             titleTextFormatter: (date, locale) =>
                 '${DateFormat.MMMMEEEEd(locale).format(date)} $year'),
         calendarFormat: _calendarFormat,

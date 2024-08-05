@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_esclass_2/Home/Todolist.dart';
+import 'package:flutter_esclass_2/Home/Even.dart';
+import 'package:flutter_esclass_2/Home/Todolist_alert.dart';
 import 'package:flutter_esclass_2/Home/calendar.dart';
 import 'package:flutter_esclass_2/Home/menu.dart';
+import 'package:flutter_esclass_2/Home/todolist_body.dart';
 
 class Home_S_body extends StatefulWidget {
   const Home_S_body({super.key});
@@ -42,7 +44,7 @@ class _Home_S_bodyState extends State<Home_S_body> {
                           bottomRight: Radius.circular(20)
                         ),
                       ),
-                      child:Menuu_class(),
+                      child:Menuu_class(),//menu.dart
                       ),
                       SizedBox(width: 50,),
 
@@ -71,7 +73,7 @@ class _Home_S_bodyState extends State<Home_S_body> {
                                     onPressed: (){
                                       showDialog(
                                         context: context, 
-                                        builder: (BuildContext context) => Alert_addtodo(),
+                                        builder: (BuildContext context) => Alert_addtodo(),// todolist_alert.dart
                                       );
                                     },
                                     style: IconButton.styleFrom(
@@ -88,6 +90,34 @@ class _Home_S_bodyState extends State<Home_S_body> {
                                       width: 1300,
                                       child: Calendar_Home(),
                                   ),
+
+                                  Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+
+                                //todolist
+                                Container(
+                                  margin: EdgeInsets.all(40),
+                                  height: 400,
+                                  width: 600,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(20)
+                                  ),
+                                  child: Todolist_class(),//todolist_body.dart
+                                ),
+
+                                //Even
+                                Container(
+                                  margin: EdgeInsets.all(40),
+                                  height: 400,
+                                  width: 600,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(20)
+                                  ), 
+                                  child: Even_class(),//Even.dart                              
+                                )
+                              ]
+                            ),
                                 ],
                               ),
                             ),

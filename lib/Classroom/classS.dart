@@ -45,8 +45,7 @@ class _toggleTState extends State<toggleS> {
     return Scaffold(
       backgroundColor: Color.fromARGB(255, 195, 238, 250),
       appBar: AppBar(
-        title: Text('ES Class'),
-        centerTitle: true,
+        title: Text('Eduelite'),
         backgroundColor: Color.fromARGB(255, 152, 186, 218),
         actions: <Widget>[
           IconButton(

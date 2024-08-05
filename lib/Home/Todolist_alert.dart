@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 
 class Alert_addtodo extends StatelessWidget {
   const Alert_addtodo({super.key});
@@ -13,6 +14,7 @@ class Alert_addtodo extends StatelessWidget {
   }
 }
 class add_todo extends StatefulWidget {
+
   const add_todo({super.key});
 
   @override
@@ -20,6 +22,15 @@ class add_todo extends StatefulWidget {
 }
 
 class _add_todoState extends State<add_todo> {
+
+
+
+
+
+
+
+TextEditingController _date = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
@@ -29,9 +40,9 @@ class _add_todoState extends State<add_todo> {
         Column(
           children: [ 
             Container(
-              height: 300,
+              height: 500,
               width: 500,
-              margin: EdgeInsets.all(20),
+              margin: EdgeInsets.all(10),
               decoration: BoxDecoration(
               ),
                 child: Column(
@@ -73,64 +84,76 @@ class _add_todoState extends State<add_todo> {
                     SizedBox(height: 10),
                     Row(
                       children: [
-                          SizedBox(
-                              height: 30,
-                              width: 150,
-                              child: TextField(
-                                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                                  decoration: InputDecoration(
-                                      border: OutlineInputBorder(),
-                                      contentPadding: EdgeInsets.symmetric(horizontal: 10,vertical: 7),
-                                      hintText: 'วันที่',
-                                      isCollapsed: true,
-                                      isDense: true,
-                                      filled: true,
-                                      fillColor: Colors.white,
-                                      enabledBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(10)
-                                      ),
-                                      focusedBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(10)
-                                      )
-                                  ),
+                        Container(
+                          height: 50,
+                          width: 200,
+                            child: TextFormField(
+                              controller: _date,
+                              decoration: InputDecoration(
+                                icon: Icon(Icons.calendar_month),
+                                label: Text("วันที่",style: TextStyle(fontSize: 20),),
                               ),
-                          ),
-                          SizedBox(width: 20),
-                          SizedBox(
-                              height: 30,
-                              width: 150,
-                              child: TextField(
-                                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                                  decoration: InputDecoration(
-                                      border: OutlineInputBorder(),
-                                      contentPadding: EdgeInsets.symmetric(horizontal: 10,vertical: 7),
-                                      hintText: 'ถึงวันที่',
-                                      isCollapsed: true,
-                                      isDense: true,
-                                      filled: true,
-                                      fillColor: Colors.white,
-                                      enabledBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(10)
-                                      ),
-                                      focusedBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(10)
-                                      )
-                                  ),
-                              ),
-                          ),
+                              onTap: ()async {
+                                DateTime? pickeddate = await showDatePicker(
+                                  context: context, 
+                                  initialDate: DateTime.now(),
+                                  firstDate: DateTime(2023), 
+                                  lastDate: DateTime(2100));
+
+                                  if  (pickeddate != null){
+                                        setState(() {
+                                          _date.text = DateFormat('yyyy-MM-dd').format(pickeddate);
+                                        });
+                                      }
+                                
+                              },
+                            ),
+                        ),
+                        // Container(
+                        //   height: 50,
+                        //   width: 200,
+                        //     child: TextFormField(
+                        //       controller: _date,
+                        //       decoration: InputDecoration(
+                        //         icon: Icon(Icons.calendar_month),
+                        //         label: Text("วันที่",style: TextStyle(fontSize: 20),),
+                        //       ),
+                        //       onTap: ()async {
+                        //         DateTime? pickeddate = await showDatePicker(
+                        //           context: context, 
+                        //           initialDate: DateTime.now(),
+                        //           firstDate: DateTime(2023), 
+                        //           lastDate: DateTime(2100));
+
+                        //           if  (pickeddate != null){
+                        //                 setState(() {
+                        //                   _date.text = DateFormat('yyyy-MM-dd').format(pickeddate);
+                        //                 });
+                        //               }
+                                
+                        //       },
+                        //     ),
+                        // ),                    
                       ],
                     ),
-                    SizedBox(height: 30),
+                             
+                    SizedBox(height: 10),
                     Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                       TextButton(
                           onPressed: () => Navigator.pop(context, 'OK'),
                           child: const Text('OK'),
+                          style: TextButton.styleFrom(
+                            foregroundColor: Color.fromARGB(255, 63, 124, 238)
+                          ),
                       ),
                       TextButton(
                           onPressed: () => Navigator.pop(context, 'Cancel'),
                           child: const Text('Cancel'),
+                          style: TextButton.styleFrom(
+                            foregroundColor: Color.fromARGB(255, 238, 108, 115)
+                          ),
                       ),  
                         ],
                     )

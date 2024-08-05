@@ -1,5 +1,6 @@
 
 import 'package:flutter/material.dart';
+import 'package:flutter_esclass_2/Home/menu.dart';
 
 class class_S_body extends StatefulWidget {
   const class_S_body({super.key});
@@ -16,6 +17,7 @@ class _class_S_bodyState extends State<class_S_body> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color.fromARGB(255, 195, 238, 250),
       body: SingleChildScrollView(
         scrollDirection:Axis.vertical,
         child: Column(
@@ -33,7 +35,7 @@ class _class_S_bodyState extends State<class_S_body> {
                       //menu
                       Container(
                       height: 1000,
-                      width: 300,
+                      width: 400,
                       alignment: Alignment.topCenter,
                       decoration: BoxDecoration(
                         color: Color.fromARGB(255, 147, 185, 221),
@@ -42,11 +44,7 @@ class _class_S_bodyState extends State<class_S_body> {
                           bottomRight: Radius.circular(20)
                         ),
                       ),
-                      child: Column(
-                        children: [
-                          SizedBox(height: 20,),
-                        ],
-                      ),
+                      child: Menuu_class(),//menu.dart,
                       ),
                       SizedBox(width: 50,),
 
@@ -64,25 +62,6 @@ class _class_S_bodyState extends State<class_S_body> {
                         child: Column(
                           children: [
                             SizedBox(height: 20,),
-                            // Container(
-                            //   height: 50,
-                            //   width: 700,
-                            //   child: Row(
-                            //     children: [
-                            //       SizedBox(width: 650,height: 50),
-                            //       IconButton(
-                            //         color: Color.fromARGB(255, 0, 0, 0),
-                            //         icon: const Icon(Icons.add),
-                            //         iconSize: 30,
-                            //         onPressed: (){},
-                            //         style: IconButton.styleFrom(
-                            //           backgroundColor: Color.fromARGB(255, 147, 185, 221),
-                            //           highlightColor: Color.fromARGB(255, 56, 105, 151),
-                            //         ), 
-                            //       )
-                            //     ],
-                            //   ),
-                            // ),
 
 
                             Text("ประกาศ", style: TextStyle(fontSize: 40),),
@@ -104,7 +83,7 @@ class _class_S_bodyState extends State<class_S_body> {
                       //งายที่มอบหมาย
                       Container(
                         height: 1000,
-                        width: 750,
+                        width: 650,
                         alignment: Alignment.topCenter,
                         decoration: BoxDecoration(
                           color: Color.fromARGB(255, 152, 186, 218),
@@ -117,7 +96,7 @@ class _class_S_bodyState extends State<class_S_body> {
                             Container(
                               alignment: Alignment.center,
                               height: 400,
-                              width: 700,
+                              width: 600,
                               decoration: BoxDecoration(
                                 color: Colors.white,
                                 borderRadius: BorderRadius.circular(20)
@@ -128,7 +107,7 @@ class _class_S_bodyState extends State<class_S_body> {
                             Container(
                               alignment: Alignment.center,
                               height: 400,
-                              width: 700,
+                              width: 600,
                               decoration: BoxDecoration(
                                 color: Colors.white,
                                 borderRadius: BorderRadius.circular(20)
@@ -137,7 +116,7 @@ class _class_S_bodyState extends State<class_S_body> {
                           ],
                         ),
                       ),
-                      SizedBox(width: 1)
+                      SizedBox(width: 20)
                     ],
                   ),
                 )

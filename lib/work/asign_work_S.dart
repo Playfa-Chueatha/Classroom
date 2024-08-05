@@ -31,8 +31,7 @@ class _Ass_work_SState extends State<Ass_work_S> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('ES Class'),
-        centerTitle: true,
+        title: Text('Eduelite'),
         backgroundColor: Color.fromARGB(255, 152, 186, 218),
         actions: <Widget>[
           IconButton(

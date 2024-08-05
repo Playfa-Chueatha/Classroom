@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_esclass_2/Home/menu.dart';
 
 class work_body_T extends StatefulWidget {
   const work_body_T({super.key});
@@ -22,35 +23,6 @@ class _work_body_TState extends State<work_body_T> {
         child: Column(
           children: [
             SizedBox(height: 10,),
-            // ToggleButtons(
-            //   direction: Axis.horizontal,
-            //   onPressed: (int index){
-            //     setState(() {
-            //       // for (int i = 0; 1 < isSelected.length;
-            //       // i++){
-            //       //   isSelected[i] = i == index;
-            //       // } 
-            //       for (int buttonIndex = 0; buttonIndex < isSelected.length; buttonIndex++) {
-            //         if (buttonIndex == index) {
-            //           isSelected[buttonIndex] = true;
-            //       } else {
-            //           isSelected[buttonIndex] = false;
-            //         }
-            //   }
-            //     });
-            //   },
-            //   borderRadius: const BorderRadius.all(Radius.circular(8)),
-            //   selectedBorderColor: Color.fromARGB(255, 152, 186, 218),
-            //   selectedColor: Colors.white,
-            //   fillColor: Color.fromARGB(255, 152, 186, 218),
-            //   color: Colors.black,
-            //   constraints: const BoxConstraints(
-            //     minHeight: 40,
-            //     minWidth: 150
-            //   ),
-            //   isSelected: isSelected,
-            //   children: Menu, 
-            //   ),
             Column(
               children: [
                 SizedBox(height: 30),
@@ -70,11 +42,7 @@ class _work_body_TState extends State<work_body_T> {
                           bottomRight: Radius.circular(20)
                         ),
                       ),
-                      child: Column(
-                        children: [
-                          SizedBox(height: 20,),
-                        ],
-                      ),
+                      child: Menuu_class(),//menu.dart,
                       ),
                       SizedBox(width: 50,),
 
@@ -83,7 +51,6 @@ class _work_body_TState extends State<work_body_T> {
                       Container(
                       height: 1000,
                       width: 600,
-                      // alignment: Alignment.topCenter,
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(20)
@@ -97,13 +64,7 @@ class _work_body_TState extends State<work_body_T> {
                               width: 700,
                               child: Row(
                                 children: [
-                                  SizedBox(width: 300,height: 50),  
-                                  // DropdownSearch(
-                                  //   popupProps: PopupProps.menu(
-                                  //     showSelectedItems: true,
-
-                                  //   ),
-                                  // ),   
+                                  SizedBox(width: 540,height: 50),  
                                   IconButton(
                                     color: Color.fromARGB(255, 0, 0, 0),
                                     icon: const Icon(Icons.add),
@@ -131,6 +92,15 @@ class _work_body_TState extends State<work_body_T> {
                             ),
                             SizedBox(height: 50,),
                             Text("งานที่เลยกำหนดแล้ว", style: TextStyle(fontSize: 20),),
+                            SizedBox(height: 20),
+                            Container(
+                              height: 100,
+                              width: 500,
+                              decoration: BoxDecoration(
+                                color: Color.fromARGB(255, 147, 185, 221),
+                                borderRadius: BorderRadius.circular(20)
+                              ),
+                            ),
                           ]
                         ),
                       ),
@@ -150,7 +120,7 @@ class _work_body_TState extends State<work_body_T> {
                         child: Column(
                           children: [
                             SizedBox(height: 50,),
-                            Text("งานที่มอบหมาย", style: TextStyle(fontSize: 30),),
+                            Text("รายละเอียดงาน", style: TextStyle(fontSize: 30),),
                             Container(
                               alignment: Alignment.center,
                               height: 400,
@@ -163,7 +133,7 @@ class _work_body_TState extends State<work_body_T> {
                           ],
                         ),
                       ),
-                      SizedBox(width: 2)
+                      SizedBox(width: 20)
                     ],
                   ),
                 )

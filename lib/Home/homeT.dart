@@ -64,7 +64,6 @@ class _homeState extends State<home> {
 
 
 
-          
           IconButton(
             onPressed: (){
               Navigator.push(

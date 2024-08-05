@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_esclass_2/Forgetpassword/Alert.dart';
 import 'package:flutter_esclass_2/Login/login.dart';
 import 'package:flutter_esclass_2/Login/loginS.dart';
 import 'package:flutter_esclass_2/Login/loginT.dart';
@@ -50,17 +51,23 @@ class _ForgetState extends State<Forget> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           SizedBox(
-                            width: 410,
+                            width: 500,
                             height: 50, 
                             child: TextField(
                               controller: _controler,
                               obscureText: true,
                               decoration: InputDecoration(
-                                border: OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                    color: Colors.white,
-                                    width: 2,
-                                  )
+                                suffixIcon: IconButton(
+                                  onPressed: (){
+                                     _validate = _controler.text.isEmpty;
+                                  }, 
+                                  icon: Icon(Icons.email),
+                                  tooltip:'ส่งรหัส OTP ไปยังอีเมล์ของคุณ',),
+                                  border: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                      color: Colors.white,
+                                      width: 2,
+                                    )
                                 ),
                                 labelText: 'กรุณากรอกอีเมล์',
                                 errorText: _validate ?  "กรุณากรอกอีเมล์ของคุณ" : null,
@@ -68,24 +75,6 @@ class _ForgetState extends State<Forget> {
                             ),
                           ),
                           SizedBox(width: 10,),
-                          SizedBox(
-                            width: 80,
-                            height: 50,
-                            child: FilledButton(
-                              onPressed: (){
-                                setState(() {
-                                  _validate = _controler.text.isEmpty;
-
-                                });
-                              },
-                              style: FilledButton.styleFrom(
-                                backgroundColor: Color.fromARGB(255, 10, 82, 104),
-                                foregroundColor: Colors.white,
-                                
-                                
-                             ), 
-                            child: const Text("OTP",style: TextStyle(fontSize: 16),)),
-                          )  
                         ],
                       ),
                       SizedBox(height: 30,),
@@ -107,9 +96,9 @@ class _ForgetState extends State<Forget> {
                         height: 50,
                         child: FilledButton(
                           onPressed: (){
-                            // Navigator.push(
-                            //       context,
-                            //       MaterialPageRoute(builder: (context) => const Re_forget_S()));
+                            showDialog(
+                                  context: context, 
+                                  builder: (BuildContext context) => Repassword(),);
                           },
                         style: FilledButton.styleFrom(
                           backgroundColor: Color.fromARGB(255, 10, 82, 104),
