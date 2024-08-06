@@ -1,6 +1,6 @@
 
 import 'package:flutter/material.dart';
-import 'package:flutter_esclass_2/Home/menu.dart';
+import 'package:flutter_esclass_2/Model/menu.dart';
 
 class class_S_body extends StatefulWidget {
   const class_S_body({super.key});

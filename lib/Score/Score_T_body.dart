@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_esclass_2/Home/menu.dart';
+import 'package:flutter_esclass_2/Model/menu.dart';
 
 class Score_T_body extends StatefulWidget {
   const Score_T_body({super.key});

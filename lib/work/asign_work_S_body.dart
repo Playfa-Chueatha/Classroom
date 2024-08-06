@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_esclass_2/Home/menu.dart';
+import 'package:flutter_esclass_2/Model/menu.dart';
 
 class work_body_S extends StatefulWidget {
   const work_body_S({super.key});

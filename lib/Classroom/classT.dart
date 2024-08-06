@@ -7,14 +7,12 @@ import 'package:flutter_esclass_2/Profile/ProfileT.dart';
 import 'package:flutter_esclass_2/Score/Score_T.dart';
 import 'package:flutter_esclass_2/work/assign_work_T.dart';
 
+
+
+
 void  main()  => runApp(const ClassT());
 
-// const List<Widget> Menu = [
-//   Text('หน้าหลัก'),
-//   Text('ห้องเรียน'),
-//   Text('งานที่มอบหมาย'),
-//   Text('รายชื่อนักเรียน'),
-// ];
+
 
 class ClassT extends StatefulWidget {
   const ClassT({super.key});
@@ -28,7 +26,7 @@ class _ClassTState extends State<ClassT> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
+      title: 'Classrom',
       home: Class_T(),
     );
   }
@@ -38,10 +36,10 @@ class Class_T extends StatefulWidget {
   const Class_T({super.key});
 
   @override
-  State<Class_T> createState() => _toggleTState();
+  State<Class_T> createState() => Class_TState();
 }
 
-class _toggleTState extends State<Class_T> {
+class Class_TState extends State<Class_T> {
 
 
 

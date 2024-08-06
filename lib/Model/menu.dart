@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_esclass_2/Classroom/setting_calss.dart';
 import 'package:flutter_esclass_2/Model/Menu_listclassroom.dart';
+  
 
 class Menuu_class extends StatelessWidget {
   const Menuu_class({super.key});
@@ -51,9 +52,7 @@ class _MenuState extends State<Menu> {
                   IconButton(
                     tooltip: 'ตั้งค่าห้องเรียน',
                     onPressed: (){
-                      // Navigator.push(
-                      //   context,
-                      //   MaterialPageRoute(builder: (context) => const SettingCalss()),);   
+
 
                     }, 
                     icon: Icon(Icons.settings))
@@ -126,3 +125,5 @@ class _MenuState extends State<Menu> {
     );
   }
 }
+
+

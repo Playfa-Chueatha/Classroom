@@ -1,7 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_esclass_2/Classroom/announce_class.dart';
-import 'package:flutter_esclass_2/Home/menu.dart';
+import 'package:flutter_esclass_2/Model/menu.dart';
 import 'package:flutter_esclass_2/work/add_work.dart';
 
 class Class_T_body extends StatefulWidget {

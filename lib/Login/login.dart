@@ -6,8 +6,16 @@ import 'package:flutter_esclass_2/Home/homeT.dart';
 import 'package:flutter_esclass_2/Login/loginS.dart';
 import 'package:flutter_esclass_2/Login/loginT.dart';
 
+void main() {
+  runApp(Login_class());
+}
 
-void  main()  => runApp(const Login_class());
+
+// void main() {
+//   setUrlStrategy(PathUrlStrategy());
+//   runApp(Login_class());
+// }
+// void  main()  => runApp(const Login_class());
 
 class Login_class extends StatelessWidget {
    const Login_class({super.key});
@@ -16,6 +24,7 @@ class Login_class extends StatelessWidget {
   Widget build(BuildContext context) {
     
     return const MaterialApp(
+      title: 'Login',
       home: Test_b(),
     );
   }
@@ -61,7 +70,7 @@ class _Test_bState extends State<Test_b> {
                               onPressed: (){
                                 Navigator.push(
                                   context,
-                                  MaterialPageRoute(builder: (context) => const Logint()),
+                                  MaterialPageRoute(builder: (context) => const Logint(),),
                                 );
                               },
                               style: FilledButton.styleFrom(
