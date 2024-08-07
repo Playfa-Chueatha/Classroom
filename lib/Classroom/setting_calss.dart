@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_esclass_2/Classroom/add_classroom.dart';
+import 'package:flutter_esclass_2/Data/data_calssroom.dart';
 
 void main() => runApp(const SettingCalss());
 
@@ -33,8 +34,10 @@ class _Setting_CalssState extends State<Setting_Calss> {
     return Scaffold(
       backgroundColor: Color.fromARGB(255, 195, 238, 250),
       body: SingleChildScrollView(
+        
         scrollDirection:Axis.vertical,
         child: Column(
+          
           children: [
             SizedBox(height: 10,),
             Column(
@@ -44,13 +47,11 @@ class _Setting_CalssState extends State<Setting_Calss> {
                   scrollDirection:Axis.horizontal,
                   child: Row(
                     children: [
-
-
                       //menu
-                      Container(
+                      Container(   
+                      alignment: Alignment.topLeft,             
                       height: 1000,
                       width: 400,
-                      alignment: Alignment.topCenter,
                       decoration: BoxDecoration(
                         color: Color.fromARGB(255, 147, 185, 221),
                         borderRadius: BorderRadius.only(
@@ -59,6 +60,7 @@ class _Setting_CalssState extends State<Setting_Calss> {
                         ),
                       ),
                       child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Row(
                             children: [
@@ -73,6 +75,15 @@ class _Setting_CalssState extends State<Setting_Calss> {
                                 icon: Icon(Icons.settings))
                             ],
                           ),
+                          Container(
+                            height: 900,
+                            width: 380,
+                            decoration: BoxDecoration(
+                              color: Color.fromARGB(255, 147, 185, 221),
+                            ),
+                            child: DataCalssroom(),
+                          ),
+                          
                         ],
                       ),
                       ),

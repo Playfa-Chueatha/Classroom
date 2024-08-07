@@ -10,12 +10,6 @@ import 'package:flutter_esclass_2/work/assign_work_T.dart';
 
 void main() => runApp(const main_home_T());
 
-// const List<Widget> Menu = [
-//   Text('หน้าหลัก'),
-//   Text('ห้องเรียน'),
-//   Text('งานที่มอบหมาย'),
-//   Text('รายชื่อนักเรียน'),
-// ];
 
 class main_home_T extends StatelessWidget {
   const main_home_T({super.key});
