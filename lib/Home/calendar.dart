@@ -76,14 +76,14 @@ class _CalendarPage extends State<CalendarPage> {
           }
         },
         //ปุ่มเปลี่ยน week/month
-        onFormatChanged: (format) {
-          if (_calendarFormat != format) {
-            // Call `setState()` when updating calendar format
-            setState(() {
-              _calendarFormat = format;
-            });
-          }
-        },
+        // onFormatChanged: (format) {
+        //   if (_calendarFormat != format) {
+        //     // Call `setState()` when updating calendar format
+        //     setState(() {
+        //       _calendarFormat = format;
+        //     });
+        //   }
+        // },
         onPageChanged: (focusedDay) {
           // No need to call `setState()` here
           _focusedDay = focusedDay;

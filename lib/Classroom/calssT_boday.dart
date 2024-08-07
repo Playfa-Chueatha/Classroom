@@ -73,9 +73,9 @@ int counter = 0;
                                     icon: const Icon(Icons.add),
                                     iconSize: 30,
                                     onPressed: (){
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(builder: (context) => const AnnounceClass()),);
+                                      showDialog(
+                                    context: context, 
+                                    builder: (BuildContext context) => AnnounceClass(),);
                                     },
                                     style: IconButton.styleFrom(
                                       backgroundColor: Color.fromARGB(255, 147, 185, 221),
