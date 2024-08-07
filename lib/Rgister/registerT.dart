@@ -33,16 +33,14 @@ class _FormState extends State<AddForm> {
   TextEditingController surname = TextEditingController();
   TextEditingController pass = TextEditingController();
   TextEditingController email = TextEditingController();
-  String type = '1';
 
   Future signUp() async {
-    String url = "http://192.168.1.102/classroom/register.php";
+    String url = "home/zgmupszw/public_html/edueliteroom.com/register.php";
     final response = await http.post(Uri.parse(url), body: {
       'name': name.text,
       'surname': surname.text,
       'password': pass.text,
       'email': email.text,
-      'type': type,
     });
     var data = json.decode(response.body);
     if (data == "Error") {
