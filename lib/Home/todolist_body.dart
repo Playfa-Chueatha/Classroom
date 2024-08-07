@@ -1,27 +1,28 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_esclass_2/Data/Data_todolist.dart';
 
-class Todolist_class extends StatelessWidget {
-  const Todolist_class({super.key});
+class Todolistclass extends StatelessWidget {
+  const Todolistclass({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: todo_calss(),
+      home: todocalss(),
     );
   }
 }
-class todo_calss extends StatefulWidget {
-  const todo_calss({super.key});
+class todocalss extends StatefulWidget {
+  const todocalss({super.key});
 
   @override
-  State<todo_calss> createState() => _todo_calssState();
+  State<todocalss> createState() => _todocalssState();
 }
 
-class _todo_calssState extends State<todo_calss> {
+class _todocalssState extends State<todocalss> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color.fromARGB(255, 255, 255, 255),
+      backgroundColor:  Color.fromARGB(255, 170, 205, 238),
       body: Container(
         height: 400,
         width: 600,
@@ -42,10 +43,9 @@ class _todo_calssState extends State<todo_calss> {
 
           child: 
             Container(
-            //แสดงกิจกรรมเฉพาะวันที่เลือก
-            //รายละเอียด => ชื่อกิจกรรม/รายละเอียด/เวลา/checkbox
-
-
+              height: 350,
+              width: 1350,
+              child: DataTodolist()
             ),
           )
         ]

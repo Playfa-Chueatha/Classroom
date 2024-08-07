@@ -7,17 +7,17 @@ class AddClassroom extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Add_room();
+    return Addroom();
   }
 }
-class Add_room extends StatefulWidget {
-  const Add_room({super.key});
+class Addroom extends StatefulWidget {
+  const Addroom({super.key});
 
   @override
-  State<Add_room> createState() => _Add_roomState();
+  State<Addroom> createState() => _AddroomState();
 }
 
-class _Add_roomState extends State<Add_room> {
+class _AddroomState extends State<Addroom> {
 
   final formKey = GlobalKey<FormState>();
   String Name_class = '';

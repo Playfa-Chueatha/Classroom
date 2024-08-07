@@ -103,7 +103,7 @@ class _Home_S_bodyState extends State<Home_S_body> {
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(20)
                                   ),
-                                  child: Todolist_class(),//todolist_body.dart
+                                  child: Todolistclass(),//todolist_body.dart
                                 ),
 
                                 //Even

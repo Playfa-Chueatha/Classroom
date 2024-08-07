@@ -64,7 +64,7 @@ class _Body_homeState extends State<Body_home> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                              SizedBox(height: 20,),
+                              SizedBox(height: 20),
                               Container(
                               height: 50,
                               width: 1440,
@@ -113,7 +113,7 @@ class _Body_homeState extends State<Body_home> {
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(20)
                                   ),
-                                  child: Todolist_class(),//todolist_body.dart
+                                  child: Todolistclass(),//todolist_body.dart
                                 ),
 
                                 //Even
