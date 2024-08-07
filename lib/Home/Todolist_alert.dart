@@ -109,31 +109,31 @@ TextEditingController _date = TextEditingController();
                               },
                             ),
                         ),
-                        // Container(
-                        //   height: 50,
-                        //   width: 200,
-                        //     child: TextFormField(
-                        //       controller: _date,
-                        //       decoration: InputDecoration(
-                        //         icon: Icon(Icons.calendar_month),
-                        //         label: Text("วันที่",style: TextStyle(fontSize: 20),),
-                        //       ),
-                        //       onTap: ()async {
-                        //         DateTime? pickeddate = await showDatePicker(
-                        //           context: context, 
-                        //           initialDate: DateTime.now(),
-                        //           firstDate: DateTime(2023), 
-                        //           lastDate: DateTime(2100));
+                        Container(
+                          height: 50,
+                          width: 200,
+                            child: TextFormField(
+                              controller: _date,
+                              decoration: InputDecoration(
+                                icon: Icon(Icons.calendar_month),
+                                label: Text("วันที่",style: TextStyle(fontSize: 20),),
+                              ),
+                              onTap: ()async {
+                                DateTime? pickeddate = await showDatePicker(
+                                  context: context, 
+                                  initialDate: DateTime.now(),
+                                  firstDate: DateTime(2023), 
+                                  lastDate: DateTime(2100));
 
-                        //           if  (pickeddate != null){
-                        //                 setState(() {
-                        //                   _date.text = DateFormat('yyyy-MM-dd').format(pickeddate);
-                        //                 });
-                        //               }
+                                  if  (pickeddate != null){
+                                        setState(() {
+                                          _date.text = DateFormat('yyyy-MM-dd').format(pickeddate);
+                                        });
+                                      }
                                 
-                        //       },
-                        //     ),
-                        // ),                    
+                              },
+                            ),
+                        ),                    
                       ],
                     ),
                              

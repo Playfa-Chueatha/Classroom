@@ -1,5 +1,6 @@
 
 import 'package:flutter/material.dart';
+import 'package:flutter_esclass_2/Classroom/add_classroom.dart';
 import 'package:flutter_esclass_2/Classroom/setting_calss.dart';
 import 'package:flutter_esclass_2/Model/Menu_listclassroom.dart';
   
@@ -52,7 +53,9 @@ class _MenuState extends State<Menu> {
                   IconButton(
                     tooltip: 'ตั้งค่าห้องเรียน',
                     onPressed: (){
-
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => AddClassroom()),);
 
                     }, 
                     icon: Icon(Icons.settings))

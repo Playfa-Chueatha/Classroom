@@ -40,21 +40,38 @@ class _Data_classState extends State<Data_class> {
                   itemCount: data.length,
                   itemBuilder: (context,index){
                     return Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(20),
-                        
-                        color: Color.fromARGB(255, 195, 238, 250),
-                      ),
-                      margin: EdgeInsets.symmetric(vertical: 5,horizontal: 10),
-                      padding: EdgeInsets.fromLTRB(30,10,10,10),
+                      margin: EdgeInsets.symmetric(vertical: 5,horizontal: 5),
+                      padding: EdgeInsets.fromLTRB(0,5,5,5),
                       child: 
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text("${data[index].Name_class} ม.${data[index].Room_year} ห้อง ${data[index].Room_No}",style: TextStyle(fontSize: 20),),
-                            Text("แผนการเรียน ${data[index].Section_class} ",style: TextStyle(fontSize: 14),),
-                            Text("ปีการศึกษา ${data[index].School_year} ", style: TextStyle(fontSize: 14),),
-                            Text(data[index].Detail,style: TextStyle(fontSize: 14),),
+                            Container(
+                              height: 30,
+                              width: 300,
+                              decoration: BoxDecoration(
+                                color: Color.fromARGB(255, 195, 238, 250),
+                                borderRadius: BorderRadius.only(
+                                  topRight: Radius.circular(20),
+                                  bottomRight: Radius.circular(20)
+                                )
+                              
+                              ),
+                              child: FilledButton(
+                                style: FilledButton.styleFrom(
+                                  backgroundColor: Color.fromARGB(255, 195, 238, 250),
+                                  foregroundColor: Colors.black
+                                  
+                                ),
+                                onPressed: (){}, 
+                                child: Text("${data[index].Name_class} ม.${data[index].Room_year} ห้อง ${data[index].Room_No}",style: TextStyle(fontSize: 16),)
+                                
+                              )
+                            ),
+                            // Text("${data[index].Name_class} ม.${data[index].Room_year} ห้อง ${data[index].Room_No}",style: TextStyle(fontSize: 20),), 
+                            // Text("แผนการเรียน ${data[index].Section_class} ",style: TextStyle(fontSize: 14),),
+                            // Text("ปีการศึกษา ${data[index].School_year} ", style: TextStyle(fontSize: 14),),
+                            // Text(data[index].Detail,style: TextStyle(fontSize: 14),),
                           ],
                         )
                       

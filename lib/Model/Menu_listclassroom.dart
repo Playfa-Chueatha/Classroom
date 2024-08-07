@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_esclass_2/Classroom/setting_calss.dart';
+import 'package:flutter_esclass_2/Data/data_calssroom.dart';
 
 class list_class extends StatelessWidget {
   const list_class({super.key});
@@ -34,6 +35,8 @@ class _List_studentState extends State<List_student> {
                 border: Border.all(color: Colors.grey),
                 borderRadius: BorderRadius.circular(10)
               ),
+              child: DataCalssroom(),
+              
               
 
 
