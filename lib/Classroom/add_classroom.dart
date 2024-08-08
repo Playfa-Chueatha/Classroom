@@ -34,7 +34,7 @@ class _AddroomState extends State<Addroom> {
       actions: [
         Form( key: formKey,
         child:
-        Container(
+        SizedBox(
           height: 550,
           width: 500,
           child: 
@@ -142,7 +142,6 @@ class _AddroomState extends State<Addroom> {
                               Detail: Detail)
                           );
                           formKey.currentState!.reset();
-                          print(data.length);
                           Navigator.pushReplacement(context,MaterialPageRoute(
                               builder: (ctx)=>const Setting_Calss())
                           ); 

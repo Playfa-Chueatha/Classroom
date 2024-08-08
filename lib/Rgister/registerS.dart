@@ -69,7 +69,7 @@ class _FormState extends State<AddForm> {
     return  Scaffold(
       backgroundColor: Color.fromARGB(255, 147, 235, 241),
         body: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(700, 150, 700, 100),
+          padding: const EdgeInsets.fromLTRB(500, 150, 500, 100),
           child: Form(
             key: formKey,
             child: Column(

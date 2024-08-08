@@ -45,8 +45,11 @@ class _Test_bState extends State<Test_b> {
       // floatingActionButton: FloatingActionButton(
       //   onPressed: (){}),
       
-      body: Center(
-        child: Container(
+      body: Center(       
+        child:  SingleChildScrollView(
+          scrollDirection: Axis.vertical,
+          child: Container(
+            alignment: Alignment.center,            
             decoration: BoxDecoration(color: Color.fromARGB(255, 147, 235, 241),borderRadius: BorderRadius.circular(20)),
             height: 750,
             width: 1000,
@@ -133,6 +136,9 @@ class _Test_bState extends State<Test_b> {
               ],
             )   
           )
+          
+        )
+        
       ),
     );
   }

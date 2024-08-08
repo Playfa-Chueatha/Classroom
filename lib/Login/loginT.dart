@@ -65,7 +65,6 @@ class _LogintState extends State<Logint> {
   Widget build(BuildContext context) {
     return Scaffold(
         body: Center(
-
           child: SingleChildScrollView(
             child: Form(
               key: formKey,
