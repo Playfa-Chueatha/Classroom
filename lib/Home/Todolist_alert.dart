@@ -1,6 +1,5 @@
 // ignore_for_file: unused_label
 
-import 'dart:js_interop';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';

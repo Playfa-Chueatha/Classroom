@@ -1,14 +1,16 @@
 <?php
-$db_name = "zgmupszw_edueliteroom";
-$db_user = "edueliteroom";
-$db_pass = "edueliteroom0";
+$db_name = "zgmupszw_edueliteroom01";
+$db_user = "zgmupszw_edueliteroom1";
+$db_pass = "edueliteroom1";
 $db_host = "118.27.130.237";
 
-$con = new mysqli_connect($db_host, $db_user, $db_pass, $db_name);
+$conn = mysqli_connect($db_host, $db_user, $db_pass, $db_name);
 
-if ($con->connect_error) {
+if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 } else {
-    die("Connection done");
+    echo "Connection done<br>";
+    echo "Server IP Address: " . $_SERVER['SERVER_ADDR'] . "<br>";
+    echo "Client IP Address: " . $_SERVER['REMOTE_ADDR'];
 }
-
+?>
