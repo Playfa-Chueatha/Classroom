@@ -1,14 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_esclass_2/Forgetpassword/Forgetpass_S.dart';
 import 'package:flutter_esclass_2/Home/homeS.dart';
 import 'package:flutter_esclass_2/Home/homeT.dart';
 import 'package:flutter_esclass_2/Login/loginS.dart';
 import 'package:flutter_esclass_2/Login/loginT.dart';
 
-void main() {
-  runApp(Login_class());
-}
 
 
 // void main() {

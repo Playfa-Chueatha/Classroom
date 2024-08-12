@@ -23,7 +23,7 @@ class announceState extends State<announce> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Color.fromARGB(255, 147, 185, 221),
-      body: Container(
+      body: SizedBox(
         width: 250,
         height: 250,
       ),

@@ -31,7 +31,7 @@ class _AnnounceClass_workState extends State<AnnounceClass_work> {
             margin: EdgeInsets.fromLTRB(0, 10, 0, 10),
             child:Column(
               children: [
-                Container(
+                SizedBox(
                   height: 100,
                   width: 500,
                   child: 

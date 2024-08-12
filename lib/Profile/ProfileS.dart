@@ -114,7 +114,7 @@ class _ProfileState extends State<Profile> {
                             borderRadius: BorderRadius.circular(20)
                           ),
                           child: Column(
-                            children: [
+                            children: const [
                               Text("ชื่อ-นามสกุล(ภาษาไทย):"),
                               // Text('ชื่อ-นามสกุล(ภาษาอังกฤษ):'),
                               // Text('ครูประจำชั้นมัธยมศึกษาปีที่:'),

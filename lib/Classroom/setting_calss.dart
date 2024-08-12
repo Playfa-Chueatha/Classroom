@@ -12,7 +12,14 @@ class SettingCalss extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      // initialRoute: "/",
+      // onGenerateRoute: (settings) {
+      //   String path = settings.name ?? "";
+      //   if (path == "/"){
+      //     return MaterialPageRoute(builder: (_) => );
 
+      //   }
+      // },
       home: Setting_Calss(),
     );
   }

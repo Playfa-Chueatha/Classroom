@@ -23,7 +23,7 @@ class _DatatodoState extends State<Datatodo> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Color.fromARGB(255, 170, 205, 238),
-      body: Container(
+      body: SizedBox(
         width: 600,
         height: 600,
         child: ListView.builder(
@@ -37,7 +37,7 @@ class _DatatodoState extends State<Datatodo> {
               Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Container(  
+                  SizedBox(  
                     width: 600,                 
                     child:  ListTile(
                       onTap: (){},
@@ -46,7 +46,7 @@ class _DatatodoState extends State<Datatodo> {
                       ),
                       tileColor: Colors.white,
                       leading: Icon(Icons.check_box),
-                      title: Text("${data[index].Title}",
+                      title: Text(data[index].Title,
                       style: TextStyle(
                         fontSize: 16,
                         color: Colors.black,

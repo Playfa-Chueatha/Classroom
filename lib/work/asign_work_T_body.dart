@@ -59,7 +59,7 @@ class _work_body_TState extends State<work_body_T> {
                         child: Column(
                           children: [
                             SizedBox(height: 20,),
-                            Container(
+                            SizedBox(
                               height: 50,
                               width: 700,
                               child: Row(

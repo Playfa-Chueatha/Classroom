@@ -29,7 +29,7 @@ class _LogintState extends State<Logins> {
   // ignore: unused_field
   String _name = '';
   // ignore: unused_field
-  String _last = '';
+  final String _last = '';
 
   @override
   Widget build(BuildContext context) {

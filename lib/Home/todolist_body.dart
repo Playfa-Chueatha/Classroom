@@ -31,7 +31,7 @@ class _todocalssState extends State<todocalss> {
           borderRadius: BorderRadius.circular(20)
         ),
         child: Column(
-        children: [
+        children: const [
           SizedBox(height: 10),
           Text('To do list to day',style: TextStyle(
             fontSize: 20,
@@ -42,7 +42,7 @@ class _todocalssState extends State<todocalss> {
             scrollDirection: Axis.vertical,
 
           child: 
-            Container(
+            SizedBox(
               height: 350,
               width: 1350,
               child: DataTodolist()

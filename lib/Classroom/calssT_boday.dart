@@ -62,7 +62,7 @@ int counter = 0;
                         child: Column(
                           children: [
                             SizedBox(height: 20,),
-                            Container(
+                            SizedBox(
                               height: 50,
                               width: 700,
                               child: Row(

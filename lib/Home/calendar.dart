@@ -31,7 +31,7 @@ class CalendarPage extends StatefulWidget {
 }
 
 class _CalendarPage extends State<CalendarPage> {
-  CalendarFormat _calendarFormat = CalendarFormat.month;
+  final CalendarFormat _calendarFormat = CalendarFormat.month;
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
 

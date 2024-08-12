@@ -118,7 +118,7 @@ class _ProfileState extends State<Profile> {
                                 margin: EdgeInsets.fromLTRB(200, 50, 0, 50),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.stretch,
-                                  children: [
+                                  children: const [
                                     Text("ชื่อ-นามสกุล(ภาษาไทย):"),
                                     Text('ชื่อ-นามสกุล(ภาษาอังกฤษ):'),
                                     Text('ครูประจำชั้นมัธยมศึกษาปีที่:'),

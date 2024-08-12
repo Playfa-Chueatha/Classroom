@@ -60,7 +60,7 @@ class _Home_S_bodyState extends State<Home_S_body> {
                         child: Column(
                           children: [
                             SizedBox(height: 20), 
-                            Container(
+                            SizedBox(
                               height: 50,
                               width: 1440,
                               child: Row(
@@ -85,7 +85,7 @@ class _Home_S_bodyState extends State<Home_S_body> {
                                 ]
                               )
                             ),
-                                  Container(
+                                  SizedBox(
                                       height: 400,
                                       width: 1300,
                                       child: Calendar_Home(),

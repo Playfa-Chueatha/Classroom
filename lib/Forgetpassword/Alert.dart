@@ -26,7 +26,7 @@ class Repass extends StatelessWidget {
         actions: [
           Column(
           children: [
-              Container(
+              SizedBox(
                 width: 300,
                 child: TextField(
                   inputFormatters: [FilteringTextInputFormatter.digitsOnly],
@@ -49,7 +49,7 @@ class Repass extends StatelessWidget {
               ),
               ),
               SizedBox(height: 20),
-              Container(
+              SizedBox(
                 width: 300,
                 child: TextField(
                   inputFormatters: [FilteringTextInputFormatter.digitsOnly],
@@ -78,17 +78,17 @@ class Repass extends StatelessWidget {
                 children: [
                     TextButton(
                         onPressed: () => Navigator.pop(context, 'OK'),
-                        child: const Text('OK'),
                         style: TextButton.styleFrom(
                           foregroundColor: Color.fromARGB(255, 63, 124, 238)
                       ),
+                        child: const Text('OK'),
                     ),
                     TextButton(
                         onPressed: () => Navigator.pop(context, 'Cancel'),
-                        child: const Text('Cancel'),
                         style: TextButton.styleFrom(
                           foregroundColor: Color.fromARGB(255, 238, 108, 115)
                       ),
+                        child: const Text('Cancel'),
                     ),  
                 ],
               )

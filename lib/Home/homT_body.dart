@@ -65,7 +65,7 @@ class _Body_homeState extends State<Body_home> {
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
                               SizedBox(height: 20),
-                              Container(
+                              SizedBox(
                               height: 50,
                               width: 1440,
                               child: Row(
@@ -92,7 +92,7 @@ class _Body_homeState extends State<Body_home> {
                             ),
 
                             //calender
-                            Container(
+                            SizedBox(
                                 height: 400,
                                 width: 1300,
                                 child: Calendar_Home(),//calendar.dart

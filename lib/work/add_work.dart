@@ -221,14 +221,14 @@ class _add_workState extends State<add_work> {
                             SizedBox(height: 10),
                             Row (
                               crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
+                              children: const [
                                 SizedBox(width: 50),
                                 Text("วันที่ :            ", style: TextStyle(fontSize: 20)),
                                 SizedBox(
                                   height: 30,
                                   width: 100,
                                   child: TextField(
-                                    decoration: const InputDecoration(
+                                    decoration: InputDecoration(
                                       prefix: Icon(Icons.calendar_today),
                                       isCollapsed: true,
                                       isDense: true,

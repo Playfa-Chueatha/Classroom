@@ -63,7 +63,7 @@ class _MenuState extends State<Menu> {
               ),
               Text('ห้องเรียนของฉัน',style: TextStyle(fontSize: 20),),
               SizedBox(height: 10),
-              Container(
+              SizedBox(
                 height: 190,
                 width: 300,
                 child:  List_student(),
@@ -92,7 +92,7 @@ class _MenuState extends State<Menu> {
             )
           ), 
           child: Column(
-            children: [
+            children: const [
               SizedBox(height: 20),
               Text('To do list',style: TextStyle(fontSize: 20),),
             ],
@@ -114,7 +114,7 @@ class _MenuState extends State<Menu> {
             )
           ), 
           child: Column(
-            children: [
+            children: const [
               SizedBox(height: 20),
               Text('Users online',style: TextStyle(fontSize: 20),),
             ],
