@@ -4,14 +4,14 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
-class Register_Page extends StatefulWidget {
-  const Register_Page({super.key});
+class AddForm_Register_T extends StatefulWidget {
+  const AddForm_Register_T({super.key});
 
   @override
-  State<Register_Page> createState() => _FormState();
+  State<AddForm_Register_T> createState() => _FormState();
 }
 
-class _FormState extends State<Register_Page> {
+class _FormState extends State<AddForm_Register_T> {
   final formKey = GlobalKey<FormState>();
 
   TextEditingController name = TextEditingController();
@@ -26,9 +26,7 @@ class _FormState extends State<Register_Page> {
         'Content-type': 'application/json',
         'Accept': 'application/json',
       };
-
       String url = "http://edueliteroom.com/connect/registerteacher.php";
-      print('POST Register !');
       final response = await client.post(Uri.parse(url),
           headers: headers,
           body: jsonEncode({
@@ -37,17 +35,12 @@ class _FormState extends State<Register_Page> {
             "password": pass.text,
             "email": email.text
           }));
-
-      print(jsonDecode(response.body));
-      //var data = jsonDecode(response.body);
-      // print(response.body);
-
-      /*
-    if (data == "Error") {
-      Navigator.pushNamed(context, 'register');
-    } else {
-      Navigator.pushNamed(context, 'login');
-    }*/
+      var data = jsonDecode(response.body);
+      if (data == "Error") {
+        Navigator.pushNamed(context, 'register');
+      } else {
+        Navigator.pushNamed(context, 'login');
+      }
     } catch (e) {
       print(e);
     }
@@ -217,17 +210,17 @@ class _FormState extends State<Register_Page> {
                 width: 150,
                 child: FilledButton(
                     onPressed: () async {
-                      await signUp();
-                      // bool pass = formKey.currentState!.validate(); //ปุ่มบันทึกลงฐานข้อมูล
-                      // if(pass){
-                      //   signUp();
+                      //await signUp();
+                      bool pass = formKey.currentState!.validate(); //ปุ่มบันทึกลงฐานข้อมูล
+                    if(pass){
+                      signUp();
 
-                      // /*Navigator.push(
-                      //     context,
-                      //     MaterialPageRoute(builder: (context) => const Login_T()));*/
-                      // }
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const Login_T()));
+                    }
 
-                      // formKey.currentState!.validate();
+                      formKey.currentState!.validate();
                     },
                     style: FilledButton.styleFrom(
                       backgroundColor: Color.fromARGB(255, 10, 82, 104),

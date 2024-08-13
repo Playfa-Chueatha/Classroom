@@ -20,8 +20,6 @@ class Login_T extends StatelessWidget {
   }
 }
 
-
-
 class Logint extends StatefulWidget {
   const Logint({super.key});
 
@@ -143,7 +141,7 @@ class _LogintState extends State<Logint> {
                       ),
                       onPressed: () => Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => Register_Page())).then((value) {
+                        MaterialPageRoute(builder: (context) => AddForm_Register_T())).then((value) {
                         },),// print Botton
                         child: Text("สมัครสมาชิก", style: TextStyle(fontSize: 20),),),
                       Icon(Icons.linear_scale),
