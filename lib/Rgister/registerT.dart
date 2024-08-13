@@ -124,7 +124,6 @@ class _FormState extends State<AddForm_Register_T> {
                   return null;
                   }
                 ),
-<<<<<<< HEAD
                 const SizedBox(height: 10),
                 TextFormField(
                   maxLength: 20,
@@ -132,73 +131,6 @@ class _FormState extends State<AddForm_Register_T> {
                     counterText: "",
                     label: Text(
                       "กรุณาระบุนามสกุล",
-=======
-                validator: validateEmail,
-                controller: email,
-              ),
-              TextFormField(
-                maxLength: 20,
-                obscureText: true,
-                decoration: const InputDecoration(
-                  counterText: "",
-                  label: Text(
-                    "กรุณากรอกรหัสผ่าน",
-                    style: TextStyle(fontSize: 20),
-                  ),
-                ),
-                validator: (val) {
-                  if (val!.isEmpty) {
-                    return 'กรุณากรอกรหัสผ่าน';
-                  }
-                  return null;
-                },
-                controller: pass,
-              ),
-              TextFormField(
-                maxLength: 20,
-                obscureText: true,
-                decoration: const InputDecoration(
-                  counterText: "",
-                  label: Text(
-                    "กรุณายืนยันรหัสผ่าน",
-                    style: TextStyle(fontSize: 20),
-                  ),
-                ),
-                validator: (val) {
-                  if (val!.isEmpty) {
-                    return 'กรุณากรอกยืนยันรหัสผ่าน';
-                  } else if (val != pass.text) {
-                    return 'รหัสผ่านไม่ตรงกัน';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(
-                height: 30,
-              ),
-              SizedBox(
-                height: 50,
-                width: 150,
-                child: FilledButton(
-                    onPressed: () async {
-                      await signUp();
-                      // bool pass = formKey.currentState!.validate(); //ปุ่มบันทึกลงฐานข้อมูล
-                      // if(pass){
-                      //   signUp();
-
-                      // /*Navigator.push(
-                      //     context,
-                      //     MaterialPageRoute(builder: (context) => const Login_T()));*/
-                      // }
-
-                      // formKey.currentState!.validate();
-                    },
-                    style: FilledButton.styleFrom(
-                      backgroundColor: Color.fromARGB(255, 10, 82, 104),
-                    ),
-                    child: const Text(
-                      "สมัครสมาชิก",
->>>>>>> 0f627cb71aae0b695867b5d9232496d5a689a021
                       style: TextStyle(fontSize: 20),
                     ),
                   ),
