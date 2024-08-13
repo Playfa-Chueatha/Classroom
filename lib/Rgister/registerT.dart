@@ -6,6 +6,19 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
+
+class Registert_T extends StatelessWidget {
+  const Registert_T({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Register',
+      home: AddForm_Register_T(),
+    );
+  }
+}
+
 class AddForm_Register_T extends StatefulWidget {
   const AddForm_Register_T({super.key});
 
@@ -21,22 +34,38 @@ class _FormState extends State<AddForm_Register_T> {
   TextEditingController surname = TextEditingController();
   TextEditingController pass = TextEditingController();
   TextEditingController email = TextEditingController();
-  String type = '1';
 
-  Future signUp() async {
-    String url = "http://192.168.1.102/classroom/register.php";
-    final response = await http.post(Uri.parse(url), body: {
-      'name': name.text,
-      'surname': surname.text,
-      'password': pass.text,
-      'email': email.text,
-      'type': type,
-    });
-    var data = json.decode(response.body);
+  Future<dynamic> signUp() async {
+    try {
+      var client = http.Client();
+      var headers = {
+        'Content-type': 'application/json',
+        'Accept': 'application/json',
+      };
+
+      String url = "http://edueliteroom.com/connect/registerteacher.php";
+      print('POST Register !');
+      final response = await client.post(Uri.parse(url),
+          headers: headers,
+          body: jsonEncode({
+            "name": name.text,
+            "surname": surname.text,
+            "password": pass.text,
+            "email": email.text
+          }));
+
+      print(jsonDecode(response.body));
+      //var data = jsonDecode(response.body);
+      // print(response.body);
+
+      /*
     if (data == "Error") {
       Navigator.pushNamed(context, 'register');
     } else {
       Navigator.pushNamed(context, 'login');
+    }*/
+    } catch (e) {
+      print(e);
     }
   }
 
@@ -79,6 +108,7 @@ class _FormState extends State<AddForm_Register_T> {
                 SizedBox(height: 10),
                 Image.asset('assets/images/ครู2.png',height: 300),
                 TextFormField(
+                  controller: name,
                   maxLength: 20,
                   decoration: const InputDecoration(
                     counterText: "",
@@ -88,14 +118,13 @@ class _FormState extends State<AddForm_Register_T> {
                     ),
                   ),
                   validator: (val) {
-                    if (val == null || val.isEmpty) {
-                      return 'กรุณากรอกระบุชื่อจริง';
-                    }
-                    return null;
-                  },
-                  controller: name,
+                  if (val == null || val.isEmpty) {
+                    return 'กรุณากรอกระบุชื่อจริง';
+                  }
+                  return null;
+                  }
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 TextFormField(
                   maxLength: 20,
                   decoration: const InputDecoration(
@@ -122,95 +151,89 @@ class _FormState extends State<AddForm_Register_T> {
                       "กรุณากรอก E-mail",
                       style: TextStyle(fontSize: 20),
                     ),
-                  ),
-                  validator: validateEmail,
-                  controller: email,
-                ),
-                TextFormField(
-                  
-                  maxLength: 20,
-                  obscureText: _isObscurd,
-                  decoration: InputDecoration(
-                    suffixIcon: IconButton(
-                        padding: const EdgeInsetsDirectional.all(10.0),
-                        icon: _isObscurd ? const Icon(Icons.visibility) : const Icon(Icons.visibility_off),
-                        onPressed: (){
-                          setState(() {
-                          _isObscurd =!_isObscurd;
-                        });
-                        }, 
-                    ),
-                    counterText: "",
-                    label: const Text(
-                      "กรุณากรอกรหัสผ่าน",
-                      style: TextStyle(fontSize: 20),
+                  ),),
+                  TextFormField(
+                    maxLength: 20,
+                    obscureText: _isObscurd,
+                    decoration: InputDecoration(
+                      suffixIcon: IconButton(
+                          padding: const EdgeInsetsDirectional.all(10.0),
+                          icon: _isObscurd ? const Icon(Icons.visibility) : const Icon(Icons.visibility_off),
+                          onPressed: (){
+                            setState(() {
+                            _isObscurd =!_isObscurd;
+                          });
+                          }, 
+                      ),
+                      counterText: "",
+                      label: const Text(
+                        "กรุณากรอกรหัสผ่าน",
+                        style: TextStyle(fontSize: 20),
+                      ),
                     ),
                   ),
-                  validator: (val) {
-                    if (val!.isEmpty) {
-                      return 'กรุณากรอกรหัสผ่าน';
-                    }
-                    return null;
-                  },
-                  controller: pass,
-                ),
-                TextFormField(
-                  maxLength: 20,
-                  obscureText: _isObscurd2,
-                  decoration: InputDecoration(
-                    suffixIcon: IconButton(
-                        padding: const EdgeInsetsDirectional.all(10.0),
-                        icon: _isObscurd2 ? const Icon(Icons.visibility) : const Icon(Icons.visibility_off),
-                        onPressed: (){
-                          setState(() {
-                          _isObscurd2 =!_isObscurd2;
-                        });
-                        }, 
+                  TextFormField(
+                    maxLength: 20,
+                    obscureText: _isObscurd2,
+                    decoration: InputDecoration(
+                      suffixIcon: IconButton(
+                          padding: const EdgeInsetsDirectional.all(10.0),
+                          icon: _isObscurd2 ? const Icon(Icons.visibility) : const Icon(Icons.visibility_off),
+                          onPressed: (){
+                            setState(() {
+                            _isObscurd2 =!_isObscurd2;
+                          });
+                          }, 
+                      ),
+                      counterText: "",
+                      label: const Text(
+                        "กรุณายืนยันรหัสผ่าน",
+                        style: TextStyle(fontSize: 20),
+                      ),
                     ),
-                    counterText: "",
-                    label: const Text(
-                      "กรุณายืนยันรหัสผ่าน",
-                      style: TextStyle(fontSize: 20),
-                    ),
+                    validator: (val) {
+                      if (val!.isEmpty) {
+                        return 'กรุณากรอกยืนยันรหัสผ่าน';
+                      } else if (val != pass.text) {
+                        return 'รหัสผ่านไม่ตรงกัน';
+                      }
+                      return null;
+                    },
                   ),
-                  validator: (val) {
-                    if (val!.isEmpty) {
-                      return 'กรุณากรอกยืนยันรหัสผ่าน';
-                    } else if (val != pass.text) {
-                      return 'รหัสผ่านไม่ตรงกัน';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(
-                  height: 30,
-                ),
-                SizedBox(
-                  height: 50,
-                  width: 150,
-                  child: FilledButton(
-                    onPressed: (){
-                    bool pass = formKey.currentState!.validate(); //ปุ่มบันทึกลงฐานข้อมูล
-                    if(pass){
-                      signUp();
+                  const SizedBox(
+                    height: 30,
+                  ),
+                  SizedBox(
+                    height: 50,
+                    width: 150,
+                    child: FilledButton(
+                        onPressed: () async {
+                          await signUp();
+                          // bool pass = formKey.currentState!.validate(); //ปุ่มบันทึกลงฐานข้อมูล
+                          // if(pass){
+                          //   signUp();
 
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => const Login_T()));
-                    }
-                    
+                          // /*Navigator.push(
+                          //     context,
+                          //     MaterialPageRoute(builder: (context) => const Login_T()));*/
+                          // }
 
-                    formKey.currentState!.validate();
-                  },
-                  style: FilledButton.styleFrom(
-                    backgroundColor: Color.fromARGB(255, 10, 82, 104),
-                  ),
-                  child: const Text("สมัครสมาชิก", style: TextStyle(fontSize: 20),)
-                  ),
-                )           
-              ],
-            ),
-          ),
+                          // formKey.currentState!.validate();
+                        },
+                        style: FilledButton.styleFrom(
+                          backgroundColor: Color.fromARGB(255, 10, 82, 104),
+                        ),
+                        child: const Text(
+                          "สมัครสมาชิก",
+                          style: TextStyle(fontSize: 20),
+                        )
+                    ),
+                  )
+            
+               
+            ],
+          )
+          )
       ),
     );
   }

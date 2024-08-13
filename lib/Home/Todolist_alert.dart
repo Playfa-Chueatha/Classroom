@@ -4,6 +4,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_esclass_2/Data/Data_todolist.dart';
 import 'package:flutter_esclass_2/Home/homeT.dart';
 import 'package:intl/intl.dart';
+
+class Addtodo extends StatelessWidget {
+  const Addtodo({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: Alert_addtodo(),
+    );
+  }
+}
+
 class Alert_addtodo extends StatefulWidget {
 
   const Alert_addtodo({super.key});
