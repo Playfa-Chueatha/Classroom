@@ -1,16 +1,5 @@
 import 'package:flutter/material.dart';
 
-class DataAnnounce extends StatelessWidget {
-  const DataAnnounce({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home: announce(),
-    );
-  }
-}
-
 class announce extends StatefulWidget {
   const announce({super.key});
 
@@ -23,7 +12,7 @@ class announceState extends State<announce> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Color.fromARGB(255, 147, 185, 221),
-      body: Container(
+      body: SizedBox(
         width: 250,
         height: 250,
       ),

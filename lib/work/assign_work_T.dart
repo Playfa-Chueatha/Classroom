@@ -1,6 +1,5 @@
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_esclass_2/Classroom/classT.dart';
 import 'package:flutter_esclass_2/Home/homeT.dart';
 import 'package:flutter_esclass_2/Login/login.dart';
@@ -9,37 +8,15 @@ import 'package:flutter_esclass_2/Profile/ProfileT.dart';
 import 'package:flutter_esclass_2/Score/Score_T.dart';
 import 'package:flutter_esclass_2/work/asign_work_T_body.dart';
 
-void  main()  => runApp(const AssignWork_class_T());
 
-// const List<Widget> Menu = [
-//   Text('หน้าหลัก'),
-//   Text('ห้องเรียน'),
-//   Text('งานที่มอบหมาย'),
-//   Text('รายชื่อนักเรียน'),
-// ];
-
-class AssignWork_class_T extends StatelessWidget {
+class AssignWork_class_T extends StatefulWidget {
   const AssignWork_class_T({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Assidn_work',
-      home: Ass_work(),
-    );
-  }
+  State<AssignWork_class_T> createState() => _ClassTState();
 }
 
-
-
-class Ass_work extends StatefulWidget {
-  const Ass_work({super.key});
-
-  @override
-  State<Ass_work> createState() => _ClassTState();
-}
-
-class _ClassTState extends State<Ass_work> {
+class _ClassTState extends State<AssignWork_class_T> {
 
   @override
   Widget build(BuildContext context) {
@@ -113,7 +90,7 @@ class _ClassTState extends State<Ass_work> {
             onPressed: (){
               Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const Score_T()),);
+                  MaterialPageRoute(builder: (context) => const ScoreT()),);
             }, 
             icon: const Icon(Icons.list_alt),
             tooltip: 'รายชื่อนักเรียน',

@@ -1,16 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_esclass_2/Data/Data_todolist.dart';
 
-class Todolistclass extends StatelessWidget {
-  const Todolistclass({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home: todocalss(),
-    );
-  }
-}
 class todocalss extends StatefulWidget {
   const todocalss({super.key});
 
@@ -21,9 +11,7 @@ class todocalss extends StatefulWidget {
 class _todocalssState extends State<todocalss> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor:  Color.fromARGB(255, 170, 205, 238),
-      body: Container(
+    return Container(
         height: 400,
         width: 600,
         decoration: BoxDecoration(
@@ -31,7 +19,7 @@ class _todocalssState extends State<todocalss> {
           borderRadius: BorderRadius.circular(20)
         ),
         child: Column(
-        children: [
+        children: const [
           SizedBox(height: 10),
           Text('To do list to day',style: TextStyle(
             fontSize: 20,
@@ -42,14 +30,13 @@ class _todocalssState extends State<todocalss> {
             scrollDirection: Axis.vertical,
 
           child: 
-            Container(
+            SizedBox(
               height: 350,
               width: 1350,
               child: DataTodolist()
             ),
           )
         ]
-      )
       ),
     );
   }

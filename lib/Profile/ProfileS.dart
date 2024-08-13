@@ -1,26 +1,13 @@
 import 'package:flutter/material.dart';
-void main() => runApp(const Profile()); 
 
-class Profile_S extends StatelessWidget {
+class Profile_S extends StatefulWidget {
   const Profile_S({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Profile',
-      home: Profile(),
-    );
-  }
+  State<Profile_S> createState() => _Profile_SState();
 }
 
-class Profile extends StatefulWidget {
-  const Profile({super.key});
-
-  @override
-  State<Profile> createState() => _ProfileState();
-}
-
-class _ProfileState extends State<Profile> {
+class _Profile_SState extends State<Profile_S> {
   final double coverHeight = 280;
   @override
   Widget build(BuildContext context) {
@@ -88,7 +75,7 @@ class _ProfileState extends State<Profile> {
                           ],
                           image: DecorationImage(
                           image: AssetImage(
-                            "assets/images/Profile.jpg"
+                            "assets/images/Profile_S.jpg"
                           ))
                       ),
                     ),
@@ -114,7 +101,7 @@ class _ProfileState extends State<Profile> {
                             borderRadius: BorderRadius.circular(20)
                           ),
                           child: Column(
-                            children: [
+                            children: const [
                               Text("ชื่อ-นามสกุล(ภาษาไทย):"),
                               // Text('ชื่อ-นามสกุล(ภาษาอังกฤษ):'),
                               // Text('ครูประจำชั้นมัธยมศึกษาปีที่:'),

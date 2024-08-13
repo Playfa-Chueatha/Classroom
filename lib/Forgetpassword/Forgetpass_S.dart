@@ -4,28 +4,15 @@ import 'package:flutter_esclass_2/Login/login.dart';
 import 'package:flutter_esclass_2/Login/loginS.dart';
 import 'package:flutter_esclass_2/Login/loginT.dart';
 
-void  main()  => runApp(const Forgetpass_S());
 
-class Forgetpass_S extends StatelessWidget {
+class Forgetpass_S extends StatefulWidget {
   const Forgetpass_S({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Forget Password',
-      home: Forget(),
-    );
-  }
+  State<Forgetpass_S> createState() => _ForgetState();
 }
 
-class Forget extends StatefulWidget {
-  const Forget({super.key});
-
-  @override
-  State<Forget> createState() => _ForgetState();
-}
-
-class _ForgetState extends State<Forget> {
+class _ForgetState extends State<Forgetpass_S> {
   final _controler = TextEditingController();
   bool _validate = false;
 

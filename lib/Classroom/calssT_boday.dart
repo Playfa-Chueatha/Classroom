@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_esclass_2/Classroom/announce_class.dart';
 import 'package:flutter_esclass_2/Model/menu.dart';
@@ -62,7 +61,7 @@ int counter = 0;
                         child: Column(
                           children: [
                             SizedBox(height: 20,),
-                            Container(
+                            SizedBox(
                               height: 50,
                               width: 700,
                               child: Row(

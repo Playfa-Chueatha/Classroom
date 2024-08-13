@@ -5,25 +5,14 @@ import 'package:flutter_esclass_2/Classroom/setting_calss.dart';
 import 'package:flutter_esclass_2/Model/Menu_listclassroom.dart';
   
 
-class Menuu_class extends StatelessWidget {
+class Menuu_class extends StatefulWidget {
   const Menuu_class({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Menu(),
-    );
-  }
+  State<Menuu_class> createState() => _MenuState();
 }
 
-class Menu extends StatefulWidget {
-  const Menu({super.key});
-
-  @override
-  State<Menu> createState() => _MenuState();
-}
-
-class _MenuState extends State<Menu> {
+class _MenuState extends State<Menuu_class> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -55,7 +44,7 @@ class _MenuState extends State<Menu> {
                     onPressed: (){
                       Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => AddClassroom()),);
+                          MaterialPageRoute(builder: (context) => SettingCalss()),);
 
                     }, 
                     icon: Icon(Icons.settings))
@@ -63,16 +52,12 @@ class _MenuState extends State<Menu> {
               ),
               Text('ห้องเรียนของฉัน',style: TextStyle(fontSize: 20),),
               SizedBox(height: 10),
-              Container(
+              SizedBox(
                 height: 190,
                 width: 300,
                 child:  List_student(),
               ),
               SizedBox(height: 5),
-
-
-              //ปุ่มคั้งค่าห้องเรียน
-              
             ],
           ),
         ),
@@ -92,7 +77,7 @@ class _MenuState extends State<Menu> {
             )
           ), 
           child: Column(
-            children: [
+            children: const [
               SizedBox(height: 20),
               Text('To do list',style: TextStyle(fontSize: 20),),
             ],
@@ -114,7 +99,7 @@ class _MenuState extends State<Menu> {
             )
           ), 
           child: Column(
-            children: [
+            children: const [
               SizedBox(height: 20),
               Text('Users online',style: TextStyle(fontSize: 20),),
             ],

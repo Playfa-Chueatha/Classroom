@@ -1,3 +1,5 @@
+
+
 import 'package:flutter/material.dart';
 import 'package:flutter_esclass_2/Classroom/calssS_boday.dart';
 import 'package:flutter_esclass_2/Home/homeS.dart';
@@ -6,8 +8,6 @@ import 'package:flutter_esclass_2/Model/Chat.dart';
 import 'package:flutter_esclass_2/Profile/ProfileS.dart';
 import 'package:flutter_esclass_2/Score/Score_S.dart';
 import 'package:flutter_esclass_2/work/asign_work_S.dart';
-
-void  main()  => runApp(const ClassS());
 
 
 class ClassS extends StatefulWidget {

@@ -3,33 +3,30 @@ import 'package:flutter_esclass_2/Forgetpassword/Forgetpass_S.dart';
 import 'package:flutter_esclass_2/Home/homeS.dart';
 import 'package:flutter_esclass_2/Rgister/registerS.dart';
 
-void  main()  => runApp(const Login_S());
 
-class Login_S extends StatelessWidget {
+class Login_S extends StatefulWidget {
   const Login_S({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Login_student',
-      home: Logins(),
-    );
-  }
-}
-class Logins extends StatefulWidget {
-  const Logins({super.key});
-
-  @override
-  State<Logins> createState() => _LogintState();
+  State<Login_S> createState() => _LogintState();
 }
 
-class _LogintState extends State<Logins> {
+class _LogintState extends State<Login_S> {
 
   final _formkey = GlobalKey<FormState>();
   // ignore: unused_field
   String _name = '';
   // ignore: unused_field
-  String _last = '';
+  final String _last = '';
+
+  var _isObscurd;
+
+  @override
+  void initState(){
+    super.initState();
+
+    _isObscurd = true;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -57,6 +54,7 @@ class _LogintState extends State<Logins> {
                       margin: EdgeInsets.fromLTRB(300,20,300,10),
                       child: TextFormField(
                         decoration: const InputDecoration(
+                        prefixIcon: Icon(Icons.person_outline_outlined),
                         label: Text("กรุณากรอกชื่อผู้ใช้", style: TextStyle(fontSize: 20),)
                         ),
                         onSaved: (Valuue){
@@ -74,10 +72,19 @@ class _LogintState extends State<Logins> {
                   Container(
                       margin: EdgeInsets.fromLTRB(300,10,300,50),
                       child: TextFormField(
-                        obscureText: true,
-                        decoration: const InputDecoration(
-                        label: Text("กรุณากรอกรหัสผ่าน", style: TextStyle(fontSize: 20),)
-                        ),
+                        obscureText: _isObscurd,
+                        decoration: InputDecoration(
+                          prefixIcon: Icon(Icons.lock),
+                          suffixIcon: IconButton(
+                            padding: const EdgeInsetsDirectional.all(10.0),
+                            icon: _isObscurd ? const Icon(Icons.visibility) : const Icon(Icons.visibility_off),
+                            onPressed: (){
+                              setState(() {
+                                _isObscurd =!_isObscurd;
+                              });
+                            }, 
+                             ),
+                        label: const Text("กรุณากรอกรหัสผ่าน", style: TextStyle(fontSize: 20),)),
                         onSaved: (Valuue){
                            _name=Valuue!;
                         },

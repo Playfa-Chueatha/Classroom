@@ -7,26 +7,16 @@ import 'package:flutter_esclass_2/Profile/ProfileT.dart';
 import 'package:flutter_esclass_2/Score/Score_T_body.dart';
 import 'package:flutter_esclass_2/work/assign_work_T.dart';
 
-class ScoreT extends StatelessWidget {
+
+
+class ScoreT extends StatefulWidget {
   const ScoreT({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'list_Student',
-      home: Score_T(),
-    );
-  }
+  State<ScoreT> createState() => _ScoreTState();
 }
 
-class Score_T extends StatefulWidget {
-  const Score_T({super.key});
-
-  @override
-  State<Score_T> createState() => _Score_TState();
-}
-
-class _Score_TState extends State<Score_T> {
+class _ScoreTState extends State<ScoreT> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -99,7 +89,7 @@ class _Score_TState extends State<Score_T> {
             onPressed: (){
               Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const Score_T()),);
+                  MaterialPageRoute(builder: (context) => const ScoreT()),);
             }, 
             icon: const Icon(Icons.list_alt),
             tooltip: 'รายชื่อนักเรียน',

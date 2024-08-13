@@ -1,24 +1,14 @@
 import 'package:flutter/material.dart';
 
-class DataCalssroom extends StatelessWidget {
+
+class DataCalssroom extends StatefulWidget {
   const DataCalssroom({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Data_class(),
-    );
-  }
+  State<DataCalssroom> createState() => _DataCalssroomState();
 }
 
-class Data_class extends StatefulWidget {
-  const Data_class({super.key});
-
-  @override
-  State<Data_class> createState() => _Data_classState();
-}
-
-class _Data_classState extends State<Data_class> {
+class _DataCalssroomState extends State<DataCalssroom> {
 
 
   @override
@@ -47,7 +37,7 @@ class _Data_classState extends State<Data_class> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Container(
-                              height: 30,
+                              height: 40,
                               width: 300,
                               decoration: BoxDecoration(
                                 color: Color.fromARGB(255, 195, 238, 250),

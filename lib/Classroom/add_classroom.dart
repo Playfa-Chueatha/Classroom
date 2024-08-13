@@ -1,23 +1,18 @@
+// ignore_for_file: non_constant_identifier_names
+
 import 'package:flutter/material.dart';
 import 'package:flutter_esclass_2/Classroom/setting_calss.dart';
 import 'package:flutter_esclass_2/Data/data_calssroom.dart';
 
-class AddClassroom extends StatelessWidget {
+
+class AddClassroom extends StatefulWidget {
   const AddClassroom({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return Addroom();
-  }
-}
-class Addroom extends StatefulWidget {
-  const Addroom({super.key});
-
-  @override
-  State<Addroom> createState() => _AddroomState();
+  State<AddClassroom> createState() => _AddClassroomState();
 }
 
-class _AddroomState extends State<Addroom> {
+class _AddClassroomState extends State<AddClassroom> {
 
   final formKey = GlobalKey<FormState>();
   String Name_class = '';
@@ -34,7 +29,7 @@ class _AddroomState extends State<Addroom> {
       actions: [
         Form( key: formKey,
         child:
-        Container(
+        SizedBox(
           height: 550,
           width: 500,
           child: 
@@ -142,9 +137,8 @@ class _AddroomState extends State<Addroom> {
                               Detail: Detail)
                           );
                           formKey.currentState!.reset();
-                          print(data.length);
                           Navigator.pushReplacement(context,MaterialPageRoute(
-                              builder: (ctx)=>const Setting_Calss())
+                              builder: (ctx)=>const SettingCalss())
                           ); 
 
 

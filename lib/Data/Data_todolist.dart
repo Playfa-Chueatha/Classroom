@@ -1,29 +1,18 @@
 import 'package:flutter/material.dart';
 
-class DataTodolist extends StatelessWidget {
+class DataTodolist extends StatefulWidget {
   const DataTodolist({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Datatodo(),
-    );
-  }
+  State<DataTodolist> createState() => _DatatodoState();
 }
 
-class Datatodo extends StatefulWidget {
-  const Datatodo({super.key});
-
-  @override
-  State<Datatodo> createState() => _DatatodoState();
-}
-
-class _DatatodoState extends State<Datatodo> {
+class _DatatodoState extends State<DataTodolist> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Color.fromARGB(255, 170, 205, 238),
-      body: Container(
+      body: SizedBox(
         width: 600,
         height: 600,
         child: ListView.builder(
@@ -37,7 +26,7 @@ class _DatatodoState extends State<Datatodo> {
               Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Container(  
+                  SizedBox(  
                     width: 600,                 
                     child:  ListTile(
                       onTap: (){},
@@ -46,7 +35,7 @@ class _DatatodoState extends State<Datatodo> {
                       ),
                       tileColor: Colors.white,
                       leading: Icon(Icons.check_box),
-                      title: Text("${data[index].Title}",
+                      title: Text(data[index].Title,
                       style: TextStyle(
                         fontSize: 16,
                         color: Colors.black,

@@ -1,3 +1,4 @@
+// import 'dart:ffi';
 import 'package:flutter/material.dart';
 import 'package:flutter_esclass_2/Forgetpassword/Forgetpass_T.dart';
 import 'package:flutter_esclass_2/Home/homeT.dart';
@@ -6,33 +7,28 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
-void  main()  => runApp(const Logint());
-
-class Login_T extends StatelessWidget {
+class Login_T extends StatefulWidget {
   const Login_T({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Login_teacher',
-      home: Logint(),
-    );
-  }
+  State<Login_T> createState() => _Login_TState();
 }
 
-class Logint extends StatefulWidget {
-  const Logint({super.key});
-
-  @override
-  State<Logint> createState() => _LogintState();
-}
-
-class _LogintState extends State<Logint> {
+class _Login_TState extends State<Login_T> {
 
   final formKey = GlobalKey<FormState>();
 
   TextEditingController pass = TextEditingController();
   TextEditingController email = TextEditingController();
+
+  var _isObscurd;
+
+  @override
+  void initState(){
+    super.initState();
+
+    _isObscurd = true;
+  }
 
   Future signIn() async {
     String url = "http://192.168.1.102/classroom/login.php";
@@ -63,7 +59,6 @@ class _LogintState extends State<Logint> {
   Widget build(BuildContext context) {
     return Scaffold(
         body: Center(
-
           child: SingleChildScrollView(
             child: Form(
               key: formKey,
@@ -85,9 +80,8 @@ class _LogintState extends State<Logint> {
                     Container(
                       margin: EdgeInsets.fromLTRB(300,20,300,10),
                       child: TextFormField(
-                
                         decoration: const InputDecoration(
-                          prefix: Icon(Icons.person_outline_outlined),
+                          prefixIcon: Icon(Icons.person_outline_outlined),
                           label: Text("กรุณากรอกชื่อผู้ใช้", style: TextStyle(fontSize: 20),)
                         ),
                         validator: validateEmail,
@@ -98,18 +92,29 @@ class _LogintState extends State<Logint> {
                   Container(
                       margin: EdgeInsets.fromLTRB(300,10,300,50),
                       child: TextFormField(
-                        obscureText: true,
-                        decoration: const InputDecoration(
-                          prefix: Icon(Icons.lock),
-                          label: Text("กรุณากรอกรหัสผ่าน", style: TextStyle(fontSize: 20),)
+                        obscureText: _isObscurd,
+                        // focusNode: paswordFocusNode,
+                        keyboardType: TextInputType.emailAddress,
+                        controller: pass,
+                        decoration: InputDecoration(
+                          prefixIcon: Icon(Icons.lock),
+                          label: const Text("กรุณากรอกรหัสผ่าน", style: TextStyle(fontSize: 20),),
+                          suffixIcon: IconButton(
+                            padding: const EdgeInsetsDirectional.all(10.0),
+                            icon: _isObscurd ? const Icon(Icons.visibility) : const Icon(Icons.visibility_off),
+                            onPressed: (){
+                              setState(() {
+                                _isObscurd =!_isObscurd;
+                              });
+                            }, 
+                             )
                         ),
                         validator: (val) {
                           if (val!.isEmpty) {
                             return 'กรุณากรอกรหัสผ่าน';
                           }
                           return null;
-                        },
-                        controller: pass,
+                        },               
                       ),
                     ),
                   FilledButton(

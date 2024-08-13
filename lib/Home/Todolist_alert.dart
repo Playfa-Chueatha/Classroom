@@ -1,32 +1,30 @@
-// ignore_for_file: unused_label
 
-
+import 'dart:js_interop';
 import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_esclass_2/Data/Data_todolist.dart';
 import 'package:flutter_esclass_2/Home/homeT.dart';
 import 'package:intl/intl.dart';
 
-class Alert_addtodo extends StatelessWidget {
-  const Alert_addtodo({super.key});
+class Addtodo extends StatelessWidget {
+  const Addtodo({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: add_todo(),
+      home: Alert_addtodo(),
     );
   }
 }
-class add_todo extends StatefulWidget {
 
-  const add_todo({super.key});
+class Alert_addtodo extends StatefulWidget {
+
+  const Alert_addtodo({super.key});
 
   @override
-  State<add_todo> createState() => add_todoState();
+  State<Alert_addtodo> createState() => add_todoState();
 }
 
-class add_todoState extends State<add_todo> {
+class add_todoState extends State<Alert_addtodo> {
 
 final formKey = GlobalKey<FormState>();
 String Title = '';
@@ -35,8 +33,8 @@ var FirstDate = '';
 var LastDate = '';
 
 
-TextEditingController _date = TextEditingController();
-TextEditingController _date2 = TextEditingController();
+final TextEditingController _date = TextEditingController();
+final TextEditingController _date2 = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -163,17 +161,17 @@ TextEditingController _date2 = TextEditingController();
                               builder: (ctx)=>const main_home_T())
                           );
                           },
-                          child: const Text('OK'),
                           style: TextButton.styleFrom(
                             foregroundColor: Color.fromARGB(255, 63, 124, 238)
                           ),
+                          child: const Text('OK'),
                       ),
                       TextButton(
                           onPressed: () => Navigator.pop(context, 'Cancel'),
-                          child: const Text('Cancel'),
                           style: TextButton.styleFrom(
                             foregroundColor: Color.fromARGB(255, 238, 108, 115)
                           ),
+                          child: const Text('Cancel'),
                       ),  
                         ],
                     )

@@ -1,52 +1,29 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_esclass_2/Forgetpassword/Forgetpass_S.dart';
 import 'package:flutter_esclass_2/Home/homeS.dart';
 import 'package:flutter_esclass_2/Home/homeT.dart';
 import 'package:flutter_esclass_2/Login/loginS.dart';
 import 'package:flutter_esclass_2/Login/loginT.dart';
 
-void main() {
-  runApp(Login_class());
-}
-
-
-// void main() {
-//   setUrlStrategy(PathUrlStrategy());
-//   runApp(Login_class());
-// }
-// void  main()  => runApp(const Login_class());
-
-class Login_class extends StatelessWidget {
-   const Login_class({super.key});
-  
-  @override
-  Widget build(BuildContext context) {
-    
-    return const MaterialApp(
-      title: 'Login',
-      home: Test_b(),
-    );
-  }
-}
-
-
-class Test_b extends StatefulWidget {
-  const Test_b({super.key});
+class Login_class extends StatefulWidget {
+  const Login_class({super.key});
 
   @override
-  State<Test_b> createState() => _Test_bState();
+  State<Login_class> createState() => _Login_classState();
 }
 
-class _Test_bState extends State<Test_b> {
+class _Login_classState extends State<Login_class> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       // floatingActionButton: FloatingActionButton(
       //   onPressed: (){}),
       
-      body: Center(
-        child: Container(
+      body: Center(       
+        child:  SingleChildScrollView(
+          scrollDirection: Axis.vertical,
+          child: Container(
+            alignment: Alignment.center,            
             decoration: BoxDecoration(color: Color.fromARGB(255, 147, 235, 241),borderRadius: BorderRadius.circular(20)),
             height: 750,
             width: 1000,
@@ -70,7 +47,7 @@ class _Test_bState extends State<Test_b> {
                               onPressed: (){
                                 Navigator.push(
                                   context,
-                                  MaterialPageRoute(builder: (context) => const Logint(),),
+                                  MaterialPageRoute(builder: (context) => const Login_T(),),
                                 );
                               },
                               style: FilledButton.styleFrom(
@@ -90,7 +67,7 @@ class _Test_bState extends State<Test_b> {
                               onPressed: (){
                                 Navigator.push(
                                   context,
-                                  MaterialPageRoute(builder: (context) => const Logins()),
+                                  MaterialPageRoute(builder: (context) => const Login_S()),
                                 );
                               },
                               style: FilledButton.styleFrom(
@@ -133,6 +110,9 @@ class _Test_bState extends State<Test_b> {
               ],
             )   
           )
+          
+        )
+        
       ),
     );
   }

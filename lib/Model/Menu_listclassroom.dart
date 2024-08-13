@@ -2,17 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_esclass_2/Classroom/setting_calss.dart';
 import 'package:flutter_esclass_2/Data/data_calssroom.dart';
 
-class list_class extends StatelessWidget {
-  const list_class({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home: List_student(),
-    );
-  }
-}
-
 class List_student extends StatefulWidget {
   const List_student({super.key});
 

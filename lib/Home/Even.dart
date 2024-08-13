@@ -1,16 +1,5 @@
 
 import 'package:flutter/material.dart';
-
-class Even_class extends StatelessWidget {
-  const Even_class({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Even(),
-    );
-  }
-}
 class Even extends StatefulWidget {
   const Even({super.key});
 

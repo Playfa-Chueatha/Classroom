@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-void  main()  => runApp(const ForgetPass());
-
 class ForgetPass extends StatefulWidget {
   const ForgetPass({super.key});
 
@@ -15,7 +13,7 @@ class _ForgetState extends State<ForgetPass> {
   // ignore: unused_field
   String _name = '';
   // ignore: unused_field
-  String _last = '';
+  final String _last = '';
 
   @override
   Widget build(BuildContext context) {

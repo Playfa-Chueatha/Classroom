@@ -1,28 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-void main() => runApp(const add_wprk_T());
-
-class add_wprk_T extends StatelessWidget {
+class add_wprk_T extends StatefulWidget {
   const add_wprk_T({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Addwork',
-      home: add_work(),
-    );
-  }
+  State<add_wprk_T> createState() => _add_workState();
 }
 
-class add_work extends StatefulWidget {
-  const add_work({super.key});
-
-  @override
-  State<add_work> createState() => _add_workState();
-}
-
-class _add_workState extends State<add_work> {
+class _add_workState extends State<add_wprk_T> {
 
   @override
   Widget build(BuildContext context) {
@@ -221,14 +207,14 @@ class _add_workState extends State<add_work> {
                             SizedBox(height: 10),
                             Row (
                               crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
+                              children: const [
                                 SizedBox(width: 50),
                                 Text("วันที่ :            ", style: TextStyle(fontSize: 20)),
                                 SizedBox(
                                   height: 30,
                                   width: 100,
                                   child: TextField(
-                                    decoration: const InputDecoration(
+                                    decoration: InputDecoration(
                                       prefix: Icon(Icons.calendar_today),
                                       isCollapsed: true,
                                       isDense: true,

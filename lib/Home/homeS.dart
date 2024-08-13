@@ -9,29 +9,25 @@ import 'package:flutter_esclass_2/Profile/ProfileS.dart';
 import 'package:flutter_esclass_2/Score/Score_S.dart';
 import 'package:flutter_esclass_2/work/asign_work_S.dart';
 
-void main() => runApp(const main_home_S());
 
-
-class main_home_S extends StatelessWidget {
-  const main_home_S({super.key});
+class Home_S extends StatelessWidget {
+  const Home_S({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Home',
-      home: home(),
+      home: main_home_S(),
     );
   }
 }
-
-class home extends StatefulWidget {
-  const home({super.key});
+class main_home_S extends StatefulWidget {
+  const main_home_S({super.key});
 
   @override
-  State<home> createState() => _homeState();
+  State<main_home_S> createState() => _homeState();
 }
 
-class _homeState extends State<home> {
+class _homeState extends State<main_home_S> {
 
   // List <bool> isSelected = [true,false,false,false];
 

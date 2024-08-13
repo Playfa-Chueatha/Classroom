@@ -1,31 +1,19 @@
+
 import 'package:flutter/material.dart';
 import 'package:flutter_esclass_2/Classroom/add_classroom.dart';
 import 'package:flutter_esclass_2/Data/data_calssroom.dart';
+import 'package:flutter_esclass_2/Model/model_Listparticipantroom.dart';
+import 'package:flutter_esclass_2/Model/model_Listsudent.dart';
 
-void main() => runApp(const SettingCalss());
 
-
-class SettingCalss extends StatelessWidget {
+class SettingCalss extends StatefulWidget {
   const SettingCalss({super.key});
 
-
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-
-      home: Setting_Calss(),
-    );
-  }
+  State<SettingCalss> createState() => _SettingCalssState();
 }
 
-class Setting_Calss extends StatefulWidget {
-  const Setting_Calss({super.key});
-
-  @override
-  State<Setting_Calss> createState() => _Setting_CalssState();
-}
-
-class _Setting_CalssState extends State<Setting_Calss> {
+class _SettingCalssState extends State<SettingCalss> {
 
                                                
   
@@ -90,17 +78,54 @@ class _Setting_CalssState extends State<Setting_Calss> {
                       SizedBox(width: 50,),
 
 
-                      //ปฏิทิน
+                      //รายชื่อนักเรียน
                       Container(
                       height: 1000,
                       width: 1440,
+                      margin: EdgeInsets.all(20),
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(20)
                         ),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
+                        child: Column(
+                          children: [
+                            Container(
+                              margin: EdgeInsets.fromLTRB(0, 50, 0, 10),
+                              height: 440,
+                              width: 1300,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(20),
+                                color: Color.fromARGB(255, 147, 185, 221),
+                              ),
+                              child: const Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Padding(
+                                    padding: EdgeInsets.fromLTRB(20, 20, 0, 0),
+                                    child: Text('รายชื่อนักเรียน',style: TextStyle(fontSize: 30))), 
+                                  ModelRoom()
+                                ],
+                              ),
+                            ),
+                            Container(
+                              margin: EdgeInsets.fromLTRB(0, 10, 0, 50),
+                              height: 440,
+                              width: 1300,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(20),
+                                color: Color.fromARGB(255, 147, 185, 221),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: const [
+                                  Padding(
+                                    padding: EdgeInsets.fromLTRB(20, 20, 0, 0),
+                                    child: Text('รายชื่อคำขอเข้าห้องเรียน',style: TextStyle(fontSize: 30))),
+                                  Listparticipantroom()
+                                ],
+                              ),
+                            )
+                          ],
                         )
                       ),
                       SizedBox(width: 30)
