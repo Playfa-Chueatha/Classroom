@@ -2,27 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
-
-
-class Calendar_Home extends StatelessWidget {
-  const Calendar_Home({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      localizationsDelegates: const[
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate
-      ],
-      supportedLocales: const[
-        Locale('th'),
-      ],
-      locale: const Locale('th'),
-      home: CalendarPage(),
-    );
-  }
-}
 class CalendarPage extends StatefulWidget {
   const CalendarPage({super.key});
 

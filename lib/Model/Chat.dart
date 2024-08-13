@@ -1,17 +1,6 @@
 
 import 'package:flutter/material.dart';
 
-class Chat extends StatelessWidget {
-  const Chat({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Chat',
-      home: Chat_classs(),
-    );
-  }
-}
 class Chat_classs extends StatefulWidget {
   const Chat_classs({super.key});
 

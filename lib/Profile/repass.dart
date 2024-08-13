@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-void  main()  => runApp(const ForgetPass());
-
 class ForgetPass extends StatefulWidget {
   const ForgetPass({super.key});
 

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_esclass_2/Classroom/classT.dart';
-import 'package:flutter_esclass_2/Home/homT_body.dart';
 import 'package:flutter_esclass_2/Home/homeS.dart';
 import 'package:flutter_esclass_2/Login/login.dart';
 import 'package:flutter_esclass_2/Model/Chat.dart';
@@ -8,29 +7,14 @@ import 'package:flutter_esclass_2/Profile/ProfileT.dart';
 import 'package:flutter_esclass_2/Score/Score_T.dart';
 import 'package:flutter_esclass_2/work/assign_work_T.dart';
 
-void main() => runApp(const main_home_T());
-
-
-class main_home_T extends StatelessWidget {
+class main_home_T extends StatefulWidget {
   const main_home_T({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Home',
-      home: home(),
-    );
-  }
+  State<main_home_T> createState() => _main_home_TState();
 }
 
-class home extends StatefulWidget {
-  const home({super.key});
-
-  @override
-  State<home> createState() => _homeState();
-}
-
-class _homeState extends State<home> {
+class _main_home_TState extends State<main_home_T> {
 
   int counter = 0;
 
@@ -123,7 +107,7 @@ class _homeState extends State<home> {
             onPressed: (){
               Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const Score_T()),);
+                  MaterialPageRoute(builder: (context) => const ScoreT()),);
             }, 
             icon: const Icon(Icons.list_alt),
             tooltip: 'รายชื่อนักเรียน',
@@ -158,7 +142,7 @@ class _homeState extends State<home> {
       ),
 
 
-      body: Body_home(),
+      body: main_home_T(),
     );
   }
 }

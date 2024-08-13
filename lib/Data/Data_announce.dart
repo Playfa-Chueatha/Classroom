@@ -1,16 +1,5 @@
 import 'package:flutter/material.dart';
 
-class DataAnnounce extends StatelessWidget {
-  const DataAnnounce({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home: announce(),
-    );
-  }
-}
-
 class announce extends StatefulWidget {
   const announce({super.key});
 

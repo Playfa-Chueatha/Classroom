@@ -1,24 +1,13 @@
 import 'package:flutter/material.dart';
 
-class DataTodolist extends StatelessWidget {
+class DataTodolist extends StatefulWidget {
   const DataTodolist({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Datatodo(),
-    );
-  }
+  State<DataTodolist> createState() => _DatatodoState();
 }
 
-class Datatodo extends StatefulWidget {
-  const Datatodo({super.key});
-
-  @override
-  State<Datatodo> createState() => _DatatodoState();
-}
-
-class _DatatodoState extends State<Datatodo> {
+class _DatatodoState extends State<DataTodolist> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(

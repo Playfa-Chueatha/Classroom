@@ -1,31 +1,18 @@
-// ignore_for_file: unused_label
 
 import 'dart:js_interop';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_esclass_2/Data/Data_todolist.dart';
 import 'package:flutter_esclass_2/Home/homeT.dart';
 import 'package:intl/intl.dart';
+class Alert_addtodo extends StatefulWidget {
 
-class Alert_addtodo extends StatelessWidget {
   const Alert_addtodo({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home: add_todo(),
-    );
-  }
-}
-class add_todo extends StatefulWidget {
-
-  const add_todo({super.key});
-
-  @override
-  State<add_todo> createState() => add_todoState();
+  State<Alert_addtodo> createState() => add_todoState();
 }
 
-class add_todoState extends State<add_todo> {
+class add_todoState extends State<Alert_addtodo> {
 
 final formKey = GlobalKey<FormState>();
 String Title = '';

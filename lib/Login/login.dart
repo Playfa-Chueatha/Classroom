@@ -6,35 +6,29 @@ import 'package:flutter_esclass_2/Login/loginS.dart';
 import 'package:flutter_esclass_2/Login/loginT.dart';
 
 
+void main() {runApp(const Myapp());}
 
-// void main() {
-//   setUrlStrategy(PathUrlStrategy());
-//   runApp(Login_class());
-// }
-// void  main()  => runApp(const Login_class());
+class Myapp extends StatelessWidget {
+  const Myapp({super.key});
 
-class Login_class extends StatelessWidget {
-   const Login_class({super.key});
-  
   @override
   Widget build(BuildContext context) {
-    
-    return const MaterialApp(
-      title: 'Login',
-      home: Test_b(),
+    return MaterialApp(
+      title: 'Eduelite',
+      home: Login_class(),
     );
   }
 }
 
 
-class Test_b extends StatefulWidget {
-  const Test_b({super.key});
+class Login_class extends StatefulWidget {
+  const Login_class({super.key});
 
   @override
-  State<Test_b> createState() => _Test_bState();
+  State<Login_class> createState() => _Login_classState();
 }
 
-class _Test_bState extends State<Test_b> {
+class _Login_classState extends State<Login_class> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -69,7 +63,7 @@ class _Test_bState extends State<Test_b> {
                               onPressed: (){
                                 Navigator.push(
                                   context,
-                                  MaterialPageRoute(builder: (context) => const Logint(),),
+                                  MaterialPageRoute(builder: (context) => const Login_T(),),
                                 );
                               },
                               style: FilledButton.styleFrom(
@@ -89,7 +83,7 @@ class _Test_bState extends State<Test_b> {
                               onPressed: (){
                                 Navigator.push(
                                   context,
-                                  MaterialPageRoute(builder: (context) => const Logins()),
+                                  MaterialPageRoute(builder: (context) => const Login_S()),
                                 );
                               },
                               style: FilledButton.styleFrom(

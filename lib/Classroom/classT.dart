@@ -1,5 +1,7 @@
+
 import 'package:flutter/material.dart';
 import 'package:flutter_esclass_2/Classroom/calssT_boday.dart';
+import 'package:flutter_esclass_2/Classroom/setting_calss.dart';
 import 'package:flutter_esclass_2/Home/homeT.dart';
 import 'package:flutter_esclass_2/Login/login.dart';
 import 'package:flutter_esclass_2/Model/Chat.dart';
@@ -8,38 +10,14 @@ import 'package:flutter_esclass_2/Score/Score_T.dart';
 import 'package:flutter_esclass_2/work/assign_work_T.dart';
 
 
-
-
-void  main()  => runApp(const ClassT());
-
-
-
 class ClassT extends StatefulWidget {
   const ClassT({super.key});
 
   @override
-  State<ClassT> createState() => _ClassTState();
+  State<ClassT> createState() => ClassTState();
 }
 
-class _ClassTState extends State<ClassT> {
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Classrom',
-      home: Class_T(),
-    );
-  }
-}
-
-class Class_T extends StatefulWidget {
-  const Class_T({super.key});
-
-  @override
-  State<Class_T> createState() => Class_TState();
-}
-
-class Class_TState extends State<Class_T> {
+class ClassTState extends State<ClassT> {
 
 
 
@@ -53,6 +31,15 @@ class Class_TState extends State<Class_T> {
         title: Text('Eduelite'),
         backgroundColor: Color.fromARGB(255, 152, 186, 218),
         actions: <Widget>[
+          IconButton(
+            onPressed: (){
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const SettingCalss()),);
+            }, 
+            icon: Icon(Icons.settings),
+            tooltip: 'ออกจากระบบ',
+          ),
           IconButton(
             onPressed: (){
               Navigator.push(
@@ -118,7 +105,7 @@ class Class_TState extends State<Class_T> {
             onPressed: (){
               Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const Score_T()),);
+                  MaterialPageRoute(builder: (context) => const ScoreT()),);
             }, 
             icon: const Icon(Icons.list_alt),
             tooltip: 'รายชื่อนักเรียน',
@@ -147,6 +134,7 @@ class Class_TState extends State<Class_T> {
             icon: Icon(Icons.logout),
             tooltip: 'ออกจากระบบ',
           ),
+          
           SizedBox(width: 50)
         ],
       ),

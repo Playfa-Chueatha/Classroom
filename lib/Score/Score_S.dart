@@ -7,26 +7,15 @@ import 'package:flutter_esclass_2/Profile/ProfileS.dart';
 import 'package:flutter_esclass_2/Score/Score_S_body.dart';
 import 'package:flutter_esclass_2/work/asign_work_S.dart';
 
-class Score_S extends StatelessWidget {
+
+class Score_S extends StatefulWidget {
   const Score_S({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'My Score',
-      home: ScoreS(),
-    );
-  }
+  State<Score_S> createState() => _Score_SState();
 }
 
-class ScoreS extends StatefulWidget {
-  const ScoreS({super.key});
-
-  @override
-  State<ScoreS> createState() => _ScoreSState();
-}
-
-class _ScoreSState extends State<ScoreS> {
+class _Score_SState extends State<Score_S> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(

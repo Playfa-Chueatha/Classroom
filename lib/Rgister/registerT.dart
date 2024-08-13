@@ -1,31 +1,19 @@
+// ignore_for_file: prefer_typing_uninitialized_variables, use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:flutter_esclass_2/Login/loginT.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
-void main() => runApp(const AddForm_Register_T());
-
-class AddForm_Register_T extends StatelessWidget {
+class AddForm_Register_T extends StatefulWidget {
   const AddForm_Register_T({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'ESclass',
-      home: AddForm(),
-    );
-  }
+  State<AddForm_Register_T> createState() => _FormState();
 }
 
-class AddForm extends StatefulWidget {
-  const AddForm({super.key});
-
-  @override
-  State<AddForm> createState() => _FormState();
-}
-
-class _FormState extends State<AddForm> {
+class _FormState extends State<AddForm_Register_T> {
 
   final formKey = GlobalKey<FormState>();
 
@@ -62,6 +50,17 @@ class _FormState extends State<AddForm> {
     }
     return null;
   }
+
+  var _isObscurd;
+  var _isObscurd2;
+  @override
+  void initState(){
+    super.initState();
+
+    _isObscurd = true;
+    _isObscurd2 = true;
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -127,56 +126,22 @@ class _FormState extends State<AddForm> {
                   validator: validateEmail,
                   controller: email,
                 ),
-                // Row(
-                //   children: [
-                //     Text(
-                //       "คุณเป็นนักเรียนหรือครู",
-                //       style: TextStyle(fontSize: 20),
-                //     )
-                //   ],
-                // ),
-                // Row(
-                //   children: [
-                //     Radio(
-                //       value: 1,
-                //       groupValue: _value,
-                //       onChanged: (value) {
-                //         setState(() {
-                //           _value = value!;
-                //           type = value.toString();
-                //         });
-                //       },
-                //     ),
-                //     SizedBox(
-                //       width: 20.0,
-                //     ),
-                //     Text("ครู"),
-                //   ],
-                // ),
-                // Row(
-                //   children: [
-                //     Radio(
-                //       value: 2,
-                //       groupValue: _value,
-                //       onChanged: (value) {
-                //         setState(() {
-                //           _value = value!;
-                //           type = value.toString();
-                //         });
-                //       },
-                //     ),
-                //     SizedBox(
-                //       width: 20.0,
-                //     ),
-                //     Text("นักเรียน"),
-                //   ],
-                // ),
                 TextFormField(
+                  
                   maxLength: 20,
-                  obscureText: true,
-                  decoration: const InputDecoration(
+                  obscureText: _isObscurd,
+                  decoration: InputDecoration(
+                    suffixIcon: IconButton(
+                        padding: const EdgeInsetsDirectional.all(10.0),
+                        icon: _isObscurd ? const Icon(Icons.visibility) : const Icon(Icons.visibility_off),
+                        onPressed: (){
+                          setState(() {
+                          _isObscurd =!_isObscurd;
+                        });
+                        }, 
+                    ),
                     counterText: "",
-                    label: Text(
+                    label: const Text(
                       "กรุณากรอกรหัสผ่าน",
                       style: TextStyle(fontSize: 20),
                     ),
@@ -191,10 +156,19 @@ class _FormState extends State<AddForm> {
                 ),
                 TextFormField(
                   maxLength: 20,
-                  obscureText: true,
-                  decoration: const InputDecoration(
+                  obscureText: _isObscurd2,
+                  decoration: InputDecoration(
+                    suffixIcon: IconButton(
+                        padding: const EdgeInsetsDirectional.all(10.0),
+                        icon: _isObscurd2 ? const Icon(Icons.visibility) : const Icon(Icons.visibility_off),
+                        onPressed: (){
+                          setState(() {
+                          _isObscurd2 =!_isObscurd2;
+                        });
+                        }, 
+                    ),
                     counterText: "",
-                    label: Text(
+                    label: const Text(
                       "กรุณายืนยันรหัสผ่าน",
                       style: TextStyle(fontSize: 20),
                     ),

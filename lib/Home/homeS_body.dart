@@ -88,7 +88,7 @@ class _Home_S_bodyState extends State<Home_S_body> {
                                   SizedBox(
                                       height: 400,
                                       width: 1300,
-                                      child: Calendar_Home(),
+                                      child: CalendarPage(),
                                   ),
 
                                   Row(
@@ -114,7 +114,7 @@ class _Home_S_bodyState extends State<Home_S_body> {
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(20)
                                   ), 
-                                  child: Even_class(),//Even.dart                              
+                                  child: Even(),//Even.dart                              
                                 )
                               ]
                             ),
