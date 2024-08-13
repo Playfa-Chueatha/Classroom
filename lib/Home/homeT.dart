@@ -1,12 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_esclass_2/Classroom/classT.dart';
+import 'package:flutter_esclass_2/Home/homT_body.dart';
 import 'package:flutter_esclass_2/Home/homeS.dart';
 import 'package:flutter_esclass_2/Login/login.dart';
 import 'package:flutter_esclass_2/Model/Chat.dart';
 import 'package:flutter_esclass_2/Profile/ProfileT.dart';
 import 'package:flutter_esclass_2/Score/Score_T.dart';
 import 'package:flutter_esclass_2/work/assign_work_T.dart';
+// class Home_T extends StatelessWidget {
+//   const Home_T({super.key});
 
+//   @override
+//   Widget build(BuildContext context) {
+//     return MaterialApp(
+//       home: main_home_T(),
+//     );
+//   }
+// }
 class main_home_T extends StatefulWidget {
   const main_home_T({super.key});
 
@@ -35,7 +45,7 @@ class _main_home_TState extends State<main_home_T> {
             onPressed: (){
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const main_home_S()),);
+                MaterialPageRoute(builder: (context) => const main_home_T()),);
             }, 
             icon: Icon(Icons.person_outline)
           ),
@@ -142,7 +152,7 @@ class _main_home_TState extends State<main_home_T> {
       ),
 
 
-      body: main_home_T(),
+      body: Body_home(),
     );
   }
 }

@@ -44,7 +44,7 @@ class _MenuState extends State<Menuu_class> {
                     onPressed: (){
                       Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => AddClassroom()),);
+                          MaterialPageRoute(builder: (context) => SettingCalss()),);
 
                     }, 
                     icon: Icon(Icons.settings))

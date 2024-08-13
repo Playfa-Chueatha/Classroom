@@ -5,22 +5,6 @@ import 'package:flutter_esclass_2/Home/homeT.dart';
 import 'package:flutter_esclass_2/Login/loginS.dart';
 import 'package:flutter_esclass_2/Login/loginT.dart';
 
-
-void main() {runApp(const Myapp());}
-
-class Myapp extends StatelessWidget {
-  const Myapp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Eduelite',
-      home: Login_class(),
-    );
-  }
-}
-
-
 class Login_class extends StatefulWidget {
   const Login_class({super.key});
 
