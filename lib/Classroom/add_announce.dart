@@ -1,6 +1,7 @@
 // ignore_for_file: camel_case_types
 
 import 'package:flutter/material.dart';
+import 'package:flutter_esclass_2/Classroom/calssT_body.dart';
 import 'package:flutter_esclass_2/Classroom/classT.dart';
 import 'package:flutter_esclass_2/Data/Data_announce.dart';
 
@@ -18,7 +19,7 @@ final formKey = GlobalKey<FormState>();
 String annoncetext = '';
 
 
-final TextEditingController annonce_class = TextEditingController();
+// final TextEditingController annonce_class = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -157,11 +158,11 @@ final TextEditingController annonce_class = TextEditingController();
                                 ),                     
                                 onPressed: (){
                                   formKey.currentState!.save();
-                                  DataAnnounce.add(
-                                    DataAnnounce(annoncetext: annoncetext)
+                                  dataAnnounce.add(
+                                    DataAnnounce(annoncetext: annoncetext),
                                   );
                                   formKey.currentState!.reset();
-                                  print('savetext');
+                                  
                                   Navigator.pushReplacement(context,MaterialPageRoute(
                                     builder: (ctx)=>const ClassT()));
                                 }, 

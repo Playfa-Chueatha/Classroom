@@ -13,9 +13,7 @@ class _DataCalssroomState extends State<DataCalssroom> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-            backgroundColor: Color.fromARGB(255, 147, 185, 221),
-            body: Container(
+    return  Container(
               width: 350,
               height: 900,
               decoration: BoxDecoration(
@@ -30,7 +28,6 @@ class _DataCalssroomState extends State<DataCalssroom> {
                   itemCount: data.length,
                   itemBuilder: (context,index){
                     return Container(
-                      margin: EdgeInsets.symmetric(vertical: 5,horizontal: 5),
                       padding: EdgeInsets.fromLTRB(0,5,5,5),
                       child: 
                         Column(
@@ -54,6 +51,7 @@ class _DataCalssroomState extends State<DataCalssroom> {
                                   
                                 ),
                                 onPressed: (){}, 
+                                
                                 child: Text("${data[index].Name_class} ม.${data[index].Room_year} ห้อง ${data[index].Room_No}",style: TextStyle(fontSize: 16),)
                                 
                               )
@@ -70,7 +68,7 @@ class _DataCalssroomState extends State<DataCalssroom> {
                       
                     );
                   },
-                ),
+                
             ),
 
             

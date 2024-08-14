@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_esclass_2/Classroom/announce_class.dart';
+import 'package:flutter_esclass_2/Classroom/add_announce.dart';
 import 'package:flutter_esclass_2/Data/Data_announce.dart';
 import 'package:flutter_esclass_2/Model/menu.dart';
 import 'package:flutter_esclass_2/work/add_work.dart';
@@ -91,9 +91,12 @@ int counter = 0;
                             Text("ประกาศ", style: TextStyle(fontSize: 40),),
                             SizedBox(height: 20),
                             Container(
-                              height: 700,
+                              height: 800,
                               width: 700,
-                              child: announce(),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(20)
+                              ),
+                              child: announce(),  //Data_announce.dart
                             ),
                             
 
@@ -107,6 +110,7 @@ int counter = 0;
                       Container(
                         height: 1000,
                         width: 650,
+                        margin: EdgeInsets.all(20),
                         alignment: Alignment.topCenter,
                         decoration: BoxDecoration(
                           color: Color.fromARGB(255, 152, 186, 218),

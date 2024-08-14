@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_esclass_2/Classroom/comment.dart';
 
 class DataAnnounce {
   DataAnnounce({
@@ -24,27 +25,50 @@ class announceState extends State<announce> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 350,
-      height: 700,
-      margin: EdgeInsets.all(5),
       child: ListView.builder(
         itemCount: dataAnnounce.length,
         itemBuilder: (context,index){
-          return Container(
-            height: 60,
-            width: 500,
-            decoration: BoxDecoration(
-                color: Color.fromARGB(255, 152, 186, 218),
-                borderRadius: BorderRadius.circular(20)
+          return Card(
+            margin: EdgeInsets.all(5),
+            color: Color.fromARGB(255, 152, 186, 218),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12.0),
             ),
-            child: Row(
+            elevation: 8,
+            child:Column(
               children: [
-                Image.asset("assets/images/ครู.png",height: 50,width: 50),
-                Container( 
-                  child: Text(" ${dataAnnounce[index].annoncetext}",style: TextStyle(fontSize: 20)),
-                ),             
+                Row(
+                  children: [
+                    Padding(padding: EdgeInsets.fromLTRB(20,5,0,5),
+                    child:Image.asset("assets/images/ครู.png",height: 50,width: 50),
+                    ),      
+                    Container( 
+                      child: Text(" ${dataAnnounce[index].annoncetext}",style: 
+                        TextStyle(
+                          fontSize: 20,
+                          
+                        )),
+                    ),                            
+                  ],
+                ),
+                Padding(padding: 
+                  EdgeInsets.fromLTRB(620, 5, 5, 5),
+                  child: Row(
+                    children: [
+                      IconButton(
+                        onPressed: (){
+                          showDialog(
+                            context: context, 
+                            builder: (BuildContext context) => Comment()
+                          );
+                        }, 
+                        icon: Icon(Icons.comment,size: 25,))
+                    ],
+                  ),
+                )
               ],
-            ),
+            )
+          
           );
         }),
     );

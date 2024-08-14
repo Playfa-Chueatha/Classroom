@@ -18,8 +18,8 @@ class _MenuState extends State<Menuu_class> {
     return Scaffold(
       backgroundColor: Color.fromARGB(255, 195, 238, 250),
       body: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.start,
       children: [
 
         //listclassroom
@@ -52,9 +52,15 @@ class _MenuState extends State<Menuu_class> {
               ),
               Text('ห้องเรียนของฉัน',style: TextStyle(fontSize: 20),),
               SizedBox(height: 10),
-              SizedBox(
+              Container(
                 height: 190,
                 width: 300,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.only(
+                    topRight: Radius.circular(20),
+                    bottomRight: Radius.circular(20)
+                  )
+                ),
                 child:  List_student(),
               ),
               SizedBox(height: 5),

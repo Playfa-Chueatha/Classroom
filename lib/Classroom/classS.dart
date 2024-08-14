@@ -1,7 +1,7 @@
 
 
 import 'package:flutter/material.dart';
-import 'package:flutter_esclass_2/Classroom/calssS_boday.dart';
+import 'package:flutter_esclass_2/Classroom/calssS_body.dart';
 import 'package:flutter_esclass_2/Home/homeS.dart';
 import 'package:flutter_esclass_2/Login/login.dart';
 import 'package:flutter_esclass_2/Model/Chat.dart';

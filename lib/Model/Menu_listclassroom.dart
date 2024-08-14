@@ -12,12 +12,7 @@ class List_student extends StatefulWidget {
 class _List_studentState extends State<List_student> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: Container(
-        child: Column(
-          children: [
-            Container(
+    return Container(
               height: 190,
               width: 300,
               decoration: BoxDecoration(
@@ -26,13 +21,6 @@ class _List_studentState extends State<List_student> {
               ),
               child: DataCalssroom(),
 
-                      
-                  ),
-              
-    
-          ],
-        )
-      ),
     );
   }
 }
