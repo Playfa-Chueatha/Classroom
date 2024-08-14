@@ -16,10 +16,8 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       // title: 'Eduelite',
       theme: ThemeData(
-        
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: Login_class(),
+      home: main_home_T(),
     );  }
 }

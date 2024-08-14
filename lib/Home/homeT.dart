@@ -7,16 +7,6 @@ import 'package:flutter_esclass_2/Model/Chat.dart';
 import 'package:flutter_esclass_2/Profile/ProfileT.dart';
 import 'package:flutter_esclass_2/Score/Score_T.dart';
 import 'package:flutter_esclass_2/work/assign_work_T.dart';
-// class Home_T extends StatelessWidget {
-//   const Home_T({super.key});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return MaterialApp(
-//       home: main_home_T(),
-//     );
-//   }
-// }
 class main_home_T extends StatefulWidget {
   const main_home_T({super.key});
 

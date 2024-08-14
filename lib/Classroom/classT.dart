@@ -34,15 +34,6 @@ class ClassTState extends State<ClassT> {
           IconButton(
             onPressed: (){
               Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const SettingCalss()),);
-            }, 
-            icon: Icon(Icons.settings),
-            tooltip: 'ออกจากระบบ',
-          ),
-          IconButton(
-            onPressed: (){
-              Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => const Profile_T()),);            
             }, 

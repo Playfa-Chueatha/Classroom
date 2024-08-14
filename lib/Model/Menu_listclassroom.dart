@@ -25,11 +25,6 @@ class _List_studentState extends State<List_student> {
                 borderRadius: BorderRadius.circular(10)
               ),
               child: DataCalssroom(),
-              
-              
-
-
-                    //พื้นที่เอาไว้ใส่รายชื่อห้องเรียน
 
                       
                   ),
