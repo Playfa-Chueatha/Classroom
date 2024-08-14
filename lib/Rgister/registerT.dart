@@ -42,9 +42,7 @@ class _FormState extends State<AddForm_Register_T> {
         'Content-type': 'application/json',
         'Accept': 'application/json',
       };
-
       String url = "http://edueliteroom.com/connect/registerteacher.php";
-      print('POST Register !');
       final response = await client.post(Uri.parse(url),
           headers: headers,
           body: jsonEncode({
@@ -53,17 +51,12 @@ class _FormState extends State<AddForm_Register_T> {
             "password": pass.text,
             "email": email.text
           }));
-
-      print(jsonDecode(response.body));
-      //var data = jsonDecode(response.body);
-      // print(response.body);
-
-      /*
-    if (data == "Error") {
-      Navigator.pushNamed(context, 'register');
-    } else {
-      Navigator.pushNamed(context, 'login');
-    }*/
+      var data = jsonDecode(response.body);
+      if (data == "Error") {
+        Navigator.pushNamed(context, 'register');
+      } else {
+        Navigator.pushNamed(context, 'login');
+      }
     } catch (e) {
       print(e);
     }
