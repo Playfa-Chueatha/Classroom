@@ -1,4 +1,3 @@
-// ignore_for_file: prefer_typing_uninitialized_variables, use_build_context_synchronously
 
 import 'package:flutter/material.dart';
 import 'package:flutter_esclass_2/Login/loginT.dart';
@@ -66,9 +65,20 @@ class _FormState extends State<AddForm_Register_T> {
     if (value == null || value.isEmpty) {
       return 'กรุณากรอก E-mail';
     }
-    final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
+    final emailRegex = RegExp(r'^[^@]+@gmail\.com$');
     if (!emailRegex.hasMatch(value)) {
       return 'กรุณากรอก E-mail ที่ถูกต้อง';
+    }
+    return null;
+  }
+
+  String? validateThaiCharacters(String? value, String errorMessage) {
+    final thaiRegex = RegExp(r'^[\u0E00-\u0E7F]+$');
+    if (value == null || value.isEmpty) {
+      return errorMessage;
+    }
+    if (!thaiRegex.hasMatch(value)) {
+      return 'กรุณากรอกเฉพาะตัวอักษรภาษาไทย';
     }
     return null;
   }
@@ -101,7 +111,6 @@ class _FormState extends State<AddForm_Register_T> {
                 SizedBox(height: 10),
                 Image.asset('assets/images/ครู2.png',height: 300),
                 TextFormField(
-                  controller: name,
                   maxLength: 20,
                   decoration: const InputDecoration(
                     counterText: "",
@@ -110,12 +119,8 @@ class _FormState extends State<AddForm_Register_T> {
                       style: TextStyle(fontSize: 20),
                     ),
                   ),
-                  validator: (val) {
-                  if (val == null || val.isEmpty) {
-                    return 'กรุณากรอกระบุชื่อจริง';
-                  }
-                  return null;
-                  }
+                  validator: (val) => validateThaiCharacters(val, 'กรุณากรอกระบุชื่อจริง'),
+                  controller: name,
                 ),
                 const SizedBox(height: 10),
                 TextFormField(
@@ -127,12 +132,7 @@ class _FormState extends State<AddForm_Register_T> {
                       style: TextStyle(fontSize: 20),
                     ),
                   ),
-                  validator: (val) {
-                    if (val == null || val.isEmpty) {
-                      return 'กรุณากรอกระบุนามสกุล';
-                    }
-                    return null;
-                  },
+                  validator: (val) => validateThaiCharacters(val, 'กรุณากรอกระบุนามสกุล'),
                   controller: surname,
                 ),
                 SizedBox(height: 10),
@@ -144,7 +144,10 @@ class _FormState extends State<AddForm_Register_T> {
                       "กรุณากรอก E-mail",
                       style: TextStyle(fontSize: 20),
                     ),
-                  ),),
+                  ),
+                  validator: validateEmail,
+                  controller: email,
+                  ),
                   TextFormField(
                     maxLength: 20,
                     obscureText: _isObscurd,
@@ -164,6 +167,13 @@ class _FormState extends State<AddForm_Register_T> {
                         style: TextStyle(fontSize: 20),
                       ),
                     ),
+                    validator: (val) {
+                    if (val == null || val.isEmpty) {
+                      return 'กรุณากรอกรหัสผ่าน';
+                    }
+                      return null;
+                    },
+                    controller: pass,
                   ),
                   TextFormField(
                     maxLength: 20,
@@ -201,17 +211,16 @@ class _FormState extends State<AddForm_Register_T> {
                     width: 150,
                     child: FilledButton(
                         onPressed: () async {
-                          await signUp();
-                          // bool pass = formKey.currentState!.validate(); //ปุ่มบันทึกลงฐานข้อมูล
-                          // if(pass){
-                          //   signUp();
+                          //await signUp();
+                           bool pass = formKey.currentState!.validate(); //ปุ่มบันทึกลงฐานข้อมูล
+                           if(pass){
+                             await signUp();
 
-                          // /*Navigator.push(
-                          //     context,
-                          //     MaterialPageRoute(builder: (context) => const Login_T()));*/
-                          // }
-
-                          // formKey.currentState!.validate();
+                            Navigator.push(
+                               context,
+                               MaterialPageRoute(builder: (context) => const Login_T()));
+                           }
+                           formKey.currentState!.validate();
                         },
                         style: FilledButton.styleFrom(
                           backgroundColor: Color.fromARGB(255, 10, 82, 104),
