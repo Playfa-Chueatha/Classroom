@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
 
+
+
+
+//datadotolist show'สิ่งที่ต้องทำวันนี้'
+
 class DataTodolist extends StatefulWidget {
   const DataTodolist({super.key});
 
@@ -10,12 +15,7 @@ class DataTodolist extends StatefulWidget {
 class _DatatodoState extends State<DataTodolist> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Color.fromARGB(255, 170, 205, 238),
-      body: SizedBox(
-        width: 600,
-        height: 600,
-        child: ListView.builder(
+    return  ListView.builder(
           itemCount: data.length,
           itemBuilder: (context,index){
             return Container(
@@ -62,11 +62,63 @@ class _DatatodoState extends State<DataTodolist> {
               ),
             );
           },
-        ),
-      ),
+      
     );
   }
 }
+
+
+
+
+//datatodolist show 'สิ่งที่ต้องทำทั้งหมด' menu
+class datatodolistmenu extends StatefulWidget {
+  const datatodolistmenu({super.key});
+
+  @override
+  State<datatodolistmenu> createState() => _datatodolistmenuState();
+}
+
+class _datatodolistmenuState extends State<datatodolistmenu> {
+  @override
+  Widget build(BuildContext context) {
+    return ListView.builder(
+      itemCount: data.length,
+      itemBuilder: (context,index){
+        return Container(
+          height: 55,
+          width: 300,
+          margin: EdgeInsets.symmetric(vertical: 5,horizontal: 5),
+          padding: EdgeInsets.fromLTRB(20,5,5,5),
+          decoration: BoxDecoration(
+            color: Color.fromARGB(255, 195, 238, 250),
+            borderRadius: BorderRadius.circular(20)
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Text(" ${data[index].Title} ",style: TextStyle(fontSize: 16),),
+                  Text(" ${data[index].FirstDate}",style: TextStyle(fontSize: 12),),
+                  Text(" ${data[index].LastDate}",style: TextStyle(fontSize: 12),),
+                ],
+              ),  
+              Text(" ${data[index].Detail}",style: TextStyle(fontSize: 12,color: const Color.fromARGB(255, 119, 118, 118)),)
+              
+
+            ],
+          ) 
+        );
+      },
+    );
+  }
+}
+
+
+
+
+
 
 
 //Model

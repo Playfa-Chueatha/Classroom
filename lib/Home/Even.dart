@@ -22,7 +22,7 @@ class _EvenState extends State<Even> {
         child: Column(
         children: [
           SizedBox(height: 10),
-          Text('กิจกรรมที่กำลังมาถึง',style: TextStyle(
+          Text('สิ่งที่ต้องทำทั้งหมด',style: TextStyle(
             fontSize: 20,
             color: Colors.black,
           ),),
@@ -34,6 +34,7 @@ class _EvenState extends State<Even> {
             Container(
             //แสดงกิจกรรมทั้งหมดที่นี่
             //รายละเอียด => วันที่/ถึงวันที่/ชื่อกิจกรรม/รายละเอียด/เวลา
+            
 
 
 

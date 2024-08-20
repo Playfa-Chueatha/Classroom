@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_esclass_2/Classroom/comment.dart';
+import 'package:flutter_esclass_2/Data/Data_comment.dart';
 
 class DataAnnounce {
   DataAnnounce({
@@ -22,6 +23,8 @@ class announce extends StatefulWidget {
 }
 
 class announceState extends State<announce> {
+  String datacommenttext = '';
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -54,7 +57,7 @@ class announceState extends State<announce> {
                 Padding(padding: 
                   EdgeInsets.fromLTRB(620, 5, 5, 5),
                   child: Row(
-                    children: [
+                    children: [ 
                       IconButton(
                         onPressed: (){
                           showDialog(
@@ -72,7 +75,5 @@ class announceState extends State<announce> {
           );
         }),
     );
-
-
+    }
   }
-}

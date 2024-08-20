@@ -31,7 +31,7 @@ class CalendarPage extends StatefulWidget {
 }
 
 class _CalendarPage extends State<CalendarPage> {
-  final CalendarFormat _calendarFormat = CalendarFormat.month;
+  CalendarFormat _calendarFormat = CalendarFormat.month;
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
 
@@ -76,14 +76,14 @@ class _CalendarPage extends State<CalendarPage> {
           }
         },
         //ปุ่มเปลี่ยน week/month
-        // onFormatChanged: (format) {
-        //   if (_calendarFormat != format) {
-        //     // Call `setState()` when updating calendar format
-        //     setState(() {
-        //       _calendarFormat = format;
-        //     });
-        //   }
-        // },
+        onFormatChanged: (format) {
+          if (_calendarFormat != format) {
+            // Call `setState()` when updating calendar format
+            setState(() {
+              _calendarFormat = format;
+            });
+          }
+        },
         onPageChanged: (focusedDay) {
           // No need to call `setState()` here
           _focusedDay = focusedDay;

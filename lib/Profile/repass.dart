@@ -1,114 +1,69 @@
 import 'package:flutter/material.dart';
 
-class ForgetPass extends StatefulWidget {
-  const ForgetPass({super.key});
+class repass extends StatefulWidget {
+  const repass({super.key});
 
   @override
-  State<ForgetPass> createState() => _ForgetState();
+  State<repass> createState() => _repassState();
 }
 
-class _ForgetState extends State<ForgetPass> {
+class _repassState extends State<repass> {
 
-  final _formkey = GlobalKey<FormState>();
-  // ignore: unused_field
-  String _name = '';
-  // ignore: unused_field
-  final String _last = '';
+  
+final formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: "Re_Pass",
-      home: Scaffold(
-        body: Center(  
-           child: SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Container(
-              height: 750,
-              width: 1500,
-              decoration: BoxDecoration(
-                color: Color.fromARGB(255, 147, 235, 241),borderRadius: BorderRadius.circular(20)
-              ),
-              child: Form(
-                key: _formkey,
-                child: Column(
-                  children: [
-                    SizedBox(height: 50), 
-                    Text("เปลี่ยนรหัสผ่าน", style: TextStyle(fontSize: 40)),
-                    SizedBox(height: 70),
-                    Container(
-                      margin: EdgeInsets.fromLTRB(400,20,400,10),
-                      child: TextFormField(
-                        
-                        decoration: const InputDecoration(
-                        label: Text("กรุณากรอกรหัสผ่านเดิม", style: TextStyle(fontSize: 20),)
-                        ),
-                      onSaved: (Valuue){
-                      _name=Valuue!;
-                      },
-                      validator: (value){
-                      if(value==null || value.isEmpty){
-                        return "กรุณากรอกรหัสผ่านเดิมของคุณ";
-                      }
-                      return null;
-                      },
-                      ),
-                    ),
-
-                    Container(
-                      margin: EdgeInsets.fromLTRB(400,20,400,10),
-                      child: TextFormField(
-                        obscureText: true,
-                        decoration: const InputDecoration(
-                        label: Text("กรุณากรอกรหัสผ่านใหม่", style: TextStyle(fontSize: 20),)
-                        ),
-                      onSaved: (Valuue){
-                      _name=Valuue!;
-                      },
-                      validator: (value){
-                      if(value==null || value.isEmpty){
-                        return "กรุณากรอกรหัสผ่านใหม่ของคุณ";
-                      }
-                      return null;
-                      },
-                      ),
-                    ),
-
-                    Container(
-                      margin: EdgeInsets.fromLTRB(400,20,400,50),
-                      child: TextFormField(
-                        obscureText: true,
-                        decoration: const InputDecoration(
-                        label: Text("กรุณากรอกรหัสผ่านใหม่", style: TextStyle(fontSize: 20),)
-                        ),
-                      onSaved: (Valuue){
-                      _name=Valuue!;
-                      },
-                      validator: (value){
-                      if(value==null || value.isEmpty){
-                        return "กรุณากรอกรหัสผ่านใหม่ของคุณ";
-                      }
-                      return null;
-                      },
-                      ),
-                    ),
-
-                    FilledButton(
-                    onPressed: (){
-                      _formkey.currentState!.validate();
-                    },
-                    style: FilledButton.styleFrom(
-                      backgroundColor: Color.fromARGB(255, 10, 82, 104),
-                    ),
-                    child: const Text("สมัตรสมาชิก", style: TextStyle(fontSize: 20),)
+    return AlertDialog(
+      title: Center(child: Text('เปลี่ยนรหัสผ่าน'),),
+      actions: [
+        Form(
+          key: formKey,
+          child: Column(
+            children: [
+              Padding(padding: EdgeInsets.all(10),
+              child: TextFormField(
+                    decoration: InputDecoration(
+                    label: Text("กรอกรหัสผ่านเดิม",style: TextStyle(fontSize: 16),),
+                    contentPadding: EdgeInsets.symmetric(horizontal: 5),
                   ),
-                  ],
                 ),
               ),
-            ),
-           ),
-        )
-      ),          
+              Padding(padding: EdgeInsets.all(10),
+              child: TextFormField(
+                    decoration: InputDecoration(
+                    label: Text("กรอกรหัสผ่านใหม่",style: TextStyle(fontSize: 16),),
+                    contentPadding: EdgeInsets.symmetric(horizontal: 5),
+                  ),
+                ),
+              ),
+              Padding(padding: EdgeInsets.all(10),
+              child: TextFormField(
+                    decoration: InputDecoration(
+                    label: Text("ยืนยันรหัสผ่านใหม่",style: TextStyle(fontSize: 16),),
+                    contentPadding: EdgeInsets.symmetric(horizontal: 5),
+                  ),
+                ),
+              ),
+              SizedBox(height: 20), 
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(
+                    onPressed: (){}, 
+                    child: Text('เปลี่ยนรหัสผ่าน',style: TextStyle(color: const Color.fromARGB(255, 53, 200, 226)),)),
+                  TextButton(
+                    onPressed: (){}, 
+                    child: Text('ยกเลิก',style: TextStyle(color: const Color.fromARGB(255, 235, 126, 119)),))
+                ],
+              )       
+            ],
+          ),
+          
+          
+          ),
+          
+      ],
     );
   }
 }

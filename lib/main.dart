@@ -16,6 +16,6 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         useMaterial3: true,
       ),
-      home: ClassT(),
+      home: main_home_T(),
     );  }
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_esclass_2/Profile/repass.dart';
 
 class Profile_S extends StatefulWidget {
   const Profile_S({super.key});
@@ -37,7 +38,11 @@ class _Profile_SState extends State<Profile_S> {
                           height: 50,
                           width: 200,
                           child: FilledButton(
-                            onPressed: (){},
+                            onPressed: (){
+                              showDialog(
+                                context: context, 
+                                builder: (BuildContext context) => repass());
+                            },
                             style: FilledButton.styleFrom(
                             backgroundColor: Color.fromARGB(255, 228, 223, 153),
                             foregroundColor: Colors.black
@@ -75,7 +80,7 @@ class _Profile_SState extends State<Profile_S> {
                           ],
                           image: DecorationImage(
                           image: AssetImage(
-                            "assets/images/Profile_S.jpg"
+                            "assets/images/นักเรียน.png"
                           ))
                       ),
                     ),
@@ -84,31 +89,70 @@ class _Profile_SState extends State<Profile_S> {
 
                     SizedBox(
                       height: 50,
-                      width: 50,
+                      width: 150,
                       child: FilledButton(
                           onPressed: (){},
                           style: FilledButton.styleFrom(
                               backgroundColor: Color.fromARGB(255, 10, 82, 104)
                           ), 
-                          child: Text("แก้ไขข้อมูล", style: TextStyle(fontSize: 20)),),
+                          child: Text("แก้ไขโปรไฟล์", style: TextStyle(fontSize: 20)),),
                   ),
                   SizedBox(height: 50),
                   Container(
                           height: 700,
                           width: 1200,
                           decoration: BoxDecoration(
-                            color: Colors.black,
+                            color: const Color.fromARGB(255, 255, 255, 255),
                             borderRadius: BorderRadius.circular(20)
                           ),
                           child: Column(
-                            children: const [
-                              Text("ชื่อ-นามสกุล(ภาษาไทย):"),
-                              // Text('ชื่อ-นามสกุล(ภาษาอังกฤษ):'),
-                              // Text('ครูประจำชั้นมัธยมศึกษาปีที่:'),
-                              // Text('ห้อง:'),
-                              // Text('เบอร์โทร:'),
-                              // Text('E-mail:'),
-                              // Text('วิชาที่สอน:'),
+                            children: [
+                              Container(
+                                margin: EdgeInsets.fromLTRB(250, 50, 0, 50),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                                  children: [
+                                    Padding(
+                                      padding: EdgeInsets.all(10),
+                                      child: Text("ชื่อ-นามสกุล(ภาษาไทย):",style: TextStyle(fontSize: 20),),
+                                    ),
+                                    Padding(
+                                      padding: EdgeInsets.all(10),
+                                      child: Text('ชื่อ-นามสกุล(ภาษาอังกฤษ):',style: TextStyle(fontSize: 20),),
+                                    ),
+                                    Padding(
+                                      padding: EdgeInsets.all(10),
+                                      child: Text('นักเรียนชั้นมัธยมศึกษาปีที่:',style: TextStyle(fontSize: 20),),
+                                    ),
+                                    Padding(
+                                      padding: EdgeInsets.all(10),
+                                      child: Text('ห้อง:',style: TextStyle(fontSize: 20),),
+                                    ),
+                                    Padding(
+                                      padding: EdgeInsets.all(10),
+                                      child: Text('เลขที่ในห้อง:',style: TextStyle(fontSize: 20),),
+                                    ),Padding(
+                                      padding: EdgeInsets.all(10),
+                                      child: Text('รหัสนักเรียน :',style: TextStyle(fontSize: 20),),
+                                    ),
+                                    Padding(
+                                      padding: EdgeInsets.all(10),
+                                      child: Text('แผนการเรียน:',style: TextStyle(fontSize: 20),),
+                                    ),
+                                    Padding(
+                                      padding: EdgeInsets.all(10),
+                                      child: Text('เบอร์โทร:',style: TextStyle(fontSize: 20),)
+                                    ),
+                                    Padding(
+                                      padding: EdgeInsets.all(10),
+                                      child: Text('E-mail:',style: TextStyle(fontSize: 20),),
+                                    ),
+                                    
+                                                                     
+                                  ],
+                                ),
+                              )
+                              
                             ],
                           ),
                   ),

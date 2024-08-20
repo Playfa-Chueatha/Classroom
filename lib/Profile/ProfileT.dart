@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_esclass_2/Profile/repass.dart';
 
 class Profile_T extends StatefulWidget {
   const Profile_T({super.key});
@@ -37,7 +38,11 @@ class _Profile_TState extends State<Profile_T> {
                           height: 50,
                           width: 200,
                           child: FilledButton(
-                            onPressed: (){},
+                            onPressed: (){
+                              showDialog(
+                                context: context, 
+                                builder: (BuildContext context) => repass());
+                            },
                             style: FilledButton.styleFrom(
                             backgroundColor: Color.fromARGB(255, 228, 223, 153),
                             foregroundColor: Colors.black
@@ -103,17 +108,39 @@ class _Profile_TState extends State<Profile_T> {
                           child: Column(
                             children: [
                               Container(
-                                margin: EdgeInsets.fromLTRB(200, 50, 0, 50),
+                                margin: EdgeInsets.fromLTRB(250, 50, 0, 50),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.stretch,
-                                  children: const [
-                                    Text("ชื่อ-นามสกุล(ภาษาไทย):"),
-                                    Text('ชื่อ-นามสกุล(ภาษาอังกฤษ):'),
-                                    Text('ครูประจำชั้นมัธยมศึกษาปีที่:'),
-                                    Text('ห้อง:'),
-                                    Text('เบอร์โทร:'),
-                                    Text('E-mail:'),
-                                    Text('วิชาที่สอน:'),
+                                  children: [
+                                    Padding(
+                                      padding: EdgeInsets.all(10),
+                                      child: Text("ชื่อ-นามสกุล(ภาษาไทย):",style: TextStyle(fontSize: 20),),
+                                    ),
+                                    Padding(
+                                      padding: EdgeInsets.all(10),
+                                      child: Text('ชื่อ-นามสกุล(ภาษาอังกฤษ):',style: TextStyle(fontSize: 20),),
+                                    ),
+                                    Padding(
+                                      padding: EdgeInsets.all(10),
+                                      child: Text('ครูประจำชั้นมัธยมศึกษาปีที่:',style: TextStyle(fontSize: 20),),
+                                    ),
+                                    Padding(
+                                      padding: EdgeInsets.all(10),
+                                      child: Text('ห้อง:',style: TextStyle(fontSize: 20),),
+                                    ),
+                                    Padding(
+                                      padding: EdgeInsets.all(10),
+                                      child: Text('เบอร์โทร:',style: TextStyle(fontSize: 20),)
+                                    ),
+                                    Padding(
+                                      padding: EdgeInsets.all(10),
+                                      child: Text('E-mail:',style: TextStyle(fontSize: 20),),
+                                    ),
+                                    Padding(
+                                      padding: EdgeInsets.all(10),
+                                      child: Text('วิชาที่สอน:',style: TextStyle(fontSize: 20),),
+                                    ),
+                                                                     
                                   ],
                                 ),
                               )

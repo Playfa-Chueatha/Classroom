@@ -12,6 +12,8 @@ class Comment extends StatefulWidget {
 
 class _CommentState extends State<Comment> {
 
+  TextEditingController textdatacomment = TextEditingController();
+
   final formKey = GlobalKey<FormState>();
   String datacommenttext = '';
   @override
@@ -34,7 +36,7 @@ class _CommentState extends State<Comment> {
                     color: Color.fromARGB(255, 152, 186, 218),
                     borderRadius: BorderRadius.circular(20)
                   ),
-                  child: DataComment(),
+                  child: DataComment()
                 ),
                 SizedBox(height: 20),
                 Row(
@@ -43,6 +45,7 @@ class _CommentState extends State<Comment> {
                         height: 40,
                         width: 600,
                         child: TextFormField(
+                          controller: textdatacomment,
                             keyboardType: TextInputType.multiline,
                             maxLines: 50,
                             decoration: InputDecoration(
@@ -50,12 +53,14 @@ class _CommentState extends State<Comment> {
                               contentPadding: EdgeInsets.symmetric(horizontal: 5,vertical: 5),
                               suffixIcon: IconButton(
                                 onPressed: (){
-                                  formKey.currentState!.save();
                                   datacommenttext.add(
                                     datacomment(datacommenttext: datacommenttext),
                                   );
                                   print('save');
                                   formKey.currentState!.reset();
+                                  setState(() {
+                                    
+                                  });
                                   // Navigator.push(context,MaterialPageRoute(
                                   //   builder: (ctx)=>const ClassT()));
                                   
@@ -68,7 +73,7 @@ class _CommentState extends State<Comment> {
                       ),
                   ],
                 ),
-              
+              Text(datacommenttext,style: TextStyle(fontSize: 20),)
             ]
         
             )

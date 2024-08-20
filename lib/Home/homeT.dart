@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_esclass_2/Classroom/classT.dart';
-import 'package:flutter_esclass_2/Home/homT_body.dart';
+import 'package:flutter_esclass_2/Home/homeT_body.dart';
 import 'package:flutter_esclass_2/Home/homeS.dart';
 import 'package:flutter_esclass_2/Login/login.dart';
 import 'package:flutter_esclass_2/Model/Chat.dart';
@@ -142,7 +142,7 @@ class _main_home_TState extends State<main_home_T> {
       ),
 
 
-      body: Body_home(),
+      body: Body_home(),//homeT_body.dart
     );
   }
 }
