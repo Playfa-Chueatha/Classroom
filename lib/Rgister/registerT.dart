@@ -6,26 +6,15 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 
-class Registert_T extends StatelessWidget {
+
+class Registert_T extends StatefulWidget {
   const Registert_T({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Register',
-      home: AddForm_Register_T(),
-    );
-  }
+  State<Registert_T> createState() => _FormState();
 }
 
-class AddForm_Register_T extends StatefulWidget {
-  const AddForm_Register_T({super.key});
-
-  @override
-  State<AddForm_Register_T> createState() => _FormState();
-}
-
-class _FormState extends State<AddForm_Register_T> {
+class _FormState extends State<Registert_T> {
 
   final formKey = GlobalKey<FormState>();
 

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart';
+import 'package:intl/intl.dart';
 
 
 
@@ -13,6 +15,7 @@ class DataTodolist extends StatefulWidget {
 }
 
 class _DatatodoState extends State<DataTodolist> {
+
   @override
   Widget build(BuildContext context) {
     return  ListView.builder(
@@ -34,12 +37,12 @@ class _DatatodoState extends State<DataTodolist> {
                         borderRadius: BorderRadius.circular(20),
                       ),
                       tileColor: Colors.white,
-                      leading: Icon(Icons.check_box),
+                      leading: Icon(Icons.check_box_outline_blank),
                       title: Text(data[index].Title,
                       style: TextStyle(
                         fontSize: 16,
                         color: Colors.black,
-                        decoration: TextDecoration.lineThrough,
+                      
                       ),),
                       trailing: Container(
                         height: 35,
@@ -79,13 +82,15 @@ class datatodolistmenu extends StatefulWidget {
 }
 
 class _datatodolistmenuState extends State<datatodolistmenu> {
+
+
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
       itemCount: data.length,
       itemBuilder: (context,index){
         return Container(
-          height: 55,
+          height: 70,
           width: 300,
           margin: EdgeInsets.symmetric(vertical: 5,horizontal: 5),
           padding: EdgeInsets.fromLTRB(20,5,5,5),
@@ -97,11 +102,11 @@ class _datatodolistmenuState extends State<datatodolistmenu> {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              Text(" ${data[index].Title} ",style: TextStyle(fontSize: 16),),
               Row(
                 children: [
-                  Text(" ${data[index].Title} ",style: TextStyle(fontSize: 16),),
                   Text(" ${data[index].FirstDate}",style: TextStyle(fontSize: 12),),
-                  Text(" ${data[index].LastDate}",style: TextStyle(fontSize: 12),),
+                  Text(" to ${data[index].LastDate}",style: TextStyle(fontSize: 12),),
                 ],
               ),  
               Text(" ${data[index].Detail}",style: TextStyle(fontSize: 12,color: const Color.fromARGB(255, 119, 118, 118)),)
@@ -131,16 +136,18 @@ class Todoclass {
   });
   String Title;
   String Detail;
-  var FirstDate;
-  var LastDate;
+  DateTime FirstDate;
+  DateTime LastDate;
 }
 
 List<Todoclass> data = [
   Todoclass(
     Title: "ทำโปรเจค",
     Detail: "ทำหน้าสร้างห้อง", 
-    FirstDate: "08/08/2567", 
-    LastDate:"08/08/2567")
+    FirstDate: DateTime(2024, 8, 20), 
+    LastDate: DateTime(2024, 8, 21)
+    ),
+    
   
 
 ];

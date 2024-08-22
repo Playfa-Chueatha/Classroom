@@ -146,7 +146,7 @@ class _Login_TState extends State<Login_T> {
                       ),
                       onPressed: () => Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => AddForm_Register_T())).then((value) {
+                        MaterialPageRoute(builder: (context) => Registert_T())).then((value) {
                         },),// print Botton
                         child: Text("สมัครสมาชิก", style: TextStyle(fontSize: 20),),),
                       Icon(Icons.linear_scale),

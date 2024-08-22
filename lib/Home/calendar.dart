@@ -40,7 +40,7 @@ class _CalendarPage extends State<CalendarPage> {
   final kLastDay = DateTime(
       DateTime.now().year, DateTime.now().month + 12, DateTime.now().day);
 
-  String year = '${DateTime.now().year + 543}';
+  String year = '${DateTime.now().year}';
 
   @override
   Widget build(BuildContext context) {
@@ -52,13 +52,14 @@ class _CalendarPage extends State<CalendarPage> {
         lastDay: kLastDay,
         focusedDay: _focusedDay,
 
-        //เปลี่ยนเป็น พ.ศ.
+//         //เปลี่ยนเป็น พ.ศ.
          headerStyle: HeaderStyle(
             titleTextStyle: TextStyle(fontSize: 18),
             titleCentered: true,
             titleTextFormatter: (date, locale) =>
                 '${DateFormat.MMMMEEEEd(locale).format(date)} $year'),
         calendarFormat: _calendarFormat,
+        availableCalendarFormats: {CalendarFormat.month: "month"},//ปิดปุ่ม
         selectedDayPredicate: (day) {
 
           return isSameDay(_selectedDay, day);
@@ -68,10 +69,7 @@ class _CalendarPage extends State<CalendarPage> {
 
             setState(() {
               _selectedDay = selectedDay;
-              _focusedDay = focusedDay;
-
-
-              
+              _focusedDay = focusedDay;             
             });
           }
         },
@@ -87,7 +85,7 @@ class _CalendarPage extends State<CalendarPage> {
         onPageChanged: (focusedDay) {
           // No need to call `setState()` here
           _focusedDay = focusedDay;
-          year = '${(focusedDay.year + 543)}';
+          year = '${(focusedDay.year)}';
         },
 
       ),

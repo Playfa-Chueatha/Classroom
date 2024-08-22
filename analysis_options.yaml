@@ -12,6 +12,7 @@ analyzer:
     avoid_print: ignore
     avoid_unnecessary_containers: ignore
     camel_case_types: ignore
+    curly_braces_in_flow_control_structures: ignore ignore
     file_names: ignore
     non_constant_identifier_names: ignore
     prefer_const_constructors: ignore

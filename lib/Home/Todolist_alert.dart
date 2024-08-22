@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_esclass_2/Data/Data_todolist_today.dart';
 import 'package:flutter_esclass_2/Home/homeT.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter/services.dart';
 
 
 class Alert_addtodo extends StatefulWidget {
@@ -14,17 +15,42 @@ class Alert_addtodo extends StatefulWidget {
   State<Alert_addtodo> createState() => add_todoState();
 }
 
+
+
 class add_todoState extends State<Alert_addtodo> {
 
 final formKey = GlobalKey<FormState>();
 String Title = '';
 String Detail = '';
-var FirstDate = '';
-var LastDate = '';
-
+DateTime? FirstDate;  
+DateTime? LastDate;
 
 final TextEditingController _date = TextEditingController();
 final TextEditingController _date2 = TextEditingController();
+
+@override
+  void dispose() {
+    _date.dispose();
+    _date2.dispose();
+    super.dispose();
+  }
+
+  void _pickDate(TextEditingController controller, DateTime? initialDate, Function(DateTime) onDateSelected) async {
+    DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: initialDate ?? DateTime.now(),
+      firstDate: DateTime(2023),
+      lastDate: DateTime(2100),
+    );
+
+    if (pickedDate != null) {
+      setState(() {
+        controller.text = DateFormat('yyyy-MM-dd').format(pickedDate);
+        onDateSelected(pickedDate);
+      });
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -76,27 +102,13 @@ final TextEditingController _date2 = TextEditingController();
                           width: 200,
                             child: TextFormField(
                               controller: _date,
+                              readOnly: true ,
                               decoration: InputDecoration(
                                 icon: Icon(Icons.calendar_month),
-                                label: Text("วันที่",style: TextStyle(fontSize: 20),),
-                                
+                                label: Text("วันที่",style: TextStyle(fontSize: 20)),                       
                               ),
                               onTap: ()async {
-                                DateTime? pickeddate = await showDatePicker(
-                                  context: context, 
-                                  initialDate: DateTime.now(),
-                                  firstDate: DateTime(2023), 
-                                  lastDate: DateTime(2100));
-
-                                  if  (pickeddate != null){
-                                        setState(() {
-                                          _date.text = DateFormat('yyyy-MM-dd').format(pickeddate);
-                                        });
-                                      }
-                                  onSaved: (value){
-                                  FirstDate=value!;
-                                };
-                                
+                                 _pickDate(_date, FirstDate, (date) => FirstDate = date);                              
                               },
                             ),
                         ),
@@ -105,26 +117,13 @@ final TextEditingController _date2 = TextEditingController();
                           width: 200,
                             child: TextFormField(
                               controller: _date2,
+                              readOnly: true ,
                               decoration: InputDecoration(
                                 icon: Icon(Icons.calendar_month),
                                 label: Text("ถึงวันที่",style: TextStyle(fontSize: 20),),
                               ),
                               onTap: ()async {
-                                DateTime? pickeddate = await showDatePicker(
-                                  context: context, 
-                                  initialDate: DateTime.now(),
-                                  firstDate: DateTime(2023), 
-                                  lastDate: DateTime(2100));
-
-                                  if  (pickeddate != null){
-                                        setState(() {
-                                          _date2.text = DateFormat('yyyy-MM-dd').format(pickeddate);
-                                        });
-                                      }
-                                  onSaved: (value){
-                                  LastDate=value!;
-                                  };
-                                
+                                _pickDate(_date2, LastDate, (date) => LastDate = date);     
                               },
                             ),
                         ),
@@ -137,20 +136,26 @@ final TextEditingController _date2 = TextEditingController();
                         children: [
                       TextButton(
                           onPressed: () {
-                            formKey.currentState!.save();
-                            data.add(
-                              Todoclass(
-                                Title: Title, 
-                                Detail: Detail, 
-                                FirstDate: FirstDate, 
-                                LastDate: LastDate)
-                            );
-                            formKey.currentState!.reset();
-                            print(FirstDate);
-                            Navigator.pushReplacement(context,MaterialPageRoute(
-                              builder: (ctx)=>const main_home_T())
-                          );
-                          },
+                            if (formKey.currentState!.validate()) {  
+                        formKey.currentState!.save();  
+                        data.add(
+                          Todoclass(
+                            Title: Title, 
+                            Detail: Detail, 
+                            FirstDate: FirstDate!, 
+                            LastDate: LastDate!)
+                        );  
+                        formKey.currentState!.reset(); 
+                        print(Title ); 
+                        print(Detail );
+                        print(FirstDate );
+                        print(LastDate );     
+
+                        Navigator.pushReplacement(context,MaterialPageRoute(
+                            builder: (ctx)=>const main_home_T()),
+                        );    
+                      }    
+                          }, 
                           style: TextButton.styleFrom(
                             foregroundColor: Color.fromARGB(255, 63, 124, 238)
                           ),
