@@ -31,16 +31,27 @@ class _Login_TState extends State<Login_T> {
   }
 
   Future signIn() async {
-    String url = "http://192.168.1.102/classroom/login.php";
-    final response = await http.post(Uri.parse(url), body: {
-      'password': pass.text,
-      'email': email.text,
-    });
-    var data = json.decode(response.body);
-    if (data == "Error") {
-      Navigator.pushNamed(context, 'login');
-    } else {
-      Navigator.pushNamed(context, 'classT');
+    try {
+      var client = http.Client();
+      var headers = {
+        'Content-type': 'application/json',
+        'Accept': 'application/json',
+      };
+      String url = "http://edueliteroom.com/connect/loginteacher.php";
+      final response = await client.post(Uri.parse(url),
+          headers: headers,
+          body: jsonEncode({
+            "password": pass.text,
+            "email": email.text
+          }));
+      var data = jsonDecode(response.body);
+      if (data == "Error") {
+        Navigator.push( context, MaterialPageRoute(builder: (context) => const Login_T()));
+      } else {
+        Navigator.push( context, MaterialPageRoute(builder: (context) => const main_home_T()));
+      }
+    } catch (e) {
+      print(e);
     }
   }
 
@@ -48,9 +59,20 @@ class _Login_TState extends State<Login_T> {
     if (value == null || value.isEmpty) {
       return 'กรุณากรอก E-mail';
     }
-    final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
+    final emailRegex = RegExp(r'^[^@]+@gmail\.com$');
     if (!emailRegex.hasMatch(value)) {
       return 'กรุณากรอก E-mail ที่ถูกต้อง';
+    }
+    return null;
+  }
+
+  String? validateThaiCharacters(String? value, String errorMessage) {
+    final thaiRegex = RegExp(r'^[\u0E00-\u0E7F]+$');
+    if (value == null || value.isEmpty) {
+      return errorMessage;
+    }
+    if (!thaiRegex.hasMatch(value)) {
+      return 'กรุณากรอกเฉพาะตัวอักษรภาษาไทย';
     }
     return null;
   }
@@ -116,19 +138,15 @@ class _Login_TState extends State<Login_T> {
                           return null;
                         },               
                       ),
+                      
                     ),
                   FilledButton(
-                    onPressed: (){
+                    onPressed: () async {
                     bool pass = formKey.currentState!.validate(); //ปุ่ม login
                     if(pass){
-                      signIn();
-
-                      Navigator.push(
-                                  context,
-                                  MaterialPageRoute(builder: (context) => const main_home_T()),
-                                );
-                      
+                      await signIn();
                     }
+                    formKey.currentState!.validate();
                     },
                     style: FilledButton.styleFrom(
                       backgroundColor: Color.fromARGB(255, 10, 82, 104),

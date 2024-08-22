@@ -41,9 +41,9 @@ class _FormState extends State<Registert_T> {
           }));
       var data = jsonDecode(response.body);
       if (data == "Error") {
-        Navigator.pushNamed(context, 'register');
+        Navigator.push( context, MaterialPageRoute(builder: (context) => const AddForm_Register_T()));
       } else {
-        Navigator.pushNamed(context, 'login');
+        Navigator.push( context, MaterialPageRoute(builder: (context) => const Login_T()));
       }
     } catch (e) {
       print(e);
@@ -203,11 +203,7 @@ class _FormState extends State<Registert_T> {
                           //await signUp();
                            bool pass = formKey.currentState!.validate(); //ปุ่มบันทึกลงฐานข้อมูล
                            if(pass){
-                             await signUp();
-
-                            Navigator.push(
-                               context,
-                               MaterialPageRoute(builder: (context) => const Login_T()));
+                             await signUp(); 
                            }
                            formKey.currentState!.validate();
                         },
