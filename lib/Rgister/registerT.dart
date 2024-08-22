@@ -41,7 +41,7 @@ class _FormState extends State<Registert_T> {
           }));
       var data = jsonDecode(response.body);
       if (data == "Error") {
-        Navigator.push( context, MaterialPageRoute(builder: (context) => const AddForm_Register_T()));
+        Navigator.push( context, MaterialPageRoute(builder: (context) => const Registert_T()));
       } else {
         Navigator.push( context, MaterialPageRoute(builder: (context) => const Login_T()));
       }
