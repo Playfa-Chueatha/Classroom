@@ -16,6 +16,12 @@ class DataTodolist extends StatefulWidget {
 
 class _DatatodoState extends State<DataTodolist> {
 
+  void _toggleTodoStatus(int index) {
+    setState(() {
+      data[index].toggleDone();
+    });
+  }
+  
   @override
   Widget build(BuildContext context) {
     return  ListView.builder(
@@ -38,7 +44,12 @@ class _DatatodoState extends State<DataTodolist> {
                       ),
                       tileColor: Colors.white,
                       hoverColor: Colors.blue,
-                      leading: Icon(Icons.check_box_outline_blank),
+                      leading: Checkbox(
+                        value: data[index].isDone, 
+                        onChanged: (bool? value){
+                          _toggleTodoStatus(index);
+                        }
+                      ),
                       title: 
                         Tooltip(
                         message: data[index].Detail,
@@ -49,7 +60,15 @@ class _DatatodoState extends State<DataTodolist> {
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(5),
                           ),
-                          child: Text(data[index].Title,style: TextStyle(fontSize: 16,color: Colors.black)),
+                          child: Text(data[index].Title,style: 
+                            TextStyle(
+                              fontSize: 16,
+                              color: data[index].isDone ? Colors.grey : Colors.black,
+                              decoration: data[index].isDone
+                                ? TextDecoration.lineThrough
+                                : TextDecoration.none,
+                              
+                            )),
                         ),
                         ),
                       trailing: Container(
@@ -62,7 +81,9 @@ class _DatatodoState extends State<DataTodolist> {
                           color: Colors.red,
                           iconSize: 20,
                           onPressed: (){
-                            
+                            setState(() {
+                              data.removeAt(index);
+                            });
                           }, 
                           icon: Icon(Icons.cancel_outlined)),
                       ),
@@ -129,9 +150,6 @@ class _datatodolistmenuState extends State<datatodolistmenu> {
                     ],
                   ),              
               // Text(" ${data[index].Detail}",style: TextStyle(fontSize: 12,color: const Color.fromARGB(255, 119, 118, 118)),),
-
-              
-
             ],
           ) 
         );
@@ -152,12 +170,18 @@ class Todoclass {
     required this.Title,
     required this.Detail,
     required this.FirstDate,
-    required this.LastDate
+    required this.LastDate,
+    this.isDone = false
   });
   String Title;
   String Detail;
   String FirstDate;
   String LastDate;
+  bool isDone;
+
+  void toggleDone(){
+    isDone = !isDone;
+  }
 }
 
 List<Todoclass> data = [
@@ -167,7 +191,4 @@ List<Todoclass> data = [
     FirstDate: "20/08/2024", 
     LastDate: "21/08/2024"
     ),
-    
-  
-
 ];
