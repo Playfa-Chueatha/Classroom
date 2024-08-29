@@ -22,7 +22,7 @@ class _EvenState extends State<Even> {
         child: Column(
         children: [
           SizedBox(height: 10),
-          Text('สิ่งที่ต้องทำทั้งหมด',style: TextStyle(
+          Text('กิจกรรมของฉัน',style: TextStyle(
             fontSize: 20,
             color: Colors.black,
           ),),

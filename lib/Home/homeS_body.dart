@@ -73,7 +73,7 @@ class _Home_S_bodyState extends State<Home_S_body> {
                                     onPressed: (){
                                       showDialog(
                                         context: context, 
-                                        builder: (BuildContext context) => Alert_addtodo(),// todolist_alert.dart
+                                        builder: (BuildContext context) => Alert_addtodo(onAddTodo: (Todoclass ) {  },),// todolist_alert.dart
                                       );
                                     },
                                     style: IconButton.styleFrom(

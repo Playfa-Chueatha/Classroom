@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_esclass_2/Model/menu.dart';
+import 'package:flutter_esclass_2/work/add_work.dart';
 
 class work_body_T extends StatefulWidget {
   const work_body_T({super.key});
@@ -69,7 +70,11 @@ class _work_body_TState extends State<work_body_T> {
                                     color: Color.fromARGB(255, 0, 0, 0),
                                     icon: const Icon(Icons.add),
                                     iconSize: 30,
-                                    onPressed: (){},
+                                    onPressed: (){
+                                      Navigator.push(
+                                      context,
+                                      MaterialPageRoute(builder: (context) => const add_wprk_T()),);
+                                    },
                                     style: IconButton.styleFrom(
                                       backgroundColor: Color.fromARGB(255, 147, 185, 221),
                                       highlightColor: Color.fromARGB(255, 56, 105, 151),

@@ -18,37 +18,71 @@ class _FormState extends State<Registert_T> {
 
   final formKey = GlobalKey<FormState>();
 
-  TextEditingController name = TextEditingController();
-  TextEditingController surname = TextEditingController();
-  TextEditingController pass = TextEditingController();
+  TextEditingController thaifirstname = TextEditingController();
+  TextEditingController thailastname = TextEditingController();
+  TextEditingController username = TextEditingController();
+  TextEditingController password = TextEditingController();
   TextEditingController email = TextEditingController();
 
-  Future<dynamic> signUp() async {
-    try {
-      var client = http.Client();
-      var headers = {
-        'Content-type': 'application/json',
-        'Accept': 'application/json',
-      };
-      String url = "http://edueliteroom.com/connect/registerteacher.php";
-      final response = await client.post(Uri.parse(url),
-          headers: headers,
-          body: jsonEncode({
-            "name": name.text,
-            "surname": surname.text,
-            "password": pass.text,
-            "email": email.text
-          }));
+  Future<void> signUp() async {
+  try {
+    var client = http.Client();
+    var headers = {
+      'Content-type': 'application/json',
+      'Accept': 'application/json',
+    };
+
+    String url = "http://localhost/edueliteroom01/registerteacher.php";
+    final response = await client.post(
+      Uri.parse(url),
+      headers: headers,
+      body: jsonEncode({
+        "thaifirstname_teacher": thaifirstname.text,
+        "thailastname_teacher": thailastname.text,
+        "username_teacher": username.text,
+        "password_teacher": password.text,
+        "email_teacher": email.text
+      }),
+    );
+
+    if (response.statusCode == 200) {
       var data = jsonDecode(response.body);
-      if (data == "Error") {
-        Navigator.push( context, MaterialPageRoute(builder: (context) => const Registert_T()));
+      
+      if (data is Map && data.containsKey('error')) {
+        // Handle the error case
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(data['error']),
+        ));
+      } else if (data.containsKey('success')) {
+        // Success, navigate to login
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(data['success']),
+        ));
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const Login_T()),
+        );
       } else {
-        Navigator.push( context, MaterialPageRoute(builder: (context) => const Login_T()));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('Unexpected response from server.'),
+        ));
       }
-    } catch (e) {
-      print(e);
+    } else {
+      // Handle non-200 status code
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Server error: ${response.statusCode}'),
+      ));
     }
+  } catch (e) {
+    // Handle other errors
+    print("Error: $e");
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text('An error occurred: $e'),
+    ));
   }
+}
+
+
 
   String? validateEmail(String? value) {
     if (value == null || value.isEmpty) {
@@ -71,6 +105,18 @@ class _FormState extends State<Registert_T> {
     }
     return null;
   }
+
+  String? validateEnglishAndNumbers(String? value, String errorMessage) {
+    final englishNumberRegex = RegExp(r'^[a-zA-Z0-9]+$');
+    if (value == null || value.isEmpty) {
+      return errorMessage;
+    }
+    if (!englishNumberRegex.hasMatch(value)) {
+      return 'กรุณากรอกเฉพาะตัวอักษรภาษาอังกฤษและตัวเลข';
+    }
+    return null;
+  }
+
 
   var _isObscurd;
   var _isObscurd2;
@@ -109,7 +155,7 @@ class _FormState extends State<Registert_T> {
                     ),
                   ),
                   validator: (val) => validateThaiCharacters(val, 'กรุณากรอกระบุชื่อจริง'),
-                  controller: name,
+                  controller: thaifirstname,
                 ),
                 const SizedBox(height: 10),
                 TextFormField(
@@ -122,7 +168,7 @@ class _FormState extends State<Registert_T> {
                     ),
                   ),
                   validator: (val) => validateThaiCharacters(val, 'กรุณากรอกระบุนามสกุล'),
-                  controller: surname,
+                  controller: thailastname,
                 ),
                 SizedBox(height: 10),
                 TextFormField(
@@ -136,6 +182,18 @@ class _FormState extends State<Registert_T> {
                   ),
                   validator: validateEmail,
                   controller: email,
+                  ),
+                  TextFormField(
+                  maxLength: 20,
+                  decoration: const InputDecoration(
+                    counterText: "",
+                    label: Text(
+                      "กรุณาระบุ User ของคุณ",
+                      style: TextStyle(fontSize: 20),
+                    ),
+                  ),
+                  validator: (val) => validateEnglishAndNumbers(val, 'กรุณากรอก User ของคุณ'),
+                  controller: username,
                   ),
                   TextFormField(
                     maxLength: 20,
@@ -162,7 +220,7 @@ class _FormState extends State<Registert_T> {
                     }
                       return null;
                     },
-                    controller: pass,
+                    controller: password,
                   ),
                   TextFormField(
                     maxLength: 20,
@@ -186,7 +244,7 @@ class _FormState extends State<Registert_T> {
                     validator: (val) {
                       if (val!.isEmpty) {
                         return 'กรุณากรอกยืนยันรหัสผ่าน';
-                      } else if (val != pass.text) {
+                      } else if (val != password.text) {
                         return 'รหัสผ่านไม่ตรงกัน';
                       }
                       return null;
@@ -215,9 +273,7 @@ class _FormState extends State<Registert_T> {
                           style: TextStyle(fontSize: 20),
                         )
                     ),
-                  )
-            
-               
+                  ) 
             ],
           )
           )

@@ -92,9 +92,9 @@ class _Login_classState extends State<Login_class> {
                   children: [
                     IconButton(
                       onPressed: (){
-                        Navigator.push(
+                        /*Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => const main_home_T()),);
+                          MaterialPageRoute(builder: (context) => const main_home_T()),);*/
                       }, 
                       icon: Icon(Icons.person_outline)),
                       SizedBox(width: 300),

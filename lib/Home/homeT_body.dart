@@ -32,8 +32,8 @@ class _Body_homeState extends State<Body_home> {
                 SingleChildScrollView(
                   scrollDirection:Axis.horizontal,
                   child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-
 
                       //menu
                       Container(
@@ -49,89 +49,46 @@ class _Body_homeState extends State<Body_home> {
                       ),
                       child:Menuu_class(),//menu.dart
                       ),
-                      SizedBox(width: 50,),
 
 
                       //ปฏิทิน
                       Container(
                       height: 1000,
-                      width: 1440,
+                      width: 1500,
+                      margin: EdgeInsets.all(10),
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(20)
                         ),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
+                          child: Center(
+                            child:                          
+                          Column(
                             children: [
-                              SizedBox(height: 20),
-                              SizedBox(
-                              height: 50,
-                              width: 1440,
-                              child: Row(
-                                children: [
-                                  SizedBox(width: 1370,height: 50),    
-                                  IconButton(
-                                    color: Color.fromARGB(255, 0, 0, 0),
-                                    icon: const Icon(Icons.add),
-                                    iconSize: 30,
-                                    onPressed: (){
-                                      showDialog(
-                                        context: context, 
-                                        builder: (BuildContext context) => Alert_addtodo(),// todolist_alert.dart
-                                      );
-                                    },
-                                    style: IconButton.styleFrom(
-                                      backgroundColor: Color.fromARGB(255, 147, 185, 221),
-                                      highlightColor: Color.fromARGB(255, 56, 105, 151),
-                                    ),
-                                    tooltip: 'เพิ่มกิจกรรม', 
-                                  ),
-                                ],
+
+                            //calender
+                            Padding(
+                              padding: EdgeInsets.all(10),
+                              child: SizedBox(
+                                height: 470,
+                                width: 1450,
+                                child: Calendar_Home(),//calendar.dart
                               ),
                             ),
 
-                            //calender
-                            SizedBox(
-                                height: 400,
-                                width: 1300,
-                                child: Calendar_Home(),//calendar.dart
-                            ),
-                            SizedBox(width: 30,),
-
-
-                            //Even
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-
                                 //todolist
                                 Container(
-                                  margin: EdgeInsets.all(40),
-                                  height: 400,
-                                  width: 600,
+                                  // margin: EdgeInsets.all(5),
+                                  height: 500,
+                                  width: 600,               
                                   decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(20)
+                                    borderRadius: BorderRadius.circular(20),
                                   ),
                                   child: todocalss(),//todolist_body.dart
                                 ),
-
-                                //Even
-                                Container(
-                                  margin: EdgeInsets.all(40),
-                                  height: 400,
-                                  width: 600,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(20)
-                                  ), 
-                                  child: Even(),//Even.dart                              
-                                )
-                              ]
-                            ),
+ 
                             ],
-                        )
+                        ))
                       ),
-                      SizedBox(width: 30)
                     ],
                   ),
                 )

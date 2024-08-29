@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_esclass_2/Home/todolist_body.dart';
 import 'package:http/http.dart';
 import 'package:intl/intl.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 
 
@@ -16,6 +19,8 @@ class DataTodolist extends StatefulWidget {
 
 class _DatatodoState extends State<DataTodolist> {
 
+
+  
   void _toggleTodoStatus(int index) {
     setState(() {
       data[index].toggleDone();
@@ -102,93 +107,27 @@ class _DatatodoState extends State<DataTodolist> {
 }
 
 
-
-
-//datatodolist show 'สิ่งที่ต้องทำทั้งหมด' menu
-class datatodolistmenu extends StatefulWidget {
-  const datatodolistmenu({super.key});
-
-  @override
-  State<datatodolistmenu> createState() => _datatodolistmenuState();
-}
-
-class _datatodolistmenuState extends State<datatodolistmenu> {
-
-
-  @override
-  Widget build(BuildContext context) {
-    return ListView.builder(
-      itemCount: data.length,
-      itemBuilder: (context,index){
-         String displayText = data[index].LastDate.isNotEmpty
-            ? " to ${data[index].LastDate}"
-            : " ";
-        return Container(
-          alignment: AlignmentDirectional.centerStart,
-          height: 60,
-          width: 300,
-          margin: EdgeInsets.symmetric(vertical: 5,horizontal: 5),
-          padding: EdgeInsets.fromLTRB(20,5,5,5),
-          decoration: BoxDecoration(
-            color: Color.fromARGB(255, 195, 238, 250),
-            borderRadius: BorderRadius.circular(20)
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(" ${data[index].Title} ",style: TextStyle(fontSize: 16),),
-                  Row(
-                    children: [
-                      
-                      Text(" ${data[index].FirstDate}",style: TextStyle(fontSize: 12),),
-                      // Text(" to ${data[index].LastDate}",style: TextStyle(fontSize: 12),),
-                      Text(
-                        displayText,
-                        style: TextStyle(fontSize: 12),
-                      ),
-                    ],
-                  ),              
-              // Text(" ${data[index].Detail}",style: TextStyle(fontSize: 12,color: const Color.fromARGB(255, 119, 118, 118)),),
-            ],
-          ) 
-        );
-      },
-    );
-  }
-}
-
-
-
-
-
-
-
 //Model
 class Todoclass {
   Todoclass({
     required this.Title,
     required this.Detail,
-    required this.FirstDate,
-    required this.LastDate,
     this.isDone = false
   });
   String Title;
   String Detail;
-  String FirstDate;
-  String LastDate;
   bool isDone;
 
   void toggleDone(){
     isDone = !isDone;
   }
+
+
 }
 
 List<Todoclass> data = [
   Todoclass(
     Title: "ทำโปรเจค",
     Detail: "ทำหน้าสร้างห้อง", 
-    FirstDate: "20/08/2024", 
-    LastDate: "21/08/2024"
     ),
 ];

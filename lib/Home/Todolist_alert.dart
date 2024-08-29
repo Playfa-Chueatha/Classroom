@@ -1,191 +1,86 @@
-
-import 'dart:js_interop';
 import 'package:flutter/material.dart';
-import 'package:flutter_esclass_2/Data/Data_todolist_today.dart';
-import 'package:flutter_esclass_2/Home/homeT.dart';
-import 'package:intl/intl.dart';
-import 'package:flutter/services.dart';
-
+import 'package:flutter_esclass_2/Data/Data_todolist.dart';
 
 class Alert_addtodo extends StatefulWidget {
-
-  const Alert_addtodo({super.key});
+  final Function(Todoclass) onAddTodo;
+  const Alert_addtodo({super.key, required this.onAddTodo});
 
   @override
   State<Alert_addtodo> createState() => add_todoState();
 }
 
-
-
 class add_todoState extends State<Alert_addtodo> {
-
-final formKey = GlobalKey<FormState>();
-String Title = '';
-String Detail = '';
-var FirstDate = '';  
-var LastDate = '';
-
-final TextEditingController _date = TextEditingController();
-final TextEditingController _date2 = TextEditingController();
-
-
+  final formKey = GlobalKey<FormState>();
+  String Title = '';
+  String Detail = '';
 
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
       title: Center(child: Text("เพิ่มกิจกรรมของคุณ")),
-      content: const Text("เพิ่มกิจกรรมของคุณ"),
-      actions: [
-        Form(
-          key: formKey,
-          child: Column(
-          children: [ 
-            Container(
-              height: 300,
-              width: 500,
-              margin: EdgeInsets.all(10),
-              decoration: BoxDecoration(
+      content: Form(
+        key: formKey,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextFormField(
+              maxLength: 25,
+              decoration: InputDecoration(
+                counterText: "",
+                label: Text("หัวข้อ", style: TextStyle(fontSize: 20)),
               ),
-                child: Column(
-                  children: [
-                    Container(  
-                      margin: EdgeInsets.fromLTRB(10, 10, 0, 10),
-                      child: 
-                        TextFormField(
-                          maxLength:25,
-                          decoration: InputDecoration(
-                            counterText: "",
-                            label: Text("หัวข้อ", style: TextStyle(fontSize: 20),)),
-                            onSaved: (value){
-                                Title=value!;
-                            },
-                        ),
-                    ),
-                    SizedBox(height: 10),
-                    Container(
-                        height: 100,
-                        width: 500,
-                        margin: EdgeInsets.fromLTRB(10, 10, 0, 10),
-                        child:                  
-                          TextFormField(                         
-                                    decoration: InputDecoration(
-                                      label: Text("รายละเอียด", style: TextStyle(fontSize: 20),)),
-                                    onSaved: (value){
-                                    Detail=value!;}   
-                          )
-                    ),
-                    SizedBox(height: 10),
-                    Row(
-                      children: [
-                        SizedBox(
-                          height: 50,
-                          width: 200,
-                            child: TextFormField(
-                              controller: _date,
-                              readOnly: true ,
-                              decoration: InputDecoration(
-                                icon: Icon(Icons.calendar_month),
-                                label: Text("วันที่",style: TextStyle(fontSize: 20)),                       
-                              ),
-                              onTap: ()async { 
-                                DateTime? pikkeddate = await showDatePicker(
-                                  context: context,
-                                  initialDate: DateTime.now(),
-                                  firstDate: DateTime(2023), 
-                                  lastDate: DateTime(2100));   
-
-                                  if (pikkeddate != null){
-                                    setState(() {
-                                      _date.text = DateFormat('dd/MM/yyyy').format(pikkeddate);
-                                      FirstDate = _date.text;
-                                    });
-                                  }  
-                                  onSaved: (value){
-                                    FirstDate = value!;
-                                  };
-                              },
-                              
-                            ),
-                        ),
-                        SizedBox(
-                          height: 50,
-                          width: 200,
-                            child: TextFormField(
-                              controller: _date2,
-                              readOnly: true ,
-                              decoration: InputDecoration(
-                                icon: Icon(Icons.calendar_month),
-                                label: Text("ถึงวันที่",style: TextStyle(fontSize: 20),),
-                              ),
-                              onTap: ()async {
-                                DateTime? pikkeddate = await showDatePicker(
-                                  context: context,
-                                  initialDate: DateTime.now(),
-                                  firstDate: DateTime(2023), 
-                                  lastDate: DateTime(2100));   
-
-                                  if (pikkeddate != null){
-                                    setState(() {
-                                      _date2.text = DateFormat('dd/MM/yyyy').format(pikkeddate);
-                                      LastDate = _date2.text;
-                                    });
-                                  }  
-                                  onSaved: (value){
-                                    LastDate = value!;
-                                  };
-                              },
-                            ),
-                        ),
-                      ],
-                    ),
-                             
-                    SizedBox(height: 10),
-                    Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                      TextButton(
-                          onPressed: () {
-                        formKey.currentState!.save();  
-                        data.add(
-                          Todoclass(
-                            Title: Title, 
-                            Detail: Detail, 
-                            FirstDate: FirstDate, 
-                            LastDate: LastDate)
-                        );  
-                        formKey.currentState?.reset(); 
-                        print(Title ); 
-                        print(Detail );
-                        print(FirstDate );
-                        print(LastDate );     
-
-                        Navigator.pushReplacement(context,MaterialPageRoute(
-                            builder: (ctx)=>const main_home_T()),
-                        );    
-                         
-                          }, 
-                          style: TextButton.styleFrom(
-                            foregroundColor: Color.fromARGB(255, 63, 124, 238)
-                          ),
-                          child: const Text('OK'),
-                      ),
-                      TextButton(
-                          onPressed: () => Navigator.pop(context, 'Cancel'),
-                          style: TextButton.styleFrom(
-                            foregroundColor: Color.fromARGB(255, 238, 108, 115)
-                          ),
-                          child: const Text('Cancel'),
-                      ),  
-                        ],
-                    )
-                       
-                  ],
-                )         
+              onSaved: (value) {
+                Title = value!;
+              },
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'กรุณากรอกหัวข้อ';
+                }
+                return null;
+              },
             ),
-          ]
-        )
-        ),                  
-      ],
+            SizedBox(height: 10),
+            TextFormField(
+              decoration: InputDecoration(
+                label: Text("รายละเอียด", style: TextStyle(fontSize: 20)),
+              ),
+              onSaved: (value) {
+                Detail = value ?? ''; 
+              },
+            ),
+            SizedBox(height: 10),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                TextButton(
+                  onPressed: () {
+                    if (formKey.currentState!.validate()) {
+                      formKey.currentState!.save();
+                      widget.onAddTodo(Todoclass(
+                        Title: Title,
+                        Detail: Detail,
+                      ));
+                      formKey.currentState?.reset();
+                      Navigator.of(context).pop();
+                    }
+                  },
+                  style: TextButton.styleFrom(
+                    foregroundColor: Color.fromARGB(255, 63, 124, 238),
+                  ),
+                  child: const Text('OK'),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.pop(context, 'Cancel'),
+                  style: TextButton.styleFrom(
+                    foregroundColor: Color.fromARGB(255, 238, 108, 115),
+                  ),
+                  child: const Text('Cancel'),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

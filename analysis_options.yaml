@@ -12,10 +12,11 @@ analyzer:
     avoid_print: ignore
     avoid_unnecessary_containers: ignore
     camel_case_types: ignore
-    curly_braces_in_flow_control_structures: ignore ignore
+    curly_braces_in_flow_control_structures: ignore
     file_names: ignore
+    library_private_types_in_public_api: ignore
     non_constant_identifier_names: ignore
-    prefer_const_constructors: ignore ignore ignore
+    prefer_const_constructors: ignore
     prefer_const_literals_to_create_immutables: ignore
     prefer_typing_uninitialized_variables: ignore
     unnecessary_import: ignore

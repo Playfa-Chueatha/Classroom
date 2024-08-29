@@ -1,5 +1,9 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_esclass_2/work/ListviweSearch.dart';
+import 'package:flutter_esclass_2/work/add_worktype.dart';
+
 
 class add_wprk_T extends StatefulWidget {
   const add_wprk_T({super.key});
@@ -10,234 +14,263 @@ class add_wprk_T extends StatefulWidget {
 
 class _add_workState extends State<add_wprk_T> {
 
+  final TextEditingController _dateController = TextEditingController();
+  bool _isChecked = false;
+
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(), // วันที่เริ่มต้นที่จะแสดง
+      firstDate: DateTime(2000), // วันที่เริ่มต้นที่สามารถเลือกได้
+      lastDate: DateTime(2101), // วันที่สิ้นสุดที่สามารถเลือกได้
+    );
+    if (picked != null) {
+      setState(() {
+        _dateController.text = "${picked.toLocal()}".split(' ')[0]; // แสดงวันที่ในฟอร์แมตที่ต้องการ
+      });
+    }
+  }
+
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
-          title: Text("มอบหมายงาน"),
-          centerTitle: true,
-          backgroundColor: Color.fromARGB(255, 195, 238, 250),
-        ),
-        body: Center(
-          child: SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Container(
-              height: 750,
-              width: 1500,
-              margin: EdgeInsets.all(50),
-              decoration: BoxDecoration(
-                color: Color.fromARGB(255, 195, 238, 250),
-                borderRadius: BorderRadius.circular(20)
-              ),
-              child: Row(
-                children: [
-                  Column(
-                    children: [
+    // ใช้ MediaQuery เพื่อดึงขนาดของหน้าจอ
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
 
-                      SizedBox(height: 30),
-                      //เขียนคำอธิบาย
-                      SizedBox(
-                        height: 200,
-                        width: 900,    
-                        child: TextField(
-                          keyboardType: TextInputType.multiline,
-                          maxLines: 50,
-                            decoration: InputDecoration(
-                              border: OutlineInputBorder(),
-                              hintText: 'เขียนอะไรหน่อย',
-                              contentPadding: EdgeInsets.symmetric(horizontal: 10,vertical: 20),
-                              isCollapsed: true,
-                              isDense: true,
-                              filled: true,
-                              fillColor: Colors.white,
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(20)
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(20)
-                              )
-                            ),
-                          ),  
-                        ),
-                        //ปุ่ม
-                      Container(
-                        alignment: Alignment.topLeft,
-                        height: 50,
-                        width: 800,
-                        decoration: BoxDecoration(
-                          color: Color.fromARGB(255, 142, 217, 238),
-                          borderRadius: BorderRadius.only(
-                            bottomLeft: Radius.circular(20),
-                            bottomRight: Radius.circular(20)
-                          )
-                        ),
-                        child: Row(
-                          children: [
-                            SizedBox(width: 10),
-                            IconButton(
-                              icon: Icon(Icons.format_bold_outlined,size: 30),
-                              onPressed: (){}, 
-                              style: IconButton.styleFrom(
-                                
-                              ),
-                            ),
-                            IconButton(
-                              icon: Icon(Icons.format_italic,size: 30),
-                              onPressed: (){}, 
-                              style: IconButton.styleFrom(
-                                
-                              ),
-                            ),
-                            IconButton(
-                              icon: Icon(Icons.format_underline,size: 30),
-                              onPressed: (){}, 
-                              style: IconButton.styleFrom(
-                                
-                              ),
-                            ),
-                            IconButton(
-                              icon: Icon(Icons.format_color_text_outlined,size: 30),
-                              onPressed: (){}, 
-                              style: IconButton.styleFrom(
-                                
-                              ),
-                            ),
-                            IconButton(
-                              icon: Icon(Icons.format_size_outlined,size: 30),
-                              onPressed: (){}, 
-                              style: IconButton.styleFrom(
-                                
-                              ),
-                            ),
-                            IconButton(
-                              icon: Icon(Icons.format_list_bulleted,size: 30),
-                              onPressed: (){}, 
-                              style: IconButton.styleFrom(
-                                
-                              ),
-                            ),
-                            IconButton(
-                              icon: Icon(Icons.format_align_left_outlined,size: 30),
-                              onPressed: (){}, 
-                              style: IconButton.styleFrom(
-                                
-                              ),
-                              ),
-                            IconButton(
-                              icon: Icon(Icons.format_align_center_outlined,size: 30),
-                              onPressed: (){}, 
-                              style: IconButton.styleFrom(
-                                
-                              ),
-                            ),
-                            IconButton(
-                              icon: Icon(Icons.format_align_right_outlined,size: 30),
-                              onPressed: (){}, 
-                              style: IconButton.styleFrom(
-                                
-                              ),
-                            ),
-                            IconButton(
-                              icon: Icon(Icons.format_align_justify_outlined,size: 30),
-                              onPressed: (){}, 
-                              style: IconButton.styleFrom(
-                                
-                              ),
-                            ),
-                            
-                          ],
-                        ),
-                      ),
-                      
-                      //ประเภทงาน
-                      Container(
-                        height: 350,
-                        width: 900,
-                        margin: EdgeInsets.fromLTRB(50,10,50,30),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(20)
-                        ),
-                      )
-                    ]
-                  ),
-                      //คะแนน
-                      Container(
-                        height: 700,
-                        width: 400,
-                        margin: EdgeInsets.fromLTRB(30,30,50,30),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(20)
-                        ),
-                        child: Column(
-                          children: [
-                            SizedBox(height: 50),
-                            Row (
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                SizedBox(width: 50),
-                                Text("คะแนนเต็ม :  ", style: TextStyle(fontSize: 20)),
-                                SizedBox(
-                                  height: 30,
-                                  width: 100,
-                                  child: TextField(
-                                    maxLength: 3,
-                                    keyboardType: TextInputType.number,
-                                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                                    decoration: InputDecoration(
-                                      border: OutlineInputBorder(),
-                                      contentPadding: EdgeInsets.symmetric(horizontal: 10,vertical: 7),
-                                      counterText: "",
-                                      isCollapsed: true,
-                                      isDense: true,
-                                      filled: true,
-                                      fillColor: Colors.white,
-                                      enabledBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(10)
-                                      ),
-                                      focusedBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(10)
-                                      )
-                                    ),
-                                  ),
-                                )
-                              ]
-                            ),
-                            SizedBox(height: 10),
-                            Row (
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: const [
-                                SizedBox(width: 50),
-                                Text("วันที่ :            ", style: TextStyle(fontSize: 20)),
-                                SizedBox(
-                                  height: 30,
-                                  width: 100,
-                                  child: TextField(
-                                    decoration: InputDecoration(
-                                      prefix: Icon(Icons.calendar_today),
-                                      isCollapsed: true,
-                                      isDense: true,
-                                      filled: true,
-                                      fillColor: Colors.white,
-                                      
-                                      
-                                      
-                                      )
-                                    ),
-                                    
-                                  )
-                              ]
-                            )
-                              ]
-                            )
-                        )
-                    ],                                                              
-                      )                                       
-              ),       
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("มอบหมายงาน"),
+        centerTitle: true,
+        backgroundColor: Color.fromARGB(255, 195, 238, 250),
+      ),
+      body: Center(
+        child: SingleChildScrollView(
+          scrollDirection: Axis.vertical,
+          child: Container(
+            height: screenHeight * 0.9, 
+            width: screenWidth * 0.9,  
+            margin: EdgeInsets.fromLTRB(10,10,10,0),
+            decoration: BoxDecoration(
+              color: Color.fromARGB(255, 195, 238, 250),
+              borderRadius: BorderRadius.circular(20),
             ),
-          )        
-        );  
+            child: Row(
+              children: [
+                Expanded(
+                  flex: 2, 
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.all(10),
+                        child: Container(
+                          height: screenHeight * 0.3,
+                          width: screenWidth * 0.5,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(20)
+                          ),
+                          child: Column(
+                            children: [
+                              Container(
+                                height: screenHeight * 0.2,
+                                width: screenWidth * 0.5,
+                                padding: EdgeInsets.fromLTRB(10,10,10,0),
+                                child: TextFormField(
+                                  keyboardType: TextInputType.multiline,
+                                  maxLines: 50,
+                                  decoration: InputDecoration(
+                                    enabledBorder: const OutlineInputBorder(
+                                      borderSide: BorderSide(color: Color.fromARGB(255, 2, 138, 175), width: 0.0),
+                                    ),
+                                    hintText: 'เขียนอะไรหน่อย',
+                                  ),
+                                ),
+                              ),
+                              Container(
+                                height: 40,
+                                width: screenWidth * 0.45,
+                                margin: EdgeInsets.all(5),
+                                decoration: BoxDecoration(
+                                  color: Color.fromARGB(255, 142, 217, 238),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                  children: [
+                                    IconButton(
+                                      icon: Icon(Icons.format_bold_outlined, size: 20),
+                                      onPressed: () {},
+                                    ),
+                                    IconButton(
+                                      icon: Icon(Icons.format_italic, size: 20),
+                                      onPressed: () {},
+                                    ),
+                                    IconButton(
+                                      icon: Icon(Icons.format_underline, size: 20),
+                                      onPressed: () {},
+                                    ),
+                                    IconButton(
+                                      icon: Icon(Icons.format_color_text_outlined, size: 20),
+                                      onPressed: () {},
+                                    ),
+                                    IconButton(
+                                      icon: Icon(Icons.format_size_outlined, size: 20),
+                                      onPressed: () {},
+                                    ),
+                                    IconButton(
+                                      icon: Icon(Icons.format_list_bulleted, size: 20),
+                                      onPressed: () {},
+                                    ),
+                                    IconButton(
+                                      icon: Icon(Icons.format_align_left_outlined, size: 20),
+                                      onPressed: () {},
+                                    ),
+                                    IconButton(
+                                      icon: Icon(Icons.format_align_center_outlined, size: 20),
+                                      onPressed: () {},
+                                    ),
+                                    IconButton(
+                                      icon: Icon(Icons.format_align_right_outlined, size: 20),
+                                      onPressed: () {},
+                                    ),
+                                    IconButton(
+                                      icon: Icon(Icons.format_align_justify_outlined, size: 20),
+                                      onPressed: () {},
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          )                          
+                        )
+                      ),
+                      Type_work(),//ประเภทงาน add_worktype.dart
+                    ],
+                  ),
+                ),
+
+
+
+
+                // คะแนน
+                  Container(
+                    padding: EdgeInsets.all(20),
+                    height: screenHeight * 0.9,
+                    width: screenWidth *0.3, // ปรับตามขนาดหน้าจอ
+                    margin: EdgeInsets.fromLTRB(30, 30, 50, 30),
+                    decoration: BoxDecoration(
+                      color: const Color.fromARGB(255, 255, 255, 255),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Center(
+                      child:
+                      Column(
+                      children: [
+
+                        //คะแนนเต็ม
+                              Row(
+                                children: [
+                                  Container(
+                                    alignment: Alignment.centerRight,
+                                    height: 50,
+                                    width: 150,
+                                    child: Text("คะแนนเต็ม :  ", style: TextStyle(fontSize: 20)),
+                                  ),
+                                  Container(
+                                    height: 50,
+                                    width: 150,
+                                    decoration: BoxDecoration(
+                                      color: const Color.fromARGB(255, 255, 255, 255)
+                                    ),                 
+                                    child: (
+                                      Padding(padding: EdgeInsets.all(5),
+                                      child:  TextFormField(
+                                          maxLength: 3,
+                                          keyboardType: TextInputType.number,
+                                          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                                          decoration: InputDecoration(
+                                            counterText: "",
+                                          ),
+                                      ),
+                                    )
+                                      ),             
+                                  ),
+                                  
+                                ],
+                              ), 
+
+                              //กำหนดส่ง
+                              Row(
+                                children: [
+                                  Container(
+                                    alignment: Alignment.centerRight,
+                                    height: 50,
+                                    width: 150,
+                                    child: Text("กำหนดส่ง :  ", style: TextStyle(fontSize: 20)),
+                                  ),
+                                  Container(
+                                    height: 50,
+                                    width: 150,
+                                    decoration: BoxDecoration(
+                                      color: const Color.fromARGB(255, 255, 255, 255)
+                                    ),                 
+                                    child: (
+                                      Padding(padding: EdgeInsets.all(5),
+                                      child:  TextFormField(
+                                          controller: _dateController,
+                                          readOnly: true,
+                                          decoration: InputDecoration(
+                                            icon: Icon(Icons.calendar_today),
+                                            hintText: "Enter Date",
+                                          ),
+                                    onTap: () => _selectDate(context),
+                                      ),
+                                      )
+                                    ),             
+                                  ),
+                                  
+                                ],
+                              ),
+
+
+                              //ปิดรับงานเมื่อครบกำหนด
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    Checkbox(
+                                      value: _isChecked,
+                                      onChanged: (bool? newValue) {
+                                        setState(() {
+                                          _isChecked = newValue ?? false;
+                                        });
+                                      },
+                                    ),
+                                    Text('ปิดรับงานเมื่อครบกำหนด',style: TextStyle(fontSize: 18),),
+                                  ],
+                                ),
+
+                              //เลือกห้องเรียน
+                              Container(
+                                height: screenHeight *0.5,
+                                width: screenWidth *0.3,
+                                decoration: BoxDecoration(
+                                  color: const Color.fromARGB(255, 191, 240, 233),
+                                  borderRadius: BorderRadius.circular(20)                
+                                ),
+                                child: Classroom_addwork(),//ListviweSearch.dart
+                              ),
+
+
+
+                            ]
+                          )
+                        ),)
+              ],
+            ),
+          
+        
+          )))
+    );
   }
 }
-
