@@ -30,7 +30,7 @@ class _CommentState extends State<Comment> {
               width: screenWidth * 0.8,
               margin: EdgeInsets.fromLTRB(0, 10, 0, 10),
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Container(
                     height: screenHeight * 0.6, // ความสูงของคอมเมนต์ตามขนาดหน้าจอ
@@ -42,8 +42,6 @@ class _CommentState extends State<Comment> {
                     child: DataComment(), // แสดงคอมเมนต์ที่อัพเดตแล้ว
                   ),
                   SizedBox(height: 20),
-                  Row(
-                    children: [
                       SizedBox(
                         height: 40,
                         width: screenWidth * 0.75, // ปรับความกว้างของ TextFormField ตามขนาดหน้าจอ
@@ -69,8 +67,7 @@ class _CommentState extends State<Comment> {
                         ),
                       ),
                     ],
-                  ),
-                ],
+                
               ),
             ),
           ),

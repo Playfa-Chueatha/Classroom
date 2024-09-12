@@ -16,8 +16,6 @@ class _Login_classState extends State<Login_class> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // floatingActionButton: FloatingActionButton(
-      //   onPressed: (){}),
       
       body: Center(       
         child:  SingleChildScrollView(
@@ -83,30 +81,7 @@ class _Login_classState extends State<Login_class> {
 
 
 
-
-
-                //เอาไว้ทดสอบขี้เกียจlogin
-                SizedBox(height: 20),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    IconButton(
-                      onPressed: (){
-                        /*Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => const main_home_T()),);*/
-                      }, 
-                      icon: Icon(Icons.person_outline)),
-                      SizedBox(width: 300),
-                      IconButton(
-                      onPressed: (){
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => const main_home_S()),);
-                      }, 
-                      icon: Icon(Icons.person_outline))
-                  ],
-                )
+                
               ],
             )   
           )

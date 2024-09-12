@@ -3,7 +3,7 @@ import 'package:flutter_esclass_2/Classroom/add_announce.dart';
 import 'package:flutter_esclass_2/Data/Data_announce.dart';
 import 'package:flutter_esclass_2/Data/Data_comment.dart';
 import 'package:flutter_esclass_2/Model/menu.dart';
-import 'package:flutter_esclass_2/work/add_work.dart';
+import 'package:flutter_esclass_2/work/add_worktype.dart';
 
 class Class_T_body extends StatefulWidget {
   const Class_T_body({super.key});
@@ -127,7 +127,7 @@ int counter = 0;
                                   onPressed: (){
                                     Navigator.push(
                                       context,
-                                      MaterialPageRoute(builder: (context) => const add_wprk_T()),);
+                                      MaterialPageRoute(builder: (context) => const Type_work()),);
                                 }, 
                                   
                                   tooltip: 'มอบหมายงาน',

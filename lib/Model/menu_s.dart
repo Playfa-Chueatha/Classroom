@@ -6,14 +6,14 @@ import 'package:flutter_esclass_2/Model/Menu_listclassroom.dart';
 import 'package:flutter_esclass_2/Model/Menu_todolist.dart';
   
 
-class Menuu_class extends StatefulWidget {
-  const Menuu_class({super.key});
+class Menuu_class_s extends StatefulWidget {
+  const Menuu_class_s({super.key});
 
   @override
-  State<Menuu_class> createState() => _MenuState();
+  State<Menuu_class_s> createState() => _MenuState();
 }
 
-class _MenuState extends State<Menuu_class> {
+class _MenuState extends State<Menuu_class_s> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -36,21 +36,10 @@ class _MenuState extends State<Menuu_class> {
           ),
           child: Column(
             children: [
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(300, 10, 10, 5),
-                    child: IconButton(
-                    tooltip: 'ตั้งค่าห้องเรียน',
-                    onPressed: (){
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => SettingCalss()),);
-
-                    }, 
-                    icon: Icon(Icons.settings)),
-                  
-                  ),  
-              Text('ห้องเรียนของฉัน',style: TextStyle(fontSize: 20),),
-              SizedBox(height: 10),
+              Padding(
+                padding: EdgeInsets.fromLTRB(0, 20, 0, 10),
+                child: Text('ห้องเรียนของฉัน',style: TextStyle(fontSize: 20),),
+              ),     
               Container(
                 height: 190,
                 width: 300,

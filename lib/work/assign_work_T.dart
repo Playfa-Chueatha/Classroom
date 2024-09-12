@@ -50,7 +50,7 @@ class _ClassTState extends State<AssignWork_class_T> {
               onPressed: (){
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => main_home_T()),);
+                  MaterialPageRoute(builder: (context) => const main_home_T()),);
               }, 
               icon: const Icon(Icons.home),
               tooltip: 'หน้าหลัก',      
@@ -122,7 +122,7 @@ class _ClassTState extends State<AssignWork_class_T> {
           SizedBox(width: 50)
         ],
       ),
-      body: work_body_T(),
+      body: AssignWork_class_T(),
     );
   }
 }

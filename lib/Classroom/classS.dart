@@ -122,15 +122,6 @@ class _toggleTState extends State<toggleS> {
             ),
           ),
           IconButton(
-            onPressed: (){
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const Chat_classs()),);
-            }, 
-            icon: Icon(Icons.chat),
-            tooltip: 'สนทนา',
-          ),
-          IconButton(
             style: IconButton.styleFrom(
               hoverColor: const Color.fromARGB(255, 235, 137, 130)
             ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_esclass_2/Model/menu.dart';
+import 'package:flutter_esclass_2/Model/menu_s.dart';
 
 class work_body_S extends StatefulWidget {
   const work_body_S({super.key});
@@ -36,7 +37,7 @@ class _work_body_SState extends State<work_body_S> {
                           bottomRight: Radius.circular(20)
                         ),
                       ),
-                      child:Menuu_class(),//menu.dart,
+                      child:Menuu_class_s(),//menu.dart,
                       ),
                       SizedBox(width: 50,),
                     

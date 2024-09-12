@@ -1,4 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_esclass_2/test.dart';
+import 'package:flutter_esclass_2/work/work_type/auswerQ.dart';
+import 'package:flutter_esclass_2/work/work_type/many_choice.dart';
+import 'package:flutter_esclass_2/work/work_type/one_choice.dart';
+import 'package:flutter_esclass_2/work/work_type/upfile.dart';
 
 class Type_work extends StatefulWidget {
   const Type_work({super.key});
@@ -8,6 +13,9 @@ class Type_work extends StatefulWidget {
 }
 
 class _Type_workState extends State<Type_work> {
+   List<String> tabData = ['', '', '', ''];  // ใช้เก็บข้อมูลจากแต่ละแท็บ
+
+
   @override
   Widget build(BuildContext context) {
 
@@ -16,11 +24,21 @@ class _Type_workState extends State<Type_work> {
 
      return DefaultTabController(
       length: 4, // จำนวนแท็บ
-      child: Container(
-        height: screenHeight * 0.5,
-        width: screenWidth * 0.5,
+      child: Scaffold(
+        backgroundColor: Color.fromARGB(255, 255, 255, 255),
+         appBar: AppBar(
+            title: Text("มอบหมายงาน"),
+            centerTitle: true,
+            backgroundColor: Color.fromARGB(255, 195, 238, 250),
+          ),
+        body:    
+      Container(
+        height: screenHeight * 0.9,
+        width: screenWidth * 1.0,
+        padding: EdgeInsets.fromLTRB(50, 10, 50, 10),
+        margin: EdgeInsets.fromLTRB(50, 10, 50, 5),
         decoration: BoxDecoration(
-          color: const Color.fromARGB(255, 255, 255, 255),
+          color: const Color.fromARGB(255, 195, 238, 250),
           borderRadius: BorderRadius.circular(20),
         ),
         child: Column(
@@ -39,16 +57,17 @@ class _Type_workState extends State<Type_work> {
             Expanded(
               child: TabBarView(
                 children: [
-                  Center(child: Text('เนื้อหาหน้า ถาม-ตอบ')),
-                  Center(child: Text('เนื้อหาหน้า ตัวเลือกคำตอบเดียว')),
-                  Center(child: Text('เนื้อหาหน้า ตัวเลือกหลายคำตอบ')),
-                  Center(child: Text('เนื้อหาหน้า ส่งงานแบบอัพไฟล์')),
+                  Center(child: Auswer_Question()),
+                  Center(child: OneChoice_test()),
+                  Center(child: many_choice()),
+                  Center(child: upfilework()),
                 ],
               ),
             ),
           ],
         ),
       ),
+      )
     );
   }
 }

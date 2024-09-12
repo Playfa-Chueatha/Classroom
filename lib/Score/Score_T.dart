@@ -5,7 +5,7 @@ import 'package:flutter_esclass_2/Login/login.dart';
 import 'package:flutter_esclass_2/Model/Chat.dart';
 import 'package:flutter_esclass_2/Profile/ProfileT.dart';
 import 'package:flutter_esclass_2/Score/Score_T_body.dart';
-import 'package:flutter_esclass_2/work/assign_work_T.dart';
+import 'package:flutter_esclass_2/work/asign_work_T_body.dart';
 
 
 
@@ -75,7 +75,7 @@ class _ScoreTState extends State<ScoreT> {
             onPressed: (){
               Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const AssignWork_class_T()),);
+                  MaterialPageRoute(builder: (context) => const AssignWork_class_T(assignmentsauswerq: [], assignmentsupfile: [], assignmentsonechoice: [], assignmentsmanychoice: [],),));
             }, 
             icon: const Icon(Icons.edit_document),
             tooltip: 'งานที่ได้รับ',
@@ -96,15 +96,6 @@ class _ScoreTState extends State<ScoreT> {
           ),
               ],
             ),
-          ),
-          IconButton(
-            onPressed: (){
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const Chat_classs()),);
-            }, 
-            icon: Icon(Icons.chat),
-            tooltip: 'สนทนา',
           ),
           IconButton(
             style: IconButton.styleFrom(

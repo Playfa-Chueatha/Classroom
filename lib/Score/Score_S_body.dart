@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_esclass_2/Model/menu.dart';
+import 'package:flutter_esclass_2/Model/menu_s.dart';
 
 class Score_S_body extends StatefulWidget {
   const Score_S_body({super.key});
@@ -39,7 +40,7 @@ class _MyWidgetState extends State<Score_S_body> {
                           bottomRight: Radius.circular(20)
                         ),
                       ),
-                      child:Menuu_class(),//menu.dart
+                      child:Menuu_class_s(),//menu.dart
                       ),
                       SizedBox(width: 50,),
 

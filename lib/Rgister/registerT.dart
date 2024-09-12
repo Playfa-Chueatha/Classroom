@@ -24,65 +24,101 @@ class _FormState extends State<Registert_T> {
   TextEditingController password = TextEditingController();
   TextEditingController email = TextEditingController();
 
-  Future<void> signUp() async {
-  try {
-    var client = http.Client();
-    var headers = {
-      'Content-type': 'application/json',
-      'Accept': 'application/json',
-    };
+//   Future<void> signUp() async {
+//   try {
+//     var client = http.Client();
+//     var headers = {
+//       'Content-type': 'application/json',
+//       'Accept': 'application/json',
+//     };
 
-    String url = "http://localhost/edueliteroom01/registerteacher.php";
-    final response = await client.post(
-      Uri.parse(url),
-      headers: headers,
-      body: jsonEncode({
-        "thaifirstname_teacher": thaifirstname.text,
-        "thailastname_teacher": thailastname.text,
-        "username_teacher": username.text,
-        "password_teacher": password.text,
-        "email_teacher": email.text
-      }),
-    );
+//     String url = "https://edueliteroom.com/connect/registerteacher.php";
+//     final response = await client.post(
+//       Uri.parse(url),
+//       headers: headers,
+//       body: jsonEncode({
+//         "thaifirstname_teacher": thaifirstname.text,
+//         "thailastname_teacher": thailastname.text,
+//         "username_teacher": username.text,
+//         "password_teacher": password.text,
+//         "email_teacher": email.text
+//       }),
+//     );
 
-    if (response.statusCode == 200) {
-      var data = jsonDecode(response.body);
+//     if (response.statusCode == 200) {
+//       var data = jsonDecode(response.body);
       
-      if (data is Map && data.containsKey('error')) {
-        // Handle the error case
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text(data['error']),
-        ));
-      } else if (data.containsKey('success')) {
-        // Success, navigate to login
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text(data['success']),
-        ));
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const Login_T()),
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text('Unexpected response from server.'),
-        ));
-      }
+//       if (data is Map && data.containsKey('error')) {
+//         // Handle the error case
+//         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+//           content: Text(data['error']),
+//         ));
+//       } else if (data.containsKey('success')) {
+//         // Success, navigate to login
+//         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+//           content: Text(data['success']),
+//         ));
+//         Navigator.push(
+//           context,
+//           MaterialPageRoute(builder: (context) => const Login_T()),
+//         );
+//       } else {
+//         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+//           content: Text('Unexpected response from server.'),
+//         ));
+//       }
+//     } else {
+//       // Handle non-200 status code
+//       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+//         content: Text('Server error: ${response.statusCode}'),
+//       ));
+//     }
+//   } catch (e) {
+//     // Handle other errors
+//     print("Error: $e");
+//     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+//       content: Text('An error occurred: $e'),
+//     ));
+//   }
+// }
+
+
+
+  Future<void> saveProfileT() async {
+
+  Uri uri = Uri.parse('https://edueliteroom.com/connect/registerteacher.php');
+  //Uri uri = Uri.parse('http://localhost/edueliteroom01/registerteacher.php');
+
+  Map<String, dynamic> data = {
+    'thaifirstname_teacher': thaifirstname.text,
+    'thailastname_teacher': thailastname.text,
+    'username_teacher': username.text,
+    'password_teacher': password.text,
+    'email_teacher': email.text,
+  };
+
+  http.Response response = await http.post(uri, body: data);
+
+  if (response.statusCode == 200) {
+    if (response.body == 1.toString()) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('การบันทึกข้อมูลล้มเหลว กรุณาลองใหม่อีกครั้ง')),
+      );
     } else {
-      // Handle non-200 status code
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Server error: ${response.statusCode}'),
-      ));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('การบันทึกข้อมูลเสร็จสิ้น')),
+      );
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => Login_T()),
+      );
     }
-  } catch (e) {
-    // Handle other errors
-    print("Error: $e");
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text('An error occurred: $e'),
-    ));
+  } else {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('เกิดข้อผิดพลาดในการเชื่อมต่อกับเซิร์ฟเวอร์')),
+    );
   }
 }
-
-
 
   String? validateEmail(String? value) {
     if (value == null || value.isEmpty) {
@@ -259,9 +295,10 @@ class _FormState extends State<Registert_T> {
                     child: FilledButton(
                         onPressed: () async {
                           //await signUp();
-                           bool pass = formKey.currentState!.validate(); //ปุ่มบันทึกลงฐานข้อมูล
+                           bool pass = formKey.currentState!.validate(); 
                            if(pass){
-                             await signUp(); 
+                            //  await signUp(); 
+                            await saveProfileT();
                            }
                            formKey.currentState!.validate();
                         },

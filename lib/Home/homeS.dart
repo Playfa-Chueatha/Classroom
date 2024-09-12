@@ -10,16 +10,6 @@ import 'package:flutter_esclass_2/Score/Score_S.dart';
 import 'package:flutter_esclass_2/work/asign_work_S.dart';
 
 
-class Home_S extends StatelessWidget {
-  const Home_S({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home: main_home_S(),
-    );
-  }
-}
 class main_home_S extends StatefulWidget {
   const main_home_S({super.key});
 
@@ -123,15 +113,6 @@ class _homeState extends State<main_home_S> {
           ),
               ],
             ),
-          ),
-          IconButton(
-            onPressed: (){
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const Chat_classs()),);
-            }, 
-            icon: Icon(Icons.chat),
-            tooltip: 'สนทนา',
           ),
           IconButton(
             style: IconButton.styleFrom(

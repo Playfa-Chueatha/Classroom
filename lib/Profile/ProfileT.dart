@@ -113,7 +113,7 @@ class _Profile_TState extends State<Profile_T> {
                               image: AssetImage("assets/images/ครู.png"),
                             )
                           : DecorationImage(
-                              image: FileImage(_image!), // ใช้ภาพที่ผู้ใช้เลือก
+                              image: FileImage(_image!), 
                               fit: BoxFit.cover,
                             ),
                     ),

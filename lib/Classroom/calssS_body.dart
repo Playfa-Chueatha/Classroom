@@ -1,6 +1,8 @@
 
 import 'package:flutter/material.dart';
+import 'package:flutter_esclass_2/Data/Data_announce.dart';
 import 'package:flutter_esclass_2/Model/menu.dart';
+import 'package:flutter_esclass_2/Model/menu_s.dart';
 
 class class_S_body extends StatefulWidget {
   const class_S_body({super.key});
@@ -44,7 +46,7 @@ class _class_S_bodyState extends State<class_S_body> {
                           bottomRight: Radius.circular(20)
                         ),
                       ),
-                      child: Menuu_class(),//menu.dart,
+                      child: Menuu_class_s(),//menu.dart,
                       ),
                       SizedBox(width: 50,),
 
@@ -62,17 +64,15 @@ class _class_S_bodyState extends State<class_S_body> {
                         child: Column(
                           children: [
                             SizedBox(height: 20,),
-
-
-                            Text("ประกาศ", style: TextStyle(fontSize: 40),),
+                            Text("ประกาศ", style: TextStyle(fontSize: 40)),
                             SizedBox(height: 20),
                             Container(
-                              height: 60,
+                              height: 800,
                               width: 700,
                               decoration: BoxDecoration(
-                                color: Color.fromARGB(255, 147, 185, 221),
                                 borderRadius: BorderRadius.circular(20)
                               ),
+                              child: announce(),
                             )
                           ]
                         ),
