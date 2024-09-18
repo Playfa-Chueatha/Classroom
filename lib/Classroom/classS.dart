@@ -71,9 +71,9 @@ class _toggleTState extends State<toggleS> {
                 highlightColor: Color.fromARGB(255, 170, 205, 238),     
               ),
               onPressed: (){
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const main_home_S()),);
+                // Navigator.push(
+                //   context,
+                //   MaterialPageRoute(builder: (context) => const main_home_S()),);
               }, 
               icon: const Icon(Icons.home),
               tooltip: 'หน้าหลัก',      

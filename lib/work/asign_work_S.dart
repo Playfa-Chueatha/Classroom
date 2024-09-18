@@ -1,117 +1,131 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_esclass_2/Classroom/classS.dart';
-import 'package:flutter_esclass_2/Home/homeS.dart';
-import 'package:flutter_esclass_2/Login/login.dart';
-import 'package:flutter_esclass_2/Model/Chat.dart';
-import 'package:flutter_esclass_2/Profile/ProfileS.dart';
-import 'package:flutter_esclass_2/Score/Score_S.dart';
-import 'package:flutter_esclass_2/work/asign_work_S_body.dart';
+import 'package:flutter_esclass_2/Model/appbar_students.dart';
+import 'package:flutter_esclass_2/Model/menu_t.dart';
+import 'package:flutter_esclass_2/Model/menu_s.dart';
 
-
-class AssignWork_class_S extends StatefulWidget {
-  const AssignWork_class_S({super.key});
+class work_body_S extends StatefulWidget {
+  const work_body_S({super.key});
 
   @override
-  State<AssignWork_class_S> createState() => _AssignWork_class_SState();
+  State<work_body_S> createState() => _work_body_SState();
 }
 
-class _AssignWork_class_SState extends State<AssignWork_class_S> {
+class _work_body_SState extends State<work_body_S> {                
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color.fromARGB(255, 195, 238, 250),
       appBar: AppBar(
-        title: Text('Eduelite'),
         backgroundColor: Color.fromARGB(255, 152, 186, 218),
-        actions: <Widget>[
-          IconButton(
-            onPressed: (){
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const Profile_S()),);            
-            }, 
-            icon: Image.asset("assets/images/นักเรียน.png"),
-            iconSize: 30,
-          ),
-          Container(
-            height: 45,
-            decoration: BoxDecoration(
-              color: Color.fromARGB(255, 71, 136, 190),
-              borderRadius: BorderRadius.circular(20)
-
-            ),
-            child: Row(
-              children: [
-                IconButton(
-            style: IconButton.styleFrom(
-                highlightColor: Color.fromARGB(255, 170, 205, 238),     
-              ),
-              onPressed: (){
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const main_home_S()),);
-              }, 
-              icon: const Icon(Icons.home),
-              tooltip: 'หน้าหลัก',      
-          ),
-          IconButton(
-            style: IconButton.styleFrom(
-                highlightColor: Color.fromARGB(255, 170, 205, 238),                      
-              ),
-            onPressed: (){
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const ClassS()),
-              );
-            }, 
-            icon: const Icon(Icons.class_outlined),
-            tooltip: 'ห้องเรียน',
-          ),
-
-          IconButton(
-            style: IconButton.styleFrom(
-                highlightColor: Color.fromARGB(255, 170, 205, 238),   
-                backgroundColor: Color.fromARGB(255, 96, 152, 204),   
-              ),
-            onPressed: (){
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const AssignWork_class_S()),);
-            }, 
-            icon: const Icon(Icons.edit_document),
-            tooltip: 'งานที่ได้รับ',
-          ),
-
-          IconButton(
-            style: IconButton.styleFrom(
-                highlightColor: Color.fromARGB(255, 170, 205, 238),      
-              ),
-            onPressed: (){
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const Score_S()),);
-            }, 
-            icon: const Icon(Icons.list_alt),
-            tooltip: 'คะแนนของฉัน',
-          ),
-              ],
-            ),
-          ),
-          IconButton(
-            style: IconButton.styleFrom(
-              hoverColor: const Color.fromARGB(255, 235, 137, 130)
-            ),
-            onPressed: (){
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const Login_class()),);
-            }, 
-            icon: Icon(Icons.logout),
-            tooltip: 'ออกจากระบบ',
-          ),
-          SizedBox(width: 50)
+        title: Text('Edueliteroom'),
+        actions: [
+          appbarstudents(context)
         ],
+        ),
+      body: SingleChildScrollView(
+        scrollDirection: Axis.vertical,
+        child: Column(
+          children: [
+            SizedBox(height: 10,),
+            Column(
+              children: [
+                SizedBox(height: 30),
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      //menu
+                      Container(
+                      height: 1000,
+                      width: 400,
+                      decoration: BoxDecoration(
+                        color: Color.fromARGB(255, 147, 185, 221),
+                        borderRadius: BorderRadius.only(
+                          topRight:Radius.circular(20),
+                          bottomRight: Radius.circular(20)
+                        ),
+                      ),
+                      child:Menuu_class_s(),//menu.dart,
+                      ),
+                      SizedBox(width: 50,),
+                    
+
+
+
+                      //งานที่ได้รับ
+                      Container(
+                      height: 1000,
+                      width: 600,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(20)
+                        ),
+                        
+                        child: Column(
+                          children: [
+                            SizedBox(height: 70,),       
+                            Text("งานที่ได้รับ", style: TextStyle(fontSize: 20),),
+                            SizedBox(height: 20),
+                            Container(
+                              height: 100,
+                              width: 500,
+                              decoration: BoxDecoration(
+                                color: Color.fromARGB(255, 147, 185, 221),
+                                borderRadius: BorderRadius.circular(20)
+                              ),
+                            ),
+                            SizedBox(height: 50,),
+                            Text("งานที่เลยกำหนดแล้ว", style: TextStyle(fontSize: 20),),
+                            SizedBox(height: 20),
+                            Container(
+                              height: 100,
+                              width: 500,
+                              decoration: BoxDecoration(
+                                color: Color.fromARGB(255, 147, 185, 221),
+                                borderRadius: BorderRadius.circular(20)
+                              ),
+                            ),
+                          ]
+                        ),
+                      ),
+                      SizedBox(width: 50,),
+
+                      //รายละเอียดงาน
+                      Container(
+                        height: 1000,
+                        width: 800,
+                        alignment: Alignment.topCenter,
+                        decoration: BoxDecoration(
+                          color: Color.fromARGB(255, 152, 186, 218),
+                          borderRadius: BorderRadius.circular(20)
+                        ),
+                        child: Column(
+                          children: [
+                            SizedBox(height: 70),                            
+                            Text("รายละเอียดงาน", style: TextStyle(fontSize: 30),),
+                            Container(
+                              alignment: Alignment.center,
+                              height: 400,
+                              width: 700,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(20)
+                              ),
+                            ),
+              
+                          ]
+                        )
+                      ),
+                      SizedBox(width: 20)
+                    ],
+                  ),
+                )
+
+              ],
+            )
+          ],
+        ),
       ),
-      body: work_body_S(),
     );
   }
 }

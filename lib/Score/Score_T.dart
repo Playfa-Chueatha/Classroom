@@ -1,119 +1,78 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_esclass_2/Classroom/classT.dart';
-import 'package:flutter_esclass_2/Home/homeT.dart';
-import 'package:flutter_esclass_2/Login/login.dart';
-import 'package:flutter_esclass_2/Model/Chat.dart';
-import 'package:flutter_esclass_2/Profile/ProfileT.dart';
-import 'package:flutter_esclass_2/Score/Score_T_body.dart';
-import 'package:flutter_esclass_2/work/asign_work_T_body.dart';
+import 'package:flutter_esclass_2/Model/appbar_teacher.dart';
+import 'package:flutter_esclass_2/Model/menu_t.dart';
+import 'package:flutter_esclass_2/Score/Tab.dart';
+import 'package:flutter_esclass_2/Score/checkinclassroom.dart';
 
-
-
-class ScoreT extends StatefulWidget {
-  const ScoreT({super.key});
+class Score_T_body extends StatefulWidget {
+  const Score_T_body({super.key});
 
   @override
-  State<ScoreT> createState() => _ScoreTState();
+  State<Score_T_body> createState() => _Score_T_bodyState();
 }
 
-class _ScoreTState extends State<ScoreT> {
+class _Score_T_bodyState extends State<Score_T_body> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color.fromARGB(255, 195, 238, 250),
       appBar: AppBar(
-        title: Text('Eduelite'),
         backgroundColor: Color.fromARGB(255, 152, 186, 218),
-        actions: <Widget>[
-          IconButton(
-            onPressed: (){
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const Profile_T()),);            
-            }, 
-            icon: Image.asset("assets/images/ครู.png"),
-            iconSize: 30,
-          ),
-          Container(
-            height: 45,
-            decoration: BoxDecoration(
-              color: Color.fromARGB(255, 71, 136, 190),
-              borderRadius: BorderRadius.circular(20)
-
-            ),
-            child: Row(
-              children: [
-                IconButton(
-            style: IconButton.styleFrom(
-                highlightColor: Color.fromARGB(255, 170, 205, 238)      
-              ),
-              onPressed: (){
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const main_home_T()),);
-              }, 
-              icon: const Icon(Icons.home),
-              tooltip: 'หน้าหลัก',      
-          ),
-          IconButton(
-            style: IconButton.styleFrom(
-                highlightColor: Color.fromARGB(255, 170, 205, 238),                     
-              ),
-            onPressed: (){
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const ClassT()),
-              );
-            }, 
-            icon: const Icon(Icons.class_outlined),
-            tooltip: 'ห้องเรียน',
-          ),
-
-          IconButton(
-            style: IconButton.styleFrom(
-                highlightColor: Color.fromARGB(255, 170, 205, 238),      
-              ),
-            onPressed: (){
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const AssignWork_class_T(assignmentsauswerq: [], assignmentsupfile: [], assignmentsonechoice: [], assignmentsmanychoice: [],),));
-            }, 
-            icon: const Icon(Icons.edit_document),
-            tooltip: 'งานที่ได้รับ',
-          ),
-
-          IconButton(
-            style: IconButton.styleFrom(
-                highlightColor: Color.fromARGB(255, 170, 205, 238),  
-                backgroundColor: Color.fromARGB(255, 96, 152, 204),    
-              ),
-            onPressed: (){
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const ScoreT()),);
-            }, 
-            icon: const Icon(Icons.list_alt),
-            tooltip: 'รายชื่อนักเรียน',
-          ),
-              ],
-            ),
-          ),
-          IconButton(
-            style: IconButton.styleFrom(
-              hoverColor: const Color.fromARGB(255, 235, 137, 130)
-            ),
-            onPressed: (){
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const Login_class()),);
-            }, 
-            icon: Icon(Icons.logout),
-            tooltip: 'ออกจากระบบ',
-          ),
-          SizedBox(width: 50)
+        title: Text('Edueliteroom'),
+        actions: [
+          appbarteacher(context)
         ],
       ),
+       body: SingleChildScrollView(
+        scrollDirection: Axis.vertical,
+        child: Column(
+          children: [
+            SizedBox(height: 10),
+            Column(
+              children: [
+                SizedBox(height: 30),
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
 
-      body: Score_T_body(),
+
+                      //menu
+                      Container(
+                      height: 1000,
+                      width: 400,
+                      alignment: Alignment.topCenter,
+                      decoration: BoxDecoration(
+                        color: Color.fromARGB(255, 147, 185, 221),
+                        borderRadius: BorderRadius.only(
+                          topRight:Radius.circular(20),
+                          bottomRight: Radius.circular(20)
+                        ),
+                      ),
+                      child:Menuu_class(),//menu.dart
+                      ),
+                      SizedBox(width: 50,),
+
+                      Container(
+                        height: 1000,
+                        width: 1440,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(20)
+                        ), 
+                        child: TabScore(),  
+                                         
+                      ),
+                      SizedBox(width: 30)
+                      
+                    ],
+                  ),
+                )
+              ],
+            )
+          ],
+        ),
+       ),
     );
   }
 }

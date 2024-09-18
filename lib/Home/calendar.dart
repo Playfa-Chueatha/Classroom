@@ -25,17 +25,24 @@ class _CalendarPageState extends State<Calendar_Home> {
   }
 
   void _addEvent(String event, String time, DateTime eventDate) {
-  setState(() {
+    setState(() {
+      if (_events[eventDate] == null) {
+        _events[eventDate] = [];
+      }
+      _events[eventDate]!.add({'event': event, 'time': time});
+      _selectedEvents = _events[eventDate]!;
+    });
+  }
 
-    
-    if (_events[eventDate] == null) {
-      _events[eventDate] = [];
-    }
-    _events[eventDate]!.add({'event': event, 'time': time});
-    _selectedEvents = _events[eventDate]!;
-  });
-}
-
+  void _deleteEvent(Map<String, String> event) {
+    setState(() {
+      _events[_selectedDay]?.remove(event);
+      if (_events[_selectedDay]?.isEmpty ?? true) {
+        _events.remove(_selectedDay);
+      }
+      _selectedEvents = _events[_selectedDay] ?? [];
+    });
+  }
 
   Future<void> _selectTime(BuildContext context) async {
     TimeOfDay? selectedTime = await showTimePicker(
@@ -46,6 +53,142 @@ class _CalendarPageState extends State<Calendar_Home> {
       final formattedTime = '${selectedTime.hour.toString().padLeft(2, '0')}:${selectedTime.minute.toString().padLeft(2, '0')}';
       _timeController.text = formattedTime;
     }
+  }
+
+  void _showAddEventDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('เพิ่มกิจกรรมของคุณ'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: _eventController,
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(),
+                  labelText: 'กิจกรรม',
+                ),
+              ),
+              SizedBox(height: 10),
+              TextField(
+                controller: _timeController,
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(),
+                  labelText: 'เวลา (HH:mm)',
+                ),
+                readOnly: true,
+                onTap: () {
+                  _selectTime(context);
+                },
+              ),
+            ],
+          ),
+          actions: [
+            OutlinedButton(
+              onPressed: () {
+                final eventText = _eventController.text;
+                final timeText = _timeController.text;
+
+                // ใช้วันที่ปัจจุบันถ้าผู้ใช้ไม่ได้เลือกวันที่
+                final eventDate = _selectedDay;
+
+                if (eventText.isNotEmpty && timeText.isNotEmpty) {
+                  _addEvent(eventText, timeText, eventDate);
+                  _eventController.clear();
+                  _timeController.clear();
+                  Navigator.of(context).pop();
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('กรุณากรอกข้อมูลให้ครบถ้วน!')),
+                  );
+                }
+              },
+              child: Text('ตกลง'),
+            ),
+            OutlinedButton(
+              onPressed: () {
+                _eventController.clear();
+                _timeController.clear();
+                Navigator.of(context).pop();
+              },
+              child: Text('ยกเลิก'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showEditEventDialog(BuildContext context, Map<String, String> event) {
+    final TextEditingController eventController = TextEditingController(text: event['event']);
+    final TextEditingController timeController = TextEditingController(text: event['time']);
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('แก้ไขกิจกรรมของคุณ'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: eventController,
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(),
+                  labelText: 'กิจกรรม',
+                ),
+              ),
+              SizedBox(height: 10),
+              TextField(
+                controller: timeController,
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(),
+                  labelText: 'เวลา (HH:mm)',
+                ),
+                readOnly: true,
+                onTap: () {
+                  _selectTime(context).then((_) {
+                    // เมื่อเลือกเวลาแล้ว ให้ทำการอัปเดตเวลาใน TextField
+                    final selectedTime = _timeController.text;
+                    timeController.text = selectedTime;
+                  });
+                },
+              ),
+            ],
+          ),
+          actions: [
+            OutlinedButton(
+              onPressed: () {
+                final updatedEventText = eventController.text;
+                final updatedTimeText = timeController.text;
+
+                if (updatedEventText.isNotEmpty && updatedTimeText.isNotEmpty) {
+                  setState(() {
+                    _events[_selectedDay]?.remove(event);
+                    _events[_selectedDay]!.add({'event': updatedEventText, 'time': updatedTimeText});
+                    _selectedEvents = _events[_selectedDay]!;
+                  });
+                  Navigator.of(context).pop();
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('กรุณากรอกข้อมูลให้ครบถ้วน!')),
+                  );
+                }
+              },
+              child: Text('ตกลง'),
+            ),
+            OutlinedButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('ยกเลิก'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -117,19 +260,31 @@ class _CalendarPageState extends State<Calendar_Home> {
                         itemBuilder: (context, index) {
                           final event = _selectedEvents[index];
                           return ListTile(
-                              title: Container(
-                                  height: 70,
-                                  width: 1200,
-                                  decoration: BoxDecoration(
-                                      color: Colors.blue,
-                                      borderRadius: BorderRadius.circular(20)),
-                                  child: Padding(
-                                    padding: EdgeInsets.fromLTRB(20, 20, 20, 20),
-                                    child: Text(
-                                      '${event['time']} - ${event['event']}',
-                                      style: const TextStyle(color: Colors.black, fontSize: 16),
-                                    ),
-                                  )));
+                            title: Container(
+                              height: 70,
+                              width: 1200,
+                              decoration: BoxDecoration(
+                                color: Colors.blue,
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Padding(
+                                padding: EdgeInsets.fromLTRB(20, 20, 20, 20),
+                                child: Text(
+                                  '${event['time']} - ${event['event']}',
+                                  style: const TextStyle(color: Colors.black, fontSize: 16),
+                                ),
+                              ),
+                            ),
+                            trailing: IconButton(
+                              icon: Icon(Icons.delete, color: Colors.red),
+                              onPressed: () {
+                                _deleteEvent(event);
+                              },
+                            ),
+                            onTap: () {
+                              _showEditEventDialog(context, event);
+                            },
+                          );
                         },
                       )
                     : Center(child: Text('- ไม่มีกิจกรรมในวันที่เลือก -')),
@@ -140,69 +295,4 @@ class _CalendarPageState extends State<Calendar_Home> {
       ),
     );
   }
-
- void _showAddEventDialog(BuildContext context) {
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        title: Text('เพิ่มกิจกรรมของคุณ'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: _eventController,
-              decoration: InputDecoration(
-                border: OutlineInputBorder(),
-                labelText: 'กิจกรรม',
-              ),
-            ),
-            SizedBox(height: 10),
-            TextField(
-              controller: _timeController,
-              decoration: InputDecoration(
-                border: OutlineInputBorder(),
-                labelText: 'เวลา (HH:mm)',
-              ),
-              readOnly: true,
-              onTap: () {
-                _selectTime(context);
-              },
-            ),
-          ],
-        ),
-        actions: [
-          OutlinedButton(
-            onPressed: () {
-              final eventText = _eventController.text;
-              final timeText = _timeController.text;
-
-              // ใช้วันที่ปัจจุบันถ้าผู้ใช้ไม่ได้เลือกวันที่
-              final eventDate = _selectedDay;
-
-              if (eventText.isNotEmpty && timeText.isNotEmpty) {
-                _addEvent(eventText, timeText, eventDate);
-                _eventController.clear();
-                _timeController.clear();
-                Navigator.of(context).pop();
-              } else {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('กรุณากรอกข้อมูลให้ครบถ้วน!')),
-                );
-              }
-            },
-            child: Text('ตกลง'),
-          ),
-          OutlinedButton(
-            onPressed: () {
-              _eventController.clear();
-              _timeController.clear();
-              Navigator.of(context).pop();
-            },
-            child: Text('ยกเลิก'),
-          ),
-        ],
-      );
-    },
-  );
- }}
+}

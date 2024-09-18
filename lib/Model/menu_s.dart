@@ -96,7 +96,7 @@ class _MenuState extends State<Menuu_class_s> {
           child: Column(
             children: const [
               SizedBox(height: 20),
-              Text('Users online',style: TextStyle(fontSize: 20),),
+              Text('กิจกรรมที่กำลังมาถึง',style: TextStyle(fontSize: 20),),
             ],
           ), 
         ),

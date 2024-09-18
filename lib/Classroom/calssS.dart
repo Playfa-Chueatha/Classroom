@@ -1,7 +1,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_esclass_2/Data/Data_announce.dart';
-import 'package:flutter_esclass_2/Model/menu.dart';
+import 'package:flutter_esclass_2/Model/appbar_students.dart';
+import 'package:flutter_esclass_2/Model/menu_t.dart';
 import 'package:flutter_esclass_2/Model/menu_s.dart';
 
 class class_S_body extends StatefulWidget {
@@ -20,6 +21,13 @@ class _class_S_bodyState extends State<class_S_body> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Color.fromARGB(255, 195, 238, 250),
+      appBar: AppBar(
+        backgroundColor: Color.fromARGB(255, 152, 186, 218),
+        title: Text('Edueliteroom'),
+        actions: [
+          appbarstudents(context)
+        ],
+        ),
       body: SingleChildScrollView(
         scrollDirection:Axis.vertical,
         child: Column(

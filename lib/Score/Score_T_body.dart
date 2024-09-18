@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_esclass_2/Model/menu.dart';
 import 'package:flutter_esclass_2/Score/Tab.dart';
-import 'package:flutter_esclass_2/Score/checkinclassroom.dart';
 
 class Score_T_body extends StatefulWidget {
   const Score_T_body({super.key});
@@ -51,8 +50,7 @@ class _Score_T_bodyState extends State<Score_T_body> {
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(20)
-                        ), 
-                        child: TabScore(),  
+                        ),   
                                          
                       ),
                       SizedBox(width: 30)

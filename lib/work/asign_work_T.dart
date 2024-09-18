@@ -3,9 +3,9 @@ import 'package:flutter_esclass_2/Data/Data_assignwork.dart';
 import 'package:flutter_esclass_2/Home/homeT.dart';
 import 'package:flutter_esclass_2/Login/login.dart';
 import 'package:flutter_esclass_2/Model/Chat.dart';
-import 'package:flutter_esclass_2/Model/menu.dart';
+import 'package:flutter_esclass_2/Model/appbar_teacher.dart';
+import 'package:flutter_esclass_2/Model/menu_t.dart';
 import 'package:flutter_esclass_2/Profile/ProfileT.dart';
-import 'package:flutter_esclass_2/Score/Score_T.dart';
 import 'package:flutter_esclass_2/work/add_worktype.dart';
 import 'package:flutter_esclass_2/work/work_type/Detail_work.dart';
 import 'package:flutter_esclass_2/work/work_type/auswerQ.dart';
@@ -17,37 +17,7 @@ class AssignWork_class_T extends StatefulWidget {
   final List<upfile> assignmentsupfile;
   final List<OneChoice> assignmentsonechoice;
   final List<Manychoice> assignmentsmanychoice;
-  AssignWork_class_T({super.key, 
-    required this.assignmentsauswerq, 
-    required this.assignmentsupfile, 
-    required this.assignmentsonechoice, 
-    required this.assignmentsmanychoice,
-
-    required this.id_teacher,
-    required this.thaifirstname_teacher, 
-    required this.thailastname_teacher, 
-    required this.email_teacher,
-    required this.engfirstname_teacher,
-    required this.englastname_teacher,
-    required this.username_teacher,
-    required this.password_teacher,
-    required this.room_teacher,
-    required this.numroom_teacher,
-    required this.phone_teacher,
-    required this.subject_teacher});
-  
-  final int id_teacher;
-  final String thaifirstname_teacher;
-  final String thailastname_teacher;
-  final String email_teacher;
-  final String engfirstname_teacher;
-  final String englastname_teacher;
-  final String username_teacher;
-  final String password_teacher;
-  final int room_teacher;
-  final int numroom_teacher;
-  final String phone_teacher;
-  final String subject_teacher;
+  const AssignWork_class_T({super.key, required this.assignmentsauswerq, required this.assignmentsupfile, required this.assignmentsonechoice, required this.assignmentsmanychoice});
   
 
   @override
@@ -65,134 +35,10 @@ class _AssignWork_class_TState extends State<AssignWork_class_T> {
     return Scaffold(
       backgroundColor: Color.fromARGB(255, 195, 238, 250),
       appBar: AppBar(
-        title: Text('Eduelite'),
         backgroundColor: Color.fromARGB(255, 152, 186, 218),
-        actions: <Widget>[
-          IconButton(
-            onPressed: (){
-              // Navigator.push(
-              //   context,
-              //   MaterialPageRoute(builder: (context) =>  Profile_T(
-              //     id_teacher: widget.id_teacher, 
-              //       thaifirstname_teacher: widget.thaifirstname_teacher,
-              //       thailastname_teacher: widget.thailastname_teacher, 
-              //       email_teacher: widget.email_teacher, 
-              //       engfirstname_teacher: widget.engfirstname_teacher, 
-              //       englastname_teacher: widget.englastname_teacher, 
-              //       room_teacher: widget.room_teacher, 
-              //       numroom_teacher: widget.numroom_teacher, 
-              //       phone_teacher: widget.phone_teacher, 
-              //       subject_teacher: widget.subject_teacher, 
-              //       username_teacher: widget.username_teacher,
-              //       password_teacher: widget.password_teacher,
-              //   )),);            
-            }, 
-            icon: Image.asset("assets/images/ครู.png"),
-            iconSize: 30,
-          ),
-          Container(
-            height: 45,
-            decoration: BoxDecoration(
-              color: Color.fromARGB(255, 71, 136, 190),
-              borderRadius: BorderRadius.circular(20)
-
-            ),
-            child: Row(
-              children: [
-                IconButton(
-            style: IconButton.styleFrom(
-                highlightColor: Color.fromARGB(255, 170, 205, 238)      
-              ),
-              onPressed: (){
-                /*Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => main_home_T()),);*/
-              }, 
-              icon: const Icon(Icons.home),
-              tooltip: 'หน้าหลัก',      
-          ),
-          IconButton(
-            style: IconButton.styleFrom(
-                highlightColor: Color.fromARGB(255, 170, 205, 238),   
-              ),
-            onPressed: (){
-              /*Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const ClassT()),
-              );*/
-            }, 
-            icon: const Icon(Icons.class_outlined),
-            tooltip: 'ห้องเรียน',
-          ),
-
-          IconButton(
-            style: IconButton.styleFrom(
-                highlightColor: Color.fromARGB(255, 170, 205, 238),  
-                backgroundColor: Color.fromARGB(255, 96, 152, 204),    
-              ),
-            onPressed: (){
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) =>  AssignWork_class_T(assignmentsauswerq: [], assignmentsupfile: [], assignmentsonechoice: [], assignmentsmanychoice: [],
-                    id_teacher: widget.id_teacher, 
-                    thaifirstname_teacher: widget.thaifirstname_teacher,
-                    thailastname_teacher: widget.thailastname_teacher, 
-                    email_teacher: widget.email_teacher, 
-                    engfirstname_teacher: widget.engfirstname_teacher, 
-                    englastname_teacher: widget.englastname_teacher, 
-                    room_teacher: widget.room_teacher, 
-                    numroom_teacher: widget.numroom_teacher, 
-                    phone_teacher: widget.phone_teacher, 
-                    subject_teacher: widget.subject_teacher, 
-                    username_teacher: widget.username_teacher,
-                    password_teacher: widget.password_teacher,
-                  )),);
-            }, 
-            icon: const Icon(Icons.edit_document),
-            tooltip: 'งานที่ได้รับ',
-          ),
-
-          IconButton(
-            style: IconButton.styleFrom(
-                highlightColor: Color.fromARGB(255, 170, 205, 238),      
-              ),
-            onPressed: (){
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) =>  ScoreT(
-                    id_teacher: widget.id_teacher, 
-                    thaifirstname_teacher: widget.thaifirstname_teacher,
-                    thailastname_teacher: widget.thailastname_teacher, 
-                    email_teacher: widget.email_teacher, 
-                    engfirstname_teacher: widget.engfirstname_teacher, 
-                    englastname_teacher: widget.englastname_teacher, 
-                    room_teacher: widget.room_teacher, 
-                    numroom_teacher: widget.numroom_teacher, 
-                    phone_teacher: widget.phone_teacher, 
-                    subject_teacher: widget.subject_teacher, 
-                    username_teacher: widget.username_teacher,
-                    password_teacher: widget.password_teacher,
-                  )),);
-            }, 
-            icon: const Icon(Icons.list_alt),
-            tooltip: 'รายชื่อนักเรียน',
-          ),
-              ],
-            ),
-          ),
-          IconButton(
-            style: IconButton.styleFrom(
-              hoverColor: const Color.fromARGB(255, 235, 137, 130)
-            ),
-            onPressed: (){
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const Login_class()),);
-            }, 
-            icon: Icon(Icons.logout),
-            tooltip: 'ออกจากระบบ',
-          ),
-          SizedBox(width: 50)
+        title: Text('Edueliteroom'),
+        actions: [
+          appbarteacher(context)
         ],
       ),
       body: SingleChildScrollView(
