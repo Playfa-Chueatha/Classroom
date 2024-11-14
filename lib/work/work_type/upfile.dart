@@ -132,7 +132,7 @@ class _Answer_QuestionState extends State<upfilework> with SingleTickerProviderS
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => AssignWork_class_T(assignmentsupfile: [Newupfile], assignmentsauswerq: [], assignmentsonechoice: [], assignmentsmanychoice: [],),
+        builder: (context) => AssignWork_class_T(assignmentsupfile: [Newupfile], assignmentsauswerq: [], assignmentsonechoice: [], assignmentsmanychoice: [], username: '',),
       ),
     );
   }

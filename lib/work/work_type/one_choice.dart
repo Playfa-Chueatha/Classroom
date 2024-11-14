@@ -151,7 +151,7 @@ void _deleteQuestion(int index) {
         builder: (context) => AssignWork_class_T(
           assignmentsonechoice: [newOneChoice],
           assignmentsauswerq: [],
-          assignmentsupfile: [], assignmentsmanychoice: [],
+          assignmentsupfile: [], assignmentsmanychoice: [], username: '',
         ),
       ),
     );

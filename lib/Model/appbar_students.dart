@@ -6,9 +6,20 @@ import 'package:flutter_esclass_2/Profile/ProfileS.dart';
 import 'package:flutter_esclass_2/Score/Score_S.dart';
 import 'package:flutter_esclass_2/work/asign_work_S.dart';
 
-Widget appbarstudents(BuildContext context) {
+Widget appbarstudents(BuildContext context, String thfname, String thlname, String username) {
+  // ignore: unused_element
+  void navigateTo(Widget page) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => page),
+    );
+  }
   return Row(
     children: [
+      Text(
+        "$thfname $thlname", // แสดงชื่อผู้ใช้จากฐานข้อมูล
+        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+      ),
       IconButton(
         onPressed: () {
           Navigator.push(
@@ -44,12 +55,7 @@ Widget appbarstudents(BuildContext context) {
               style: IconButton.styleFrom(
                 highlightColor: const Color.fromARGB(255, 170, 205, 238),
               ),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const main_home_S()),
-                );
-              },
+              onPressed: () => navigateTo(main_home_S(thfname: thfname, thlname: thlname, username: username)),              
               icon: const Icon(Icons.home),
               tooltip: 'หน้าหลัก',
             ),
@@ -60,7 +66,7 @@ Widget appbarstudents(BuildContext context) {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const class_S_body()),
+                  MaterialPageRoute(builder: (context) =>  class_S_body(thfname: thfname, thlname: thlname, username: username)),
                 );
               },
               icon: const Icon(Icons.class_outlined),

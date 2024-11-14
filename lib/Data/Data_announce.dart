@@ -10,10 +10,7 @@ class DataAnnounce {
 
   static void add(DataAnnounce dataAnnounce) {}
 }
-List<DataAnnounce> dataAnnounce =[
-  DataAnnounce(
-    annoncetext: 'ทำงานด้วยนะคะทุกคน')
-];
+List<DataAnnounce> dataAnnounce =[];
 
 class announce extends StatefulWidget {
   const announce({super.key});

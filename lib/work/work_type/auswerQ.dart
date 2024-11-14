@@ -73,6 +73,7 @@ class _Answer_QuestionState extends State<Auswer_Question> with SingleTickerProv
     });
   }
 
+  // ignore: unused_element
   Future<void> _uploadFile(String filePath) async {
     var uri = Uri.parse('https://your-server-endpoint/upload');
     var request = http.MultipartRequest('POST', uri);
@@ -162,7 +163,7 @@ class _Answer_QuestionState extends State<Auswer_Question> with SingleTickerProv
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => AssignWork_class_T(assignmentsauswerq: [newauswerq], assignmentsupfile: [], assignmentsonechoice: [], assignmentsmanychoice: [],),
+        builder: (context) => AssignWork_class_T(assignmentsauswerq: [newauswerq], assignmentsupfile: [], assignmentsonechoice: [], assignmentsmanychoice: [], username: '',),
       ),
     );
   }

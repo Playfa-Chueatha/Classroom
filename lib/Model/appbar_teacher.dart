@@ -1,5 +1,3 @@
-
-
 import 'package:flutter/material.dart';
 import 'package:flutter_esclass_2/Classroom/classT.dart';
 import 'package:flutter_esclass_2/Home/homeT.dart';
@@ -8,25 +6,22 @@ import 'package:flutter_esclass_2/Profile/ProfileT.dart';
 import 'package:flutter_esclass_2/Score/Score_T.dart';
 import 'package:flutter_esclass_2/work/asign_work_T.dart';
 
-Widget appbarteacher(BuildContext context) {
+Widget appbarteacher(BuildContext context, String thfname, String thlname, String username) {
+  void navigateTo(Widget page) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => page),
+    );
+  }
+
   return Row(
     children: [
-      IconButton(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const main_home_T()),
-          );
-        },
-        icon: const Icon(Icons.person_outline),
+      Text(
+        "$username $thfname $thlname", // แสดงชื่อผู้ใช้จากฐานข้อมูล
+        style: TextStyle(fontSize: 20),
       ),
       IconButton(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const Profile_T()),
-          );
-        },
+        onPressed: () => navigateTo(const Profile_T()),
         icon: Image.asset("assets/images/ครู.png"),
         iconSize: 30,
       ),
@@ -34,12 +29,7 @@ Widget appbarteacher(BuildContext context) {
         style: IconButton.styleFrom(
           highlightColor: const Color.fromARGB(255, 170, 205, 238),
         ),
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const Score_T_body()),
-          );
-        },
+        onPressed: () => navigateTo(Score_T_body(username: username)), // ส่ง username
         icon: const Icon(Icons.announcement),
         tooltip: 'แจ้งเตือน',
       ),
@@ -55,12 +45,7 @@ Widget appbarteacher(BuildContext context) {
               style: IconButton.styleFrom(
                 highlightColor: const Color.fromARGB(255, 170, 205, 238),
               ),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const main_home_T()),
-                );
-              },
+              onPressed: () => navigateTo(main_home_T(thfname: thfname, thlname: thlname, username: username)), // ส่ง username
               icon: const Icon(Icons.home),
               tooltip: 'หน้าหลัก',
             ),
@@ -68,12 +53,7 @@ Widget appbarteacher(BuildContext context) {
               style: IconButton.styleFrom(
                 highlightColor: const Color.fromARGB(255, 170, 205, 238),
               ),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const ClassT()),
-                );
-              },
+              onPressed: () => navigateTo(ClassT(thfname: thfname, thlname: thlname, username: username, classroomName: '', classroomMajor: '', classroomYear: '', classroomNumRoom: '',)), // ส่ง username
               icon: const Icon(Icons.class_outlined),
               tooltip: 'ห้องเรียน',
             ),
@@ -81,17 +61,13 @@ Widget appbarteacher(BuildContext context) {
               style: IconButton.styleFrom(
                 highlightColor: const Color.fromARGB(255, 170, 205, 238),
               ),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const AssignWork_class_T(
-                    assignmentsauswerq: [],
-                    assignmentsupfile: [],
-                    assignmentsonechoice: [],
-                    assignmentsmanychoice: [],
-                  )),
-                );
-              },
+              onPressed: () => navigateTo(AssignWork_class_T(
+                assignmentsauswerq: [],
+                assignmentsupfile: [],
+                assignmentsonechoice: [],
+                assignmentsmanychoice: [],
+                username: username, // ส่ง username
+              )),
               icon: const Icon(Icons.edit_document),
               tooltip: 'งานที่ได้รับ',
             ),
@@ -99,12 +75,7 @@ Widget appbarteacher(BuildContext context) {
               style: IconButton.styleFrom(
                 highlightColor: const Color.fromARGB(255, 170, 205, 238),
               ),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const Score_T_body()),
-                );
-              },
+              onPressed: () => navigateTo(Score_T_body(username: username)), // ส่ง username
               icon: const Icon(Icons.list_alt),
               tooltip: 'รายชื่อนักเรียน',
             ),
@@ -115,12 +86,7 @@ Widget appbarteacher(BuildContext context) {
         style: IconButton.styleFrom(
           hoverColor: const Color.fromARGB(255, 235, 137, 130),
         ),
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const Login_class()),
-          );
-        },
+        onPressed: () => navigateTo(const Login_class()),
         icon: const Icon(Icons.logout),
         tooltip: 'ออกจากระบบ',
       ),

@@ -23,102 +23,111 @@ class _FormState extends State<Registert_T> {
   TextEditingController username = TextEditingController();
   TextEditingController password = TextEditingController();
   TextEditingController email = TextEditingController();
+  TextEditingController prefix = TextEditingController();
 
-//   Future<void> signUp() async {
-//   try {
-//     var client = http.Client();
-//     var headers = {
-//       'Content-type': 'application/json',
-//       'Accept': 'application/json',
-//     };
+  String? selectedPrefix;
+  String engfirstname = "-";
+  String englastname = "-";
+  String phone = "-";
+  String subject = "-";
+  int room = 0;
+  int numroom = 0;
+  String msg = '';
 
-//     String url = "https://edueliteroom.com/connect/registerteacher.php";
-//     final response = await client.post(
-//       Uri.parse(url),
-//       headers: headers,
-//       body: jsonEncode({
-//         "thaifirstname_teacher": thaifirstname.text,
-//         "thailastname_teacher": thailastname.text,
-//         "username_teacher": username.text,
-//         "password_teacher": password.text,
-//         "email_teacher": email.text
-//       }),
-//     );
+    
+    //check user ว่ามีอยู่แล้วหรือไม่
+    Future<void> checkUser() async {
+    String url = "https://edueliteroom.com/connect/check_user_teacher.php";
 
-//     if (response.statusCode == 200) {
-//       var data = jsonDecode(response.body);
-      
-//       if (data is Map && data.containsKey('error')) {
-//         // Handle the error case
-//         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-//           content: Text(data['error']),
-//         ));
-//       } else if (data.containsKey('success')) {
-//         // Success, navigate to login
-//         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-//           content: Text(data['success']),
-//         ));
-//         Navigator.push(
-//           context,
-//           MaterialPageRoute(builder: (context) => const Login_T()),
-//         );
-//       } else {
-//         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-//           content: Text('Unexpected response from server.'),
-//         ));
-//       }
-//     } else {
-//       // Handle non-200 status code
-//       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-//         content: Text('Server error: ${response.statusCode}'),
-//       ));
-//     }
-//   } catch (e) {
-//     // Handle other errors
-//     print("Error: $e");
-//     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-//       content: Text('An error occurred: $e'),
-//     ));
-//   }
-// }
+    final Map<String, dynamic> queryParams = {
+      "usert_username": username.text,
+    };
+    try {
+      http.Response response =
+          await http.get(Uri.parse(url).replace(queryParameters: queryParams));
+
+      if (response.statusCode == 200) {
+        var checkEmailT = jsonDecode(response.body);
+        setState(() {
+          if (checkEmailT.isEmpty) {
+            msg = "สามารถใช้ User นี้ได้";
+          } else {
+            msg = "User นี้มีผู้ใช้แล้ว";
+          }
+        });
+      } else {
+        print("Error: ${response.statusCode}");
+      }
+    } catch (error) {
+      print("Error: $error");
+    }
+  }
 
 
+  // ฟังก์ชัน saveProfileT
+Future<void> saveProfileT(context) async {
+    Uri uri = Uri.parse('https://www.edueliteroom.com/connect/Register_teacher.php');
 
-  Future<void> saveProfileT() async {
+    // ข้อมูลที่ต้องการส่งเป็น JSON
+    Map<String, dynamic> data = {
+      'usert_prefix': prefix.text,
+      'usert_thfname': thaifirstname.text,
+      'usert_thlname': thailastname.text,
+      'usert_enfname': engfirstname,
+      'usert_enlname': englastname,
+      'usert_username': username.text,
+      'usert_password': password.text,
+      'usert_email': email.text,
+      'usert_classroom': room.toString(),
+      'usert_numroom': numroom.toString(),
+      'usert_phone': phone,
+      'usert_subjects': subject,
+    };
 
-  Uri uri = Uri.parse('https://edueliteroom.com/connect/registerteacher.php');
-  //Uri uri = Uri.parse('http://localhost/edueliteroom01/registerteacher.php');
-
-  Map<String, dynamic> data = {
-    'thaifirstname_teacher': thaifirstname.text,
-    'thailastname_teacher': thailastname.text,
-    'username_teacher': username.text,
-    'password_teacher': password.text,
-    'email_teacher': email.text,
-  };
-
-  http.Response response = await http.post(uri, body: data);
-
-  if (response.statusCode == 200) {
-    if (response.body == 1.toString()) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('การบันทึกข้อมูลล้มเหลว กรุณาลองใหม่อีกครั้ง')),
+    try {
+      // ส่งข้อมูลแบบ JSON
+      http.Response response = await http.post(
+        uri,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(data),
       );
-    } else {
+
+      print('Response status: ${response.statusCode}');
+      print('Response body: ${response.body}'); 
+
+      if (response.statusCode == 200) {
+        try {
+          var responseBody = jsonDecode(response.body);
+          if (responseBody['success'] != null) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('การบันทึกข้อมูลเสร็จสิ้น')),
+            );
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => Login_T()),
+            );
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('การบันทึกข้อมูลล้มเหลว กรุณาลองใหม่อีกครั้ง')),
+            );
+          }
+        } catch (e) {
+          // ถ้าเกิดข้อผิดพลาดในการแปลง JSON แสดงข้อความให้ผู้ใช้
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('เกิดข้อผิดพลาดในการแปลงข้อมูล: $e')),
+          );
+        }
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('เกิดข้อผิดพลาดในการเชื่อมต่อกับเซิร์ฟเวอร์')),
+        );
+      }
+    } catch (error) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('การบันทึกข้อมูลเสร็จสิ้น')),
-      );
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => Login_T()),
+        SnackBar(content: Text('เกิดข้อผิดพลาด: $error')),
       );
     }
-  } else {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('เกิดข้อผิดพลาดในการเชื่อมต่อกับเซิร์ฟเวอร์')),
-    );
   }
-}
 
   String? validateEmail(String? value) {
     if (value == null || value.isEmpty) {
@@ -154,14 +163,12 @@ class _FormState extends State<Registert_T> {
   }
 
 
-  var _isObscurd;
-  var _isObscurd2;
-  @override
-  void initState(){
-    super.initState();
+  bool _isObscurd = true;
+  bool _isObscurd2 = true ;
 
-    _isObscurd = true;
-    _isObscurd2 = true;
+    @override
+  void initState() {
+    super.initState();
   }
 
 
@@ -181,6 +188,30 @@ class _FormState extends State<Registert_T> {
                 ),
                 SizedBox(height: 10),
                 Image.asset('assets/images/ครู2.png',height: 300),
+                SizedBox(height: 50),
+                DropdownButtonFormField<String>(
+                  decoration: const InputDecoration(
+                    label: Text(
+                      "กรุณาเลือกคำนำหน้าชื่อ",
+                      style: TextStyle(fontSize: 20),
+                    ),
+                  ),
+                  value: selectedPrefix,
+                  items: ["นาย", "นาง", "นางสาว"].map((prefix) {
+                    return DropdownMenuItem(
+                      value: prefix,
+                      child: Text(prefix),
+                    );
+                  }).toList(),
+                  onChanged: (value) {
+                    setState(() {
+                      selectedPrefix = value;
+                      prefix.text = value!;
+                    });
+                  },
+                  validator: (value) => value == null ? 'กรุณาเลือกคำนำหน้าชื่อ' : null,
+                ),
+                SizedBox(height: 10),
                 TextFormField(
                   maxLength: 20,
                   decoration: const InputDecoration(
@@ -224,11 +255,11 @@ class _FormState extends State<Registert_T> {
                   decoration: const InputDecoration(
                     counterText: "",
                     label: Text(
-                      "กรุณาระบุ User ของคุณ",
+                      "กรุณาระบุชื่อผู้ใช้ของคุณ",
                       style: TextStyle(fontSize: 20),
                     ),
                   ),
-                  validator: (val) => validateEnglishAndNumbers(val, 'กรุณากรอก User ของคุณ'),
+                  validator: (val) => validateEnglishAndNumbers(val, 'กรุณากรอกชื่อผู้ใช้ของคุณ'),
                   controller: username,
                   ),
                   TextFormField(
@@ -286,31 +317,17 @@ class _FormState extends State<Registert_T> {
                       return null;
                     },
                   ),
-                  const SizedBox(
-                    height: 30,
-                  ),
-                  SizedBox(
-                    height: 50,
-                    width: 150,
-                    child: FilledButton(
-                        onPressed: () async {
-                          //await signUp();
-                           bool pass = formKey.currentState!.validate(); 
-                           if(pass){
-                            //  await signUp(); 
-                            await saveProfileT();
-                           }
-                           formKey.currentState!.validate();
-                        },
-                        style: FilledButton.styleFrom(
-                          backgroundColor: Color.fromARGB(255, 10, 82, 104),
-                        ),
-                        child: const Text(
-                          "สมัครสมาชิก",
-                          style: TextStyle(fontSize: 20),
-                        )
-                    ),
-                  ) 
+
+              SizedBox(height: 30),
+              ElevatedButton(
+                onPressed: () {
+                  checkUser();
+                  if (formKey.currentState!.validate()) {
+                    saveProfileT(context);
+                  }
+                },
+                child: const Text("สมัครสมาชิก",style: TextStyle(fontSize: 20),),
+              )
             ],
           )
           )

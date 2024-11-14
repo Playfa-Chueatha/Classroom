@@ -1,18 +1,13 @@
-//Model todolist
-class Todoclass {
-  Todoclass({required this.Title, required this.Detail, this.isDone = false});
-  String Title;
-  String Detail;
-  bool isDone;
+class TodoClass {
+  final String title;
+  final String detail;
+  final String status;
+  final int autoId; // ID ของ To-Do
 
-  void toggleDone() {
-    isDone = !isDone;
-  }
+  TodoClass({
+    required this.title,
+    required this.detail,
+    required this.status,
+    required this.autoId,
+  });
 }
-
-List<Todoclass> data = [
-  Todoclass(
-    Title: "ทำโปรเจค",
-    Detail: "ทำหน้าสร้างห้อง",
-  ),
-];

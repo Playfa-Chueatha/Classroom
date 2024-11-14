@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart'; // นำเข้าเพื่อใช้กับ inputFormatters
-import 'package:flutter_esclass_2/Classroom/setting_calss.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_esclass_2/Data/data_calssroom.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:connectivity_plus/connectivity_plus.dart';
 
 class AddClassroom extends StatefulWidget {
-  const AddClassroom({super.key});
+  final String username;
+  const AddClassroom({super.key, required this.username});
 
   @override
   State<AddClassroom> createState() => _AddClassroomState();
@@ -12,22 +16,73 @@ class AddClassroom extends StatefulWidget {
 
 class _AddClassroomState extends State<AddClassroom> {
   final formKey = GlobalKey<FormState>();
-  String Name_class = '';
-  String Section_class = '';  // กำหนดค่าเริ่มต้นเป็นค่าว่าง
-  int Room_year = 100; //ชั้นปี
-  int Room_No = 15; //ห้อง
-  int School_year = 2590; //ปีการศึกษา
-  String Detail = '';
+  String? selectedclassroom;
+  late String Name_class;
+  late String Section_class;
+  late String Room_year;
+  late int Room_No;
+  late int School_year;
+  late String Detail;
+
   
-  // รายการแผนการเรียน
-  final List<String> sectionOptions = [
-    'คณิตศาสตร์ - วิทยาศาสตร์',
-    'ภาษาอังกฤษ-คณิตศาสตร์',
-    'ภาษาอังกฤษ-ภาษาจีน',
-    'ภาษาอังกฤษ-ภาษาฝรั่งเศส',
-    'ภาษาอังกฤษ-ภาษาญี่ปุ่น',
-    'สายศิลป์-สังคม',
-  ];
+
+  Future<void> addClassroom() async {
+    var data = {
+      'classroom_name': Name_class,
+      'classroom_major': Section_class,
+      'classroom_year': Room_year,
+      'classroom_numroom': Room_No,
+      'classroom_detail': Detail,
+      'usert_username': widget.username,
+    };
+
+    var response = await http.post(
+      Uri.parse('https://www.edueliteroom.com/connect/add_classroom.php'),
+      body: json.encode(data),
+      headers: {"Content-Type": "application/json"},
+    );
+    print(response.body);
+
+    if (response.statusCode == 200) {
+      var responseData = json.decode(response.body);
+      if (responseData['status'] == 'success') {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Classroom added successfully'), backgroundColor: Colors.green),
+        );
+        Navigator.pop(context, true); // ส่งค่ากลับไปที่หน้าหลักว่าเพิ่มสำเร็จ
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to add classroom: ${data['message']}'), backgroundColor: Colors.red),
+        );
+      }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: ${response.body}'), backgroundColor: Colors.red),
+      );
+    }
+  }
+
+  void showToast(String message) {
+    FToast().init(context).showToast(
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(25.0),
+          color: Colors.black87,
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.info, color: Colors.white),
+            SizedBox(width: 12.0),
+            Text(message, style: TextStyle(color: Colors.white)),
+          ],
+        ),
+      ),
+      gravity: ToastGravity.BOTTOM,
+      toastDuration: Duration(seconds: 2),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -43,15 +98,12 @@ class _AddClassroomState extends State<AddClassroom> {
           child: SingleChildScrollView(
             child: Column(
               children: [
-                // ฟิลด์วิชา
                 Container(
                   height: screenSize.height * 0.08,
                   width: screenSize.width * 0.3,
                   margin: EdgeInsets.all(10),
                   child: TextFormField(
-                    decoration: InputDecoration(
-                      label: Text("วิชา", style: TextStyle(fontSize: 20)),
-                    ),
+                    decoration: InputDecoration(label: Text("วิชา", style: TextStyle(fontSize: 20))),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return "กรุณากรอกชื่อวิชา";
@@ -59,19 +111,16 @@ class _AddClassroomState extends State<AddClassroom> {
                       return null;
                     },
                     onSaved: (value) {
-                      Name_class = value ?? '';  // กำหนดค่าเริ่มต้นเป็นค่าว่าง
+                      Name_class = value ?? '';
                     },
                   ),
                 ),
-                // ฟิลด์แผนการเรียน
                 Container(
                   height: screenSize.height * 0.08,
                   width: screenSize.width * 0.3,
                   margin: EdgeInsets.all(10),
                   child: DropdownButtonFormField<String>(
-                    decoration: InputDecoration(
-                      label: Text("แผนการเรียน", style: TextStyle(fontSize: 20)),
-                    ),
+                    decoration: InputDecoration(label: Text("แผนการเรียน", style: TextStyle(fontSize: 20))),
                     items: sectionOptions.map((String section) {
                       return DropdownMenuItem<String>(
                         value: section,
@@ -80,7 +129,7 @@ class _AddClassroomState extends State<AddClassroom> {
                     }).toList(),
                     onChanged: (value) {
                       setState(() {
-                        Section_class = value ?? '';  // ตรวจสอบไม่ให้เป็น null
+                        Section_class = value ?? '';
                       });
                     },
                     validator: (value) {
@@ -90,44 +139,41 @@ class _AddClassroomState extends State<AddClassroom> {
                       return null;
                     },
                     onSaved: (value) {
-                      Section_class = value ?? '';  // กำหนดค่าเริ่มต้นเป็นค่าว่าง
+                      Section_class = value ?? '';
                     },
                   ),
                 ),
-                // ฟิลด์ชั้นปี
+                Container(
+                  height: screenSize.height * 0.08,
+                  width: screenSize.width * 0.3,
+                  margin: EdgeInsets.all(10),
+                  child: DropdownButtonFormField<String>(
+                    decoration: const InputDecoration(
+                      label: Text("กรุณาเลือกชั้นปีการศึกษา", style: TextStyle(fontSize: 20)),
+                    ),
+                    value: selectedclassroom,
+                    items: ["ชั้นมัธยมศึกษาปีที่ 4", "ชั้นมัธยมศึกษาปีที่ 5", "ชั้นมัธยมศึกษาปีที่ 6"]
+                        .map((classroom) {
+                      return DropdownMenuItem(
+                        value: classroom,
+                        child: Text(classroom),
+                      );
+                    }).toList(),
+                    onChanged: (value) {
+                      setState(() {
+                        selectedclassroom = value;
+                        Room_year = value ?? '';
+                      });
+                    },
+                    validator: (value) => value == null ? 'กรุณาเลือกชั้นปีการศึกษา' : null,
+                  ),
+                ),
                 Container(
                   height: screenSize.height * 0.08,
                   width: screenSize.width * 0.3,
                   margin: EdgeInsets.all(10),
                   child: TextFormField(
-                    decoration: InputDecoration(
-                      label: Text("ชั้นปี", style: TextStyle(fontSize: 20)),
-                    ),
-                    keyboardType: TextInputType.number,
-                    inputFormatters: [
-                      FilteringTextInputFormatter.digitsOnly,
-                      LengthLimitingTextInputFormatter(1),
-                    ],
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return "กรุณากรอกชั้นปี";
-                      }
-                      return null;
-                    },
-                    onSaved: (value) {
-                      Room_year = int.parse(value!);
-                    },
-                  ),
-                ),
-                // ฟิลด์ห้อง
-                Container(
-                  height: screenSize.height * 0.08,
-                  width: screenSize.width * 0.3,
-                  margin: EdgeInsets.all(10),
-                  child: TextFormField(
-                    decoration: InputDecoration(
-                      label: Text("ห้อง", style: TextStyle(fontSize: 20)),
-                    ),
+                    decoration: InputDecoration(label: Text("ห้อง", style: TextStyle(fontSize: 20))),
                     keyboardType: TextInputType.number,
                     inputFormatters: [
                       FilteringTextInputFormatter.digitsOnly,
@@ -144,15 +190,12 @@ class _AddClassroomState extends State<AddClassroom> {
                     },
                   ),
                 ),
-                // ฟิลด์ปีการศึกษา
                 Container(
                   height: screenSize.height * 0.08,
                   width: screenSize.width * 0.3,
                   margin: EdgeInsets.all(10),
                   child: TextFormField(
-                    decoration: InputDecoration(
-                      label: Text("ปีการศึกษา", style: TextStyle(fontSize: 20)),
-                    ),
+                    decoration: InputDecoration(label: Text("ปีการศึกษา", style: TextStyle(fontSize: 20))),
                     keyboardType: TextInputType.number,
                     inputFormatters: [
                       FilteringTextInputFormatter.digitsOnly,
@@ -169,22 +212,18 @@ class _AddClassroomState extends State<AddClassroom> {
                     },
                   ),
                 ),
-                // ฟิลด์รายละเอียดเพิ่มเติม
                 Container(
                   height: screenSize.height * 0.08,
                   width: screenSize.width * 0.3,
                   margin: EdgeInsets.all(10),
                   child: TextFormField(
-                    decoration: InputDecoration(
-                      label: Text("รายละเอียดเพิ่มเติม", style: TextStyle(fontSize: 20)),
-                    ),
+                    decoration: InputDecoration(label: Text("รายละเอียดเพิ่มเติม", style: TextStyle(fontSize: 20))),
                     onSaved: (value) {
-                      Detail = value ?? ''; // กำหนดค่าเริ่มต้นเป็นค่าว่าง
+                      Detail = value ?? '';
                     },
                   ),
                 ),
                 SizedBox(height: 20),
-                // ปุ่มสร้างห้องเรียน
                 SizedBox(
                   height: screenSize.height * 0.07,
                   width: screenSize.width * 0.2,
@@ -192,24 +231,17 @@ class _AddClassroomState extends State<AddClassroom> {
                     style: FilledButton.styleFrom(
                       backgroundColor: Color.fromARGB(255, 45, 124, 155),
                     ),
-                    onPressed: () {
+                    onPressed: () async {
+                      var connectivityResult = await Connectivity().checkConnectivity();
+                      // ignore: unrelated_type_equality_checks
+                      if (connectivityResult == ConnectivityResult.none) {
+                        showToast("กรุณาตรวจสอบการเชื่อมต่ออินเทอร์เน็ต");
+                        return;
+                      }
+
                       if (formKey.currentState!.validate()) {
                         formKey.currentState!.save();
-                        data.add(
-                          ClassroomData(
-                            Name_class: Name_class,
-                            Section_class: Section_class,
-                            Room_year: Room_year,
-                            Room_No: Room_No,
-                            School_year: School_year,
-                            Detail: Detail,
-                          ),
-                        );
-                        formKey.currentState!.reset();
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(builder: (ctx) => const SettingCalss()),
-                        );
+                        await addClassroom();
                       }
                     },
                     child: Text("สร้างห้องเรียน", style: TextStyle(fontSize: 20)),

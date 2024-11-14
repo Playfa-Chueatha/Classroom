@@ -6,7 +6,10 @@ import 'package:flutter_esclass_2/Model/menu_t.dart';
 import 'package:flutter_esclass_2/Model/menu_s.dart';
 
 class class_S_body extends StatefulWidget {
-  const class_S_body({super.key});
+  final String thfname;
+  final String thlname;
+  final String username;
+  const class_S_body({super.key, required this.thfname, required this.thlname, required this.username});
 
   @override
   State<class_S_body> createState() => _class_S_bodyState();
@@ -25,7 +28,7 @@ class _class_S_bodyState extends State<class_S_body> {
         backgroundColor: Color.fromARGB(255, 152, 186, 218),
         title: Text('Edueliteroom'),
         actions: [
-          appbarstudents(context)
+          appbarstudents(context, widget.thfname, widget.thlname, widget.username),
         ],
         ),
       body: SingleChildScrollView(
@@ -54,7 +57,7 @@ class _class_S_bodyState extends State<class_S_body> {
                           bottomRight: Radius.circular(20)
                         ),
                       ),
-                      child: Menuu_class_s(),//menu.dart,
+                      child: Menuu_class_s(username:widget.username),//menu.dart,
                       ),
                       SizedBox(width: 50,),
 

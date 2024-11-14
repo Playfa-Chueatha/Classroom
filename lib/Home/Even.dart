@@ -1,49 +1,20 @@
+import 'package:flutter_esclass_2/Data/Data_students.dart';
 
-import 'package:flutter/material.dart';
-class Even extends StatefulWidget {
-  const Even({super.key});
+class Even_teacher {
+  String Title;
+  String Date;
+  String Time;
 
-  @override
-  State<Even> createState() => _EvenState();
+  Even_teacher({
+    required this.Title,
+    required this.Date,
+    required this.Time
+  });
 }
 
-class _EvenState extends State<Even> {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Color.fromARGB(255, 255, 255, 255),
-      body: Container(
-        height: 400,
-        width: 600,
-        decoration: BoxDecoration(
-          color: Color.fromARGB(255, 170, 205, 238),
-          borderRadius: BorderRadius.circular(20)
-        ),
-        child: Column(
-        children: [
-          SizedBox(height: 10),
-          Text('กิจกรรมของฉัน',style: TextStyle(
-            fontSize: 20,
-            color: Colors.black,
-          ),),
-
-          SingleChildScrollView(
-            scrollDirection: Axis.vertical,
-
-          child: 
-            Container(
-            //แสดงกิจกรรมทั้งหมดที่นี่
-            //รายละเอียด => วันที่/ถึงวันที่/ชื่อกิจกรรม/รายละเอียด/เวลา
-            
-
-
-
-
-            ),
-          )
-        ],
-        )
-      ),
-    );
-  }
-}
+List<Even_teacher> dataevent = [
+  Even_teacher(
+    Title: " ", 
+    Date: " ", 
+    Time: " ")
+];

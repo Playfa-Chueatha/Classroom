@@ -1,9 +1,7 @@
-// import 'dart:ffi';
 import 'package:flutter/material.dart';
 import 'package:flutter_esclass_2/Forgetpassword/Forgetpass_T.dart';
 import 'package:flutter_esclass_2/Home/homeT.dart';
 import 'package:flutter_esclass_2/Rgister/registerT.dart';
-import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
@@ -15,177 +13,203 @@ class Login_T extends StatefulWidget {
 }
 
 class _Login_TState extends State<Login_T> {
-
   final formKey = GlobalKey<FormState>();
-
-  TextEditingController pass = TextEditingController();
-  TextEditingController email = TextEditingController();
-
-  var _isObscurd;
+  TextEditingController usert_password = TextEditingController();
+  TextEditingController usert_username = TextEditingController();
+  bool _isObscured = true;
+  String? username;
+  String thfname = "";
+  String thlname = "";
 
   @override
-  void initState(){
+  void initState() {
     super.initState();
-
-    _isObscurd = true;
   }
 
-  Future signIn() async {
+  Future<void> signIn() async {
     try {
       var client = http.Client();
       var headers = {
-        'Content-type': 'application/json',
+        'Content-Type': 'application/json',
         'Accept': 'application/json',
       };
-      String url = "http://edueliteroom.com/connect/loginteacher.php";
+      String url = "https://www.edueliteroom.com/connect/login_teacher.php";
+
       final response = await client.post(Uri.parse(url),
           headers: headers,
           body: jsonEncode({
-            "password": pass.text,
-            "email": email.text
+            "usert_username": usert_username.text,
+            "usert_password": usert_password.text,
           }));
-      var data = jsonDecode(response.body);
-      if (data == "Error") {
-        Navigator.push( context, MaterialPageRoute(builder: (context) => const Login_T()));
+
+      if (response.statusCode == 200) {
+        var data = jsonDecode(response.body);
+        if (data['error'] != null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(data['error'])),
+          );
+        } else if (data['success'] == true) {
+          setState(() {
+            username = data['user']['usert_username'];
+            thfname = data['user']['usert_thfname'] ?? "ไม่ระบุ";
+            thlname = data['user']['usert_thlname'] ?? "ไม่ระบุ";
+          });
+
+          // print('Username: $username');
+          // print('Thairfirstname: $thfname');
+          // print('Thailastname: $thlname');
+
+          // Check if username is not null
+          if (username != null) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => main_home_T(
+                      thfname: thfname,
+                      thlname: thlname,
+                      username: username!)),
+            );
+          } else {
+            print("Username is null");
+          }
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text("เกิดข้อผิดพลาดในการเข้าสู่ระบบ")),
+          );
+        }
       } else {
-        Navigator.push( context, MaterialPageRoute(builder: (context) => const main_home_T()));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("เกิดข้อผิดพลาดจากเซิร์ฟเวอร์: ${response.statusCode}")),
+        );
       }
     } catch (e) {
-      print(e);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("เกิดข้อผิดพลาดในการเชื่อมต่อกับเซิร์ฟเวอร์: $e")),
+      );
+      print("Error: $e");
     }
-  }
-
-  String? validateEmail(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'กรุณากรอก E-mail';
-    }
-    final emailRegex = RegExp(r'^[^@]+@gmail\.com$');
-    if (!emailRegex.hasMatch(value)) {
-      return 'กรุณากรอก E-mail ที่ถูกต้อง';
-    }
-    return null;
-  }
-
-  String? validateThaiCharacters(String? value, String errorMessage) {
-    final thaiRegex = RegExp(r'^[\u0E00-\u0E7F]+$');
-    if (value == null || value.isEmpty) {
-      return errorMessage;
-    }
-    if (!thaiRegex.hasMatch(value)) {
-      return 'กรุณากรอกเฉพาะตัวอักษรภาษาไทย';
-    }
-    return null;
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        body: Center(
-          child: SingleChildScrollView(
-            child: Form(
-              key: formKey,
-              child: Container(
-                alignment: Alignment.center,
-                height: 800,
-                width: 1000,
-                decoration: BoxDecoration(
-                  color: Color.fromARGB(255, 147, 235, 241),
-                  borderRadius: BorderRadius.circular(20)
-                ),
-                child: Column(
-                  children: [
-                    SizedBox(height: 50),
-                    Text("Login",style: TextStyle(fontSize: 40)),
-                    SizedBox(height: 30),
-                    Image.asset('assets/images/ครู.png',height: 200),
-                    SizedBox(height: 50),
-                    Container(
-                      margin: EdgeInsets.fromLTRB(300,20,300,10),
-                      child: TextFormField(
-                        decoration: const InputDecoration(
-                          prefixIcon: Icon(Icons.person_outline_outlined),
-                          label: Text("กรุณากรอกชื่อผู้ใช้", style: TextStyle(fontSize: 20),)
-                        ),
-                        validator: validateEmail,
-                        controller: email,
-                      ),
-                    ),
+    final size = MediaQuery.of(context).size;
 
-                  Container(
-                      margin: EdgeInsets.fromLTRB(300,10,300,50),
-                      child: TextFormField(
-                        obscureText: _isObscurd,
-                        // focusNode: paswordFocusNode,
-                        keyboardType: TextInputType.emailAddress,
-                        controller: pass,
-                        decoration: InputDecoration(
-                          prefixIcon: Icon(Icons.lock),
-                          label: const Text("กรุณากรอกรหัสผ่าน", style: TextStyle(fontSize: 20),),
-                          suffixIcon: IconButton(
-                            padding: const EdgeInsetsDirectional.all(10.0),
-                            icon: _isObscurd ? const Icon(Icons.visibility) : const Icon(Icons.visibility_off),
-                            onPressed: (){
-                              setState(() {
-                                _isObscurd =!_isObscurd;
-                              });
-                            }, 
-                             )
-                        ),
-                        validator: (val) {
-                          if (val!.isEmpty) {
-                            return 'กรุณากรอกรหัสผ่าน';
-                          }
-                          return null;
-                        },               
+    return Scaffold(
+      body: Center(
+        child: SingleChildScrollView(
+          child: Form(
+            key: formKey,
+            child: Container(
+              alignment: Alignment.center,
+              height: size.height * 0.9,
+              width: size.width * 0.5,
+              decoration: BoxDecoration(
+                color: Color.fromARGB(255, 147, 235, 241),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SizedBox(height: size.height * 0.05),
+                  Text("Login", style: TextStyle(fontSize: size.height * 0.05)),
+                  SizedBox(height: size.height * 0.03),
+                  Image.asset('assets/images/ครู.png', height: size.height * 0.3),
+                  SizedBox(height: size.height * 0.05),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: size.width * 0.1),
+                    child: TextFormField(
+                      decoration: InputDecoration(
+                        prefixIcon: Icon(Icons.person_outline_outlined),
+                        labelText: "กรุณากรอกชื่อผู้ใช้",
+                        labelStyle: TextStyle(fontSize: size.height * 0.025),
                       ),
-                      
+                      validator: (val) {
+                        if (val!.isEmpty) {
+                          return 'กรุณากรอกชื่อผู้ใช้';
+                        }
+                        return null;
+                      },
+                      controller: usert_username,
                     ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: size.width * 0.1, vertical: size.height * 0.01),
+                    child: TextFormField(
+                      obscureText: _isObscured,
+                      controller: usert_password,
+                      decoration: InputDecoration(
+                        prefixIcon: Icon(Icons.lock),
+                        labelText: "กรุณากรอกรหัสผ่าน",
+                        labelStyle: TextStyle(fontSize: size.height * 0.025),
+                        suffixIcon: IconButton(
+                          padding: const EdgeInsetsDirectional.all(10.0),
+                          icon: _isObscured
+                              ? const Icon(Icons.visibility)
+                              : const Icon(Icons.visibility_off),
+                          onPressed: () {
+                            setState(() {
+                              _isObscured = !_isObscured;
+                            });
+                          },
+                        ),
+                      ),
+                      validator: (val) {
+                        if (val!.isEmpty) {
+                          return 'กรุณากรอกรหัสผ่าน';
+                        }
+                        return null;
+                      },
+                    ),
+                  ),
+                  SizedBox(height: size.height * 0.05),
                   FilledButton(
                     onPressed: () async {
-                    bool pass = formKey.currentState!.validate(); //ปุ่ม login
-                    if(pass){
-                      await signIn();
-                    }
-                    formKey.currentState!.validate();
+                      bool pass = formKey.currentState!.validate();
+                      if (pass) {
+                        await signIn();
+                      }
                     },
                     style: FilledButton.styleFrom(
                       backgroundColor: Color.fromARGB(255, 10, 82, 104),
+                      padding: EdgeInsets.symmetric(vertical: size.height * 0.02, horizontal: size.width * 0.1),
                     ),
-                    child: const Text("เข้าสู่ระบบ", style: TextStyle(fontSize: 20),)
+                    child: Text("เข้าสู่ระบบ", style: TextStyle(fontSize: size.height * 0.03)),
                   ),
-                  SizedBox(height: 90),
+                  SizedBox(height: size.height * 0.05),
                   Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       TextButton(
-                      style: TextButton.styleFrom(
-                        foregroundColor: Color.fromARGB(255, 67, 132, 230)
+                        style: TextButton.styleFrom(
+                          foregroundColor: Color.fromARGB(255, 67, 132, 230),
+                        ),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => Registert_T()),
+                          );
+                        },
+                        child: Text("สมัครสมาชิก", style: TextStyle(fontSize: size.height * 0.025)),
                       ),
-                      onPressed: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => Registert_T())).then((value) {
-                        },),// print Botton
-                        child: Text("สมัครสมาชิก", style: TextStyle(fontSize: 20),),),
                       Icon(Icons.linear_scale),
                       TextButton(
-                      style: TextButton.styleFrom(
-                        foregroundColor: Color.fromARGB(255, 238, 108, 115)
+                        style: TextButton.styleFrom(
+                          foregroundColor: Color.fromARGB(255, 238, 108, 115),
+                        ),
+                        onPressed: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => Forgetpass_T()),
+                        ),
+                        child: Text("ลืมรหัสผ่าน", style: TextStyle(fontSize: size.height * 0.025)),
                       ),
-                      onPressed: () => 
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => Forgetpass_T())).then((value) {},),// print Botton
-                        child: Text("ลืมรหัสผ่าน", style: TextStyle(fontSize: 20),),),
                     ],
-                  )
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
-            
+          ),
         ),
-        )
+      ),
     );
   }
 }

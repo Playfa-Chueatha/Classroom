@@ -1,26 +1,45 @@
 import 'package:flutter/material.dart';
 import 'package:dropdown_search/dropdown_search.dart';
-import 'package:flutter_esclass_2/Home/calendar.dart';
+import 'package:flutter_esclass_2/Home/calendar_S.dart';
 import 'package:flutter_esclass_2/Home/homeT.dart';
-import 'package:flutter_esclass_2/Home/todolist_body.dart';
+import 'package:flutter_esclass_2/Home/todolist_S.dart';
+import 'package:flutter_esclass_2/Home/todolist_T.dart';
 import 'package:flutter_esclass_2/Login/login.dart';
 import 'package:flutter_esclass_2/Model/Chat.dart';
 import 'package:flutter_esclass_2/Model/appbar_students.dart';
+import 'package:flutter_esclass_2/Model/menu_s.dart';
 import 'package:flutter_esclass_2/Model/menu_t.dart';
 import 'package:flutter_esclass_2/Profile/ProfileS.dart';
 import 'package:flutter_esclass_2/Score/Score_S.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 
 class main_home_S extends StatefulWidget {
-  const main_home_S({super.key});
+  final String thfname;
+  final String thlname;
+  final String username;
+  const main_home_S({super.key, required this.thfname, required this.thlname, required this.username});
+
 
   @override
   State<main_home_S> createState() => _homeState();
 }
 
 class _homeState extends State<main_home_S> {
+  Future<Map<String, String>> fetchTeacherInfo() async {
+    final response = await http.get(Uri.parse('https://www.edueliteroom.com/connect/get_user_students.php'));
 
-  // List <bool> isSelected = [true,false,false,false];
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      return {
+        'thfname': data['users_thfname'] ?? "ไม่ระบุ",
+        'thlname': data['users_thlname'] ?? "ไม่ระบุ",
+      };
+    } else {
+      throw Exception('ล้มเหลวในการโหลดข้อมูล');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +49,7 @@ class _homeState extends State<main_home_S> {
         backgroundColor: Color.fromARGB(255, 152, 186, 218),
         title: Text('Edueliteroom'),
         actions: [
-          appbarstudents(context)
+          appbarstudents(context, widget.thfname, widget.thlname, widget.username),
         ],
         ),
       
@@ -61,7 +80,7 @@ class _homeState extends State<main_home_S> {
                           bottomRight: Radius.circular(20)
                         ),
                       ),
-                      child:Menuu_class(),//menu.dart
+                      child:Menuu_class_s(username:widget.username),//menu.dart
                       ),
 
 
@@ -85,7 +104,7 @@ class _homeState extends State<main_home_S> {
                               child: SizedBox(
                                 height: 470,
                                 width: 1450,
-                                child: Calendar_Home(),//calendar.dart
+                                child: CalendarHome_S(username: widget.username),//calendar.dart
                               ),
                             ),
 
@@ -97,7 +116,7 @@ class _homeState extends State<main_home_S> {
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(20),
                                   ),
-                                  child: todocalss(),//todolist_body.dart
+                                  child: Todocalss_S(username: widget.username),//todolist_body.dart
                                 ),
  
                             ],

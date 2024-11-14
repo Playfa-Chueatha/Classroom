@@ -4,7 +4,11 @@ import 'package:flutter_esclass_2/Data/Data_assignwork.dart';
 import 'package:flutter_esclass_2/Home/homeS.dart';
 import 'package:flutter_esclass_2/Home/homeT.dart';
 import 'package:flutter_esclass_2/Login/login.dart';
+import 'package:flutter_esclass_2/Login/loginS.dart';
+import 'package:flutter_esclass_2/Login/loginT.dart';
 import 'package:flutter_esclass_2/Profile/ProfileT.dart';
+import 'package:flutter_esclass_2/Rgister/registerS.dart';
+import 'package:flutter_esclass_2/Rgister/registerT.dart';
 import 'package:flutter_esclass_2/Score/Score_S.dart';
 import 'package:flutter_esclass_2/Score/Score_T.dart';
 import 'package:flutter_esclass_2/test.dart';
@@ -22,7 +26,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: Score_T_body()
+      home:Login_class()
     );  }
 }
  

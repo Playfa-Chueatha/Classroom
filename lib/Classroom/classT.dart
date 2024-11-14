@@ -12,20 +12,35 @@ import 'package:flutter_esclass_2/Profile/ProfileT.dart';
 import 'package:flutter_esclass_2/work/add_worktype.dart';
 import 'package:flutter_esclass_2/work/asign_work_T.dart';
 import 'package:flutter_esclass_2/work/work_type/Detail_work.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 
 class ClassT extends StatefulWidget {
-  const ClassT({super.key});
+  final String thfname;
+  final String thlname;
+  final String username;
+  final String classroomName;
+  final String classroomMajor;
+  final String classroomYear;
+  final String classroomNumRoom;
+
+  const ClassT({
+    super.key,
+    required this.thfname,
+    required this.thlname,
+    required this.username, 
+    required this.classroomName,
+    required this.classroomMajor,
+    required this.classroomYear,
+    required this.classroomNumRoom,
+  });
 
   @override
   State<ClassT> createState() => ClassTState();
 }
 
 class ClassTState extends State<ClassT> {
-
-
-
-  // List <bool> isSelected = [false,true,false,false];
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +50,7 @@ class ClassTState extends State<ClassT> {
         backgroundColor: Color.fromARGB(255, 152, 186, 218),
         title: Text('Edueliteroom'),
         actions: [
-          appbarteacher(context)
+          appbarteacher(context, widget.thfname, widget.thlname, widget.username),
         ],
       ),
      body: SingleChildScrollView(
@@ -63,7 +78,7 @@ class ClassTState extends State<ClassT> {
                           bottomRight: Radius.circular(20)
                         ),
                       ),
-                    child:Menuu_class(),//menu.dart,
+                    child:Menuu_class(username: widget.username),//menu.dart,
                       ),
                       SizedBox(width: 50,),
 
@@ -85,8 +100,9 @@ class ClassTState extends State<ClassT> {
                               height: 50,
                               width: 700,
                               child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
-                                  SizedBox(width: 650,height: 50),
+                                  Text('${widget.classroomName} ${widget.classroomYear}/${widget.classroomNumRoom} (${widget.classroomMajor})', style: TextStyle(fontSize: 20)),
                                   IconButton(
                                     color: Color.fromARGB(255, 0, 0, 0),
                                     icon: const Icon(Icons.add),
@@ -94,7 +110,7 @@ class ClassTState extends State<ClassT> {
                                     onPressed: (){
                                       showDialog(
                                     context: context, 
-                                    builder: (BuildContext context) => AnnounceClass(),);
+                                    builder: (BuildContext context) => AnnounceClass(username: widget.username, classroomMajor: widget.classroomMajor, classroomName: widget.classroomName, classroomNumRoom: widget.classroomNumRoom, classroomYear: widget.classroomYear, thfname: '',thlname: '',));
                                     },
                                     style: IconButton.styleFrom(
                                       backgroundColor: Color.fromARGB(255, 147, 185, 221),

@@ -183,6 +183,7 @@ class _ScorestudentsState extends State<Scorestudenst> {
                         ),
                       ),
                     );
+                  // ignore: unnecessary_to_list_in_spreads
                   }).toList(),
                 ],
                 rows: dataliststudents.asMap().entries.map((entry) {

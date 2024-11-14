@@ -13,11 +13,15 @@ import 'package:url_launcher/url_launcher.dart';
 import '../Classroom/classT.dart';
 
 class AssignWork_class_T extends StatefulWidget {
+  final String? username;
+  const AssignWork_class_T ({super.key, required this.username, required this.assignmentsauswerq, required this.assignmentsupfile, required this.assignmentsonechoice, required this.assignmentsmanychoice});
+
+
   final List<auswerq> assignmentsauswerq;
   final List<upfile> assignmentsupfile;
   final List<OneChoice> assignmentsonechoice;
   final List<Manychoice> assignmentsmanychoice;
-  const AssignWork_class_T({super.key, required this.assignmentsauswerq, required this.assignmentsupfile, required this.assignmentsonechoice, required this.assignmentsmanychoice});
+  
   
 
   @override
@@ -38,7 +42,7 @@ class _AssignWork_class_TState extends State<AssignWork_class_T> {
         backgroundColor: Color.fromARGB(255, 152, 186, 218),
         title: Text('Edueliteroom'),
         actions: [
-          appbarteacher(context)
+          // appbarteacher(context, widget.username),
         ],
       ),
       body: SingleChildScrollView(
@@ -65,7 +69,7 @@ class _AssignWork_class_TState extends State<AssignWork_class_T> {
                           bottomRight: Radius.circular(20)
                         ),
                       ),
-                      child: Menuu_class(),//menu.dart,
+                      child: Menuu_class(username: '',),//menu.dart,
                       ),
                       SizedBox(width: 50,),
 

@@ -4,15 +4,15 @@ import 'package:table_calendar/table_calendar.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
-class CalendarHome extends StatefulWidget {
+class CalendarHome_T extends StatefulWidget {
   final String username;
-  const CalendarHome({super.key, required this.username});
+  const CalendarHome_T({super.key, required this.username});
 
   @override
   _CalendarHomeState createState() => _CalendarHomeState();
 }
 
-class _CalendarHomeState extends State<CalendarHome> {
+class _CalendarHomeState extends State<CalendarHome_T> {
   late Map<DateTime, List<Map<String, String>>> _events;
   late List<Map<String, String>> _selectedEvents;
   late DateTime _selectedDay;
@@ -22,90 +22,97 @@ class _CalendarHomeState extends State<CalendarHome> {
   final TextEditingController _timeController = TextEditingController();
 
   Future<void> addEventToDatabase(String event, String time, String formattedDate, String username) async {
-    final url = Uri.parse('https://www.edueliteroom.com/connect/event.php');
+    final url = Uri.parse('https://www.edueliteroom.com/connect/event_teacher.php');
 
     // ตรวจสอบค่าก่อนส่ง
-  if (username.isEmpty) {
-    print('ชื่อผู้ใช้ไม่ควรเป็นค่าว่าง');
-    return;
-  }
+    if (username.isEmpty) {
+      print('ชื่อผู้ใช้ไม่ควรเป็นค่าว่าง');
+      return;
+    }
 
-  if (formattedDate.isEmpty) {
-    print('วันที่ไม่ควรเป็นค่าว่าง');
-    return;
-  }
+    if (formattedDate.isEmpty) {
+      print('วันที่ไม่ควรเป็นค่าว่าง');
+      return;
+    }
 
-  if (event.isEmpty) {
-    print('กรุณากรอกชื่อกิจกรรม');
-    return;
-  }
+    if (event.isEmpty) {
+      print('กรุณากรอกชื่อกิจกรรม');
+      return;
+    }
 
-  if (time.isEmpty) {
-    print('กรุณากรอกเวลา');
-    return;
-  }
+    if (time.isEmpty) {
+      print('กรุณากรอกเวลา');
+      return;
+    }
 
-  // แสดงค่าใน terminal
-  print('Username: $username');
-  print('Formatted Date: $formattedDate');
-  print('Event: $event');
-  print('Time: $time');
+    // แสดงค่าใน terminal
+    print('Username: $username');
+    print('Formatted Date: $formattedDate');
+    print('Event: $event');
+    print('Time: $time');
 
-    try {
-      final response = await http.post(
-        url,
-        headers: {"Content-Type": "application/x-www-form-urlencoded"},
-        body: {
-          'event_usert_title': event,
-          'event_usert_date': formattedDate,
-          'event_usert_time': time, 
-          'usert_username': widget.username,
-        },
-      );
-      print('Response status: ${response.statusCode}');
-      print('Response body: ${response.body}');
+      try {
+        final response = await http.post(
+          url,
+          headers: {"Content-Type": "application/x-www-form-urlencoded"},
+          body: {
+            'event_usert_title': event,
+            'event_usert_date': formattedDate,
+            'event_usert_time': time, 
+            'usert_username': widget.username,
+          },
+        );
+        print('Response status: ${response.statusCode}');
+        print('Response body: ${response.body}');
 
-      if (response.statusCode == 200) {
-        final responseData = jsonDecode(response.body);
-        if (responseData['status'] == 'success') {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('เพิ่มกิจกรรมสำเร็จ')),
-          );
+        if (response.statusCode == 200) {
+          final responseData = jsonDecode(response.body);
+          if (responseData['status'] == 'success') {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('เพิ่มกิจกรรมสำเร็จ'),backgroundColor: Colors.green,),
+              
+            );
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('เพิ่มกิจกรรมไม่สำเร็จ: ${responseData['message']}'),backgroundColor: Colors.red),
+            );
+          }
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('เพิ่มกิจกรรมไม่สำเร็จ: ${responseData['message']}')),
+            SnackBar(content: Text('เกิดข้อผิดพลาดจากเซิร์ฟเวอร์: ${response.statusCode}'),backgroundColor: Colors.red),
           );
         }
-      } else {
+      } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('เกิดข้อผิดพลาดจากเซิร์ฟเวอร์: ${response.statusCode}')),
+          SnackBar(content: Text('เกิดข้อผิดพลาดจากเครือข่าย: ${e.toString()}'),backgroundColor: Colors.red),
         );
       }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('เกิดข้อผิดพลาดจากเครือข่าย: ${e.toString()}')),
-      );
     }
-  }
 
   void _addEvent(String event, String time, DateTime eventDate) {
     setState(() {
-      final eventDateKey = DateTime(eventDate.year, eventDate.month, eventDate.day); // ใช้ปี, เดือน, วันเท่านั้น
-      if (_events[eventDateKey] == null) {
-        _events[eventDateKey] = [];
-      }
+      final eventDateKey = DateTime(eventDate.year, eventDate.month, eventDate.day);
+      _events[eventDateKey] ??= [];
       _events[eventDateKey]!.add({'event': event, 'time': time});
       _selectedEvents = _events[eventDateKey]!;
-      _eventController.clear();
-      _timeController.clear();
 
       String formattedDate = "${eventDate.year}-${eventDate.month.toString().padLeft(2, '0')}-${eventDate.day.toString().padLeft(2, '0')}";
-      addEventToDatabase(event, time, formattedDate, widget.username);
+      
+      
+      addEventToDatabase(event, time, formattedDate, widget.username).then((_) {
+        
+        fetchEvents();
+      });
+
+      // เคลียร์ TextField
+      _eventController.clear();
+      _timeController.clear();
     });
   }
 
+
   void fetchEvents() async {
-    final url = Uri.parse('https://www.edueliteroom.com/connect/event.php?usert_username=${widget.username}');
+    final url = Uri.parse('https://www.edueliteroom.com/connect/event_teacher.php?usert_username=${widget.username}');
     try {
       final response = await http.get(url);
       if (response.statusCode == 200) {
@@ -287,7 +294,7 @@ class _CalendarHomeState extends State<CalendarHome> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text('วันที่: ${event['date'] ?? ''}'),
-                                Text('เวลา: ${event['time'] ?? ''}'),
+                                Text('เวลา: ${event['time'] ?? ''} น.'),
                               ],
                             ),
                           );

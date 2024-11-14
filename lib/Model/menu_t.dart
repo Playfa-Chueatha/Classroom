@@ -1,193 +1,203 @@
-
+import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:flutter_esclass_2/Classroom/add_classroom.dart';
 import 'package:flutter_esclass_2/Classroom/setting_calss.dart';
-import 'package:flutter_esclass_2/Model/Menu_listclassroom.dart';
-import 'package:flutter_esclass_2/Model/Menu_todolist.dart';
-  
+import 'package:flutter_esclass_2/Home/Even.dart';
+import 'package:flutter_esclass_2/Model/Menu_listclassroom_T.dart';
+import 'package:flutter_esclass_2/Model/Menu_listclassroom_T_inclass.dart';
+import 'package:http/http.dart' as http;
 
 class Menuu_class extends StatefulWidget {
-  const Menuu_class({super.key});
+  final String username;
+
+  const Menuu_class({super.key, required this.username});
 
   @override
   State<Menuu_class> createState() => _MenuState();
 }
 
 class _MenuState extends State<Menuu_class> {
-  // สมมติว่ามีข้อมูลกิจกรรมในปฏิทินเป็น List<Map<String, String>>
-  final List<Map<String, String>> _events = [
-    {'time': '10:00', 'event': 'ประชุมทีม', 'date': '2024-09-19'},
-    {'time': '14:00', 'event': 'สัมมนา', 'date': '2024-09-20'},
-    {'time': '16:00', 'event': 'นำเสนอโปรเจค', 'date': '2024-09-18'},
-  ];
+  late final Map<DateTime, List<Map<String, String>>> _events = {};
+  List<Even_teacher> dataevent = [];
+  bool isLoading = true; // Loading state
 
-  List<Map<String, Object>> _getUpcomingEvents() {
-    // ดึงวันที่ปัจจุบัน
+  Future<void> fetchEvents() async {
+    final url = Uri.parse('https://www.edueliteroom.com/connect/event_teacher.php?usert_username=${widget.username}');
+    
+    try {
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+        
+        if (responseData['status'] == 'success') {
+          setState(() {
+            _events.clear();
+            dataevent.clear();
+            isLoading = false;
 
-    // แปลงข้อมูลกิจกรรมที่เก็บเป็น String ให้เป็น DateTime
-    final eventsWithDate = _events.map((event) {
-      final dateParts = event['date']?.split('-') ?? [];
-      final timeParts = event['time']?.split(':') ?? [];
+            List<Even_teacher> todayEvents = []; // Current day's events
+            List<Even_teacher> futureEvents = []; // Future events
 
-      // ตรวจสอบและแปลงค่า
-      final date = DateTime(
-        int.tryParse(dateParts[0]) ?? 0,
-        int.tryParse(dateParts[1]) ?? 0,
-        int.tryParse(dateParts[2]) ?? 0,
-        int.tryParse(timeParts[0]) ?? 0,
-        int.tryParse(timeParts[1]) ?? 0,
-      );
+            for (var event in responseData['data']) {
+              DateTime eventDate = DateTime.parse(event['event_usert_date']);
+              DateTime today = DateTime.now();
+              
+              // Check if the event date is today (ignoring the time)
+              if (eventDate.year == today.year && eventDate.month == today.month && eventDate.day == today.day) {
+                todayEvents.add(Even_teacher(
+                  Title: event['event_usert_title'],
+                  Date: event['event_usert_date'],
+                  Time: event['event_usert_time'],
+                ));
+              } else if (eventDate.isAfter(today)) {
+                futureEvents.add(Even_teacher(
+                  Title: event['event_usert_title'],
+                  Date: event['event_usert_date'],
+                  Time: event['event_usert_time'],
+                ));
+              }
+            }
+            
+            // Sort today’s and future events by date
+            todayEvents.sort((a, b) => DateTime.parse(a.Date).compareTo(DateTime.parse(b.Date)));
+            futureEvents.sort((a, b) => DateTime.parse(a.Date).compareTo(DateTime.parse(b.Date)));
 
-      return {
-        'time': event['time'] ?? '',
-        'event': event['event'] ?? '',
-        'dateTime': date,
-      };
-    }).toList();
+            // Combine today’s and future events
+            dataevent = todayEvents + futureEvents;
+          });
+        } else {
+          setState(() {
+            isLoading = false;
+          });
+          print('Error: ${responseData['message']}');
+        }
+      } else {
+        print('Error: ${response.statusCode}'); 
+        print('Response body: ${response.body}');
+      }
+    } catch (e) {
+      print('Network error: $e');
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
 
-    // จัดเรียงกิจกรรมตามวันที่และเวลา
-    eventsWithDate.sort((a, b) {
-      final dateTimeA = a['dateTime'] as DateTime;
-      final dateTimeB = b['dateTime'] as DateTime;
-      return dateTimeA.compareTo(dateTimeB);
-    });
-
-    // คืนค่าเป็น List<Map<String, String>> ที่จัดเรียงแล้ว
-    return eventsWithDate.map((event) {
-      return {
-        'time': event['time']!,
-        'event': event['event']!,
-      };
-    }).toList();
+  @override
+  void initState() {
+    super.initState();
+    fetchEvents();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Color.fromARGB(255, 195, 238, 250),
-      body: Column(
-        children: [
-          // listclassroom
-          Container(
-            height: 350,
-            width: 350,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.only(
-                topRight: Radius.circular(20),
-                bottomRight: Radius.circular(20),
+      body: isLoading
+        ? Center(child: CircularProgressIndicator()) // Loading indicator
+        : Column(
+          children: [
+            Container(
+              height: 350,
+              width: 350,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                  topRight: Radius.circular(20),
+                  bottomRight: Radius.circular(20),
+                ),
               ),
-            ),
-            child: Column(
-              children: [
-                Padding(
-                  padding: EdgeInsets.fromLTRB(300, 10, 10, 0),
-                  child: IconButton(
-                    tooltip: 'ตั้งค่าห้องเรียน',
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => SettingCalss(),
-                        ),
-                      );
-                    },
-                    icon: Icon(Icons.settings),
-                  ),
-                ),
-                Text(
-                  'ห้องเรียนของฉัน',
-                  style: TextStyle(fontSize: 20),
-                ),
-                SizedBox(height: 5),
-                Container(
-                  height: 250,
-                  width: 300,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.only(
-                      topRight: Radius.circular(20),
-                      bottomRight: Radius.circular(20),
+              child: Column(
+                children: [
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(300, 10, 10, 0),
+                    child: IconButton(
+                      tooltip: 'ตั้งค่าห้องเรียน',
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => SettingCalss(username: widget.username, classroomName: '', classroomMajor: '', classroomYear: '', classroomNumRoom: '', thfname: '', thlname: '',),
+                          ),
+                        );
+                      },
+                      icon: Icon(Icons.settings),
                     ),
                   ),
-                  child: List_student(), // Menu_listclassroom.dart
-                ),
-                SizedBox(height: 5),
-              ],
-            ),
-          ),
-          SizedBox(height: 20),
-
-          // todolist
-          Container(
-            height: 300,
-            width: 350,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.only(
-                topRight: Radius.circular(20),
-                bottomRight: Radius.circular(20),
+                  SizedBox(
+                    height: 250,
+                    width: 300,
+                    child: List_classroom_inclass(username: widget.username), // Menu_listclassroom.dart
+                  ),
+                ],
               ),
             ),
-            child: Column(
-              children: const [
-                SizedBox(height: 20),
-                Text(
-                  'งานที่มอบหมาย',
-                  style: TextStyle(fontSize: 20),
-                ),
-                // MenuTodolist()
-              ],
-            ),
-          ),
-          SizedBox(height: 20),
+            SizedBox(height: 20),
 
-          // event
-          Container(
-            height: 300,
-            width: 350,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.only(
-                topRight: Radius.circular(20),
-                bottomRight: Radius.circular(20),
+            // Assigned tasks section
+            Container(
+              height: 300,
+              width: 350,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                  topRight: Radius.circular(20),
+                  bottomRight: Radius.circular(20),
+                ),
+              ),
+              child: Column(
+                children: const [
+                  SizedBox(height: 20),
+                  Text(
+                    'งานที่มอบหมาย',
+                    style: TextStyle(fontSize: 20),
+                  ),
+                ],
               ),
             ),
-            child: Column(
-              children: [
-                SizedBox(height: 20),
-                Text(
-                  'กิจกรรมที่กำลังมาถึง',
-                  style: TextStyle(fontSize: 20),
+            SizedBox(height: 20),
+
+            Container(
+              height: 300,
+              width: 350,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                  topRight: Radius.circular(20),
+                  bottomRight: Radius.circular(20),
                 ),
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: _getUpcomingEvents().length,
-                    itemBuilder: (context, index) {
-                      final event = _getUpcomingEvents()[index];
-                      return ListTile(
-                        title: Container(
-                          height: 70,
+              ),
+              child: Column(
+                children: [
+                  SizedBox(height: 20),
+                  Text(
+                    'กิจกรรมที่กำลังมาถึง',
+                    style: TextStyle(fontSize: 20),
+                  ),
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: dataevent.length,
+                      itemBuilder: (context, index) {
+                        return Container(
+                          margin: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
                           decoration: BoxDecoration(
-                            color: Colors.blue,
+                            color: Color.fromARGB(255, 195, 238, 250),
                             borderRadius: BorderRadius.circular(20),
                           ),
-                          child: Padding(
-                            padding: EdgeInsets.fromLTRB(20, 20, 20, 20),
-                            child: Text(
-                              '${event['time']} - ${event['event']}',
-                              style: const TextStyle(color: Colors.black, fontSize: 16),
+                          child: ListTile(
+                            title: Text(dataevent[index].Title),
+                            subtitle: Text(
+                              'วันที่: ${dataevent[index].Date} เวลา: ${dataevent[index].Time} น.',
                             ),
                           ),
-                        ),
-                      );
-                    },
+                        ); 
+                      },
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        ],
-      ),
+          ],
+        ),
     );
   }
 }

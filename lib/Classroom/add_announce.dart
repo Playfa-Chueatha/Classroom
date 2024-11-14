@@ -1,10 +1,29 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_esclass_2/Classroom/classT.dart';
-import 'package:flutter_esclass_2/Data/Data_announce.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter_esclass_2/Data/data_calssroom.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class AnnounceClass extends StatefulWidget {
-  const AnnounceClass({super.key});
+  final String thfname;
+  final String thlname;
+  final String username;
+  final String classroomName;
+  final String classroomMajor;
+  final String classroomYear;
+  final String classroomNumRoom;
+
+  const AnnounceClass({
+    super.key,
+    required this.thfname,
+    required this.thlname,
+    required this.username, 
+    required this.classroomName,
+    required this.classroomMajor,
+    required this.classroomYear,
+    required this.classroomNumRoom,
+  });
 
   @override
   State<AnnounceClass> createState() => _AnnounceClassState();
@@ -13,12 +32,67 @@ class AnnounceClass extends StatefulWidget {
 class _AnnounceClassState extends State<AnnounceClass> {
   final formKey = GlobalKey<FormState>();
   String annoncetext = '';
+  String? filePath;
+  String? link;
+  TextEditingController linkController = TextEditingController();
+  var fileBytes;
+
+  Future<void> _sendDataToPHP(String title, String? filePath, String? link) async {
+  String classroomName = widget.classroomName;
+  String classroomMajor = widget.classroomMajor;
+  String classroomYear = widget.classroomYear;
+  String classroomNumRoom = widget.classroomNumRoom;
+  String usertUsername = widget.username;
+
+  try {
+    var request = http.MultipartRequest('POST', Uri.parse('https://www.edueliteroom.com/connect/save_post.php'));
+
+    // Add text fields
+    request.fields['title'] = title;
+    request.fields['link'] = link ?? '';
+    request.fields['classroom_name'] = classroomName;
+    request.fields['classroom_major'] = classroomMajor;
+    request.fields['classroom_year'] = classroomYear;
+    request.fields['classroom_numroom'] = classroomNumRoom;
+    request.fields['usert_username'] = usertUsername;
+
+    // Handle file upload
+    if (filePath != null) {
+      if (kIsWeb && fileBytes != null) {
+        var file = http.MultipartFile.fromBytes('file', fileBytes!, filename: 'uploadfile');
+        request.files.add(file);
+        print("File path: $filePath");
+        print("File bytes length: ${fileBytes?.length}");
+      } else {
+        var file = await http.MultipartFile.fromPath('file', filePath);
+        request.files.add(file);
+        print("No file selected");
+      }
+    }
+
+    var response = await request.send();
+
+    if (response.statusCode == 200) {
+      print('Data saved successfully');
+      // Optionally, capture the response body if needed
+      var responseBody = await response.stream.bytesToString();
+      print(responseBody);
+    } else {
+      print('Failed to save data');
+    }
+  } catch (e) {
+    print('Error: $e');
+  }
+}
+
+
+
 
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
       backgroundColor: Color.fromARGB(255, 152, 186, 218),
-      title: Center(child: Text("สร้างประกาศใหม่")),
+      title: Center(child: Text("สร้างประกาศใหม่ใน วิชา ${widget.classroomName} ${widget.classroomYear}/${widget.classroomNumRoom} (${widget.classroomMajor}) ")),
       content: SizedBox(
         width: MediaQuery.of(context).size.width * 0.8, 
         child: Form(
@@ -55,78 +129,41 @@ class _AnnounceClassState extends State<AnnounceClass> {
                 },
               ),
               SizedBox(height: 10),
-              Wrap(
-                spacing: 8.0,
-                children: [
-                  IconButton(
-                    icon: Icon(Icons.format_bold_outlined, size: 20),
-                    onPressed: () {},
-                  ),
-                  IconButton(
-                    icon: Icon(Icons.format_italic, size: 20),
-                    onPressed: () {},
-                  ),
-                  IconButton(
-                    icon: Icon(Icons.format_underline, size: 20),
-                    onPressed: () {},
-                  ),
-                  IconButton(
-                    icon: Icon(Icons.format_color_text_outlined, size: 20),
-                    onPressed: () {},
-                  ),
-                  IconButton(
-                    icon: Icon(Icons.format_size_outlined, size: 20),
-                    onPressed: () {},
-                  ),
-                  IconButton(
-                    icon: Icon(Icons.format_list_bulleted, size: 20),
-                    onPressed: () {},
-                  ),
-                  IconButton(
-                    icon: Icon(Icons.format_align_left_outlined, size: 20),
-                    onPressed: () {},
-                  ),
-                  IconButton(
-                    icon: Icon(Icons.format_align_center_outlined, size: 20),
-                    onPressed: () {},
-                  ),
-                  IconButton(
-                    icon: Icon(Icons.format_align_right_outlined, size: 20),
-                    onPressed: () {},
-                  ),
-                  IconButton(
-                    icon: Icon(Icons.format_align_justify_outlined, size: 20),
-                    onPressed: () {},
-                  ),
-                ],
-              ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  IconButton(onPressed: () {}, icon: Icon(Icons.link, size: 30)),
-
-
-                  //uploadfile
+                  IconButton(
+                    onPressed: () {
+                      _showLinkDialog();
+                    },
+                    icon: Icon(Icons.link, size: 30),
+                  ),
                   IconButton(
                     onPressed: () async {
-                      FilePickerResult? result = await FilePicker.platform.pickFiles();
-
-                      if (result != null) {
-                        // แสดงไฟล์ที่เลือก
-                        PlatformFile file = result.files.first;
-                        print('File name: ${file.name}');
-                        print('File size: ${file.size}');
-                        print('File path: ${file.path}');
-                        // สามารถทำการอัพโหลดไฟล์ที่นี่
+                    FilePickerResult? result = await FilePicker.platform.pickFiles();
+                    if (result != null) {
+                      if (kIsWeb) {
+                        fileBytes = result.files.first.bytes;
+                        setState(() {});
+                      } else {
+                        filePath = result.files.first.path;
+                        setState(() {});
                       }
-                      else {
-                        // ผู้ใช้ยกเลิกการเลือกไฟล์
-                        print('No file selected');
-                      }
+                    }
                     }, 
-                    icon: Icon(Icons.upload, size: 30)),
+                    icon: Icon(Icons.upload, size: 30),
+                  ),
                 ],
               ),
+              // แสดงตัวอย่างลิงค์ที่เพิ่มไป
+              if (link != null && link!.isNotEmpty) 
+                Text("ลิงค์ที่เพิ่ม: $link"),
+              SizedBox(height: 10),
+              // แสดงตัวอย่างไฟล์ที่เลือก
+              if (filePath != null) 
+                Text("ไฟล์ที่เลือก: ${filePath!.split('/').last}"),
+              if (kIsWeb && fileBytes != null)
+                Text("ไฟล์ที่เลือก (Web): ${fileBytes.length} bytes"),
               SizedBox(height: 20),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -138,17 +175,12 @@ class _AnnounceClassState extends State<AnnounceClass> {
                       style: FilledButton.styleFrom(
                         backgroundColor: Color.fromARGB(255, 45, 124, 155),
                       ),
-                      onPressed: () {
+                      onPressed: () async {
                         if (formKey.currentState!.validate()) {
                           formKey.currentState!.save();
-                          dataAnnounce.add(
-                            DataAnnounce(annoncetext: annoncetext),
-                          );
+                           await _sendDataToPHP(annoncetext, filePath, link);
                           formKey.currentState!.reset();
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(builder: (ctx) => const ClassT()),
-                          );
+                          Navigator.pop(context);
                         } else {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(content: Text('กรุณากรอกข้อมูลให้ครบถ้วน')),
@@ -180,4 +212,39 @@ class _AnnounceClassState extends State<AnnounceClass> {
       ),
     );
   }
+
+  // ฟังก์ชันแสดง dialog สำหรับเพิ่มลิงค์
+  void _showLinkDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("เพิ่มลิงค์"),
+          content: TextField(
+            controller: linkController,
+            decoration: InputDecoration(hintText: 'ใส่ลิงค์ที่นี่'),
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                setState(() {
+                  link = linkController.text; // กำหนดลิงค์ที่เพิ่ม
+                });
+                Navigator.pop(context);
+              },
+              child: Text("ตกลง"),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: Text("ยกเลิก"),
+            ),
+          ],
+        );
+      },
+    );
+  }
 }
+
+

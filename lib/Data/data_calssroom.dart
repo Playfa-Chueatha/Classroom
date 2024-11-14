@@ -17,40 +17,17 @@ class ClassroomData{
   String Detail;        //รายละเอียด
 }
 
-List<ClassroomData> data = [
-  ClassroomData(
-    Name_class: "คณิตศาสตร์", 
-    Section_class: "วิทยาศาสตร์-คณิตศาสตร์", 
-    Room_year: 4, 
-    Room_No: 9, 
-    School_year: 2567, 
-    Detail: " "),
-
-    ClassroomData(
-    Name_class: "ภาษาไทย", 
-    Section_class: "อังกฤษ-สังคม", 
-    Room_year: 4, 
-    Room_No: 1, 
-    School_year: 2567, 
-    Detail: " "),
-
-    ClassroomData(
-    Name_class: "ภาษาจีน", 
-    Section_class: "อังกฤษ-จีน", 
-    Room_year: 4, 
-    Room_No: 4, 
-    School_year: 2567, 
-    Detail: " เวลา 09.00-10.00 น."),
-
-    ClassroomData(
-    Name_class: "เคมี", 
-    Section_class: "วิทยาศาสตร์-คณิตศาสตร์", 
-    Room_year: 4, 
-    Room_No: 10, 
-    School_year: 2567, 
-    Detail: " ")
-];
+List<ClassroomData> data = [];
 
 
+
+final List<String> sectionOptions = [
+    'วิทยาศาสตร์-คณิตศาสตร์',
+    'ภาษาอังกฤษ-คณิตศาสตร์',
+    'ภาษาอังกฤษ-ภาษาจีน',
+    'ภาษาอังกฤษ-ภาษาฝรั่งเศส',
+    'ภาษาอังกฤษ-ภาษาญี่ปุ่น',
+    'สายศิลป์-สังคม',
+  ];
 
 

@@ -5,7 +5,9 @@ import 'package:flutter_esclass_2/Score/Tab.dart';
 import 'package:flutter_esclass_2/Score/checkinclassroom.dart';
 
 class Score_T_body extends StatefulWidget {
-  const Score_T_body({super.key});
+  final String? username;
+  const Score_T_body ({super.key, required this.username});
+
 
   @override
   State<Score_T_body> createState() => _Score_T_bodyState();
@@ -20,7 +22,7 @@ class _Score_T_bodyState extends State<Score_T_body> {
         backgroundColor: Color.fromARGB(255, 152, 186, 218),
         title: Text('Edueliteroom'),
         actions: [
-          appbarteacher(context)
+          // appbarteacher(context, widget.username),
         ],
       ),
        body: SingleChildScrollView(
@@ -49,7 +51,7 @@ class _Score_T_bodyState extends State<Score_T_body> {
                           bottomRight: Radius.circular(20)
                         ),
                       ),
-                      child:Menuu_class(),//menu.dart
+                      child:Menuu_class(username: '',),//menu.dart
                       ),
                       SizedBox(width: 50,),
 

@@ -21,7 +21,7 @@ class _Score_SState extends State<Score_S> {
         backgroundColor: Color.fromARGB(255, 152, 186, 218),
         title: Text('Edueliteroom'),
         actions: [
-          appbarstudents(context)
+          // appbarstudents(context)
         ],
         ),
     );

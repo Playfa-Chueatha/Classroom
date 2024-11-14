@@ -19,7 +19,7 @@ class _work_body_SState extends State<work_body_S> {
         backgroundColor: Color.fromARGB(255, 152, 186, 218),
         title: Text('Edueliteroom'),
         actions: [
-          appbarstudents(context)
+          // appbarstudents(context)
         ],
         ),
       body: SingleChildScrollView(
@@ -45,7 +45,7 @@ class _work_body_SState extends State<work_body_S> {
                           bottomRight: Radius.circular(20)
                         ),
                       ),
-                      child:Menuu_class_s(),//menu.dart,
+                      child:Menuu_class_s(username: '',),//menu.dart,
                       ),
                       SizedBox(width: 50,),
                     
