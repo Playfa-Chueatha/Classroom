@@ -29,7 +29,7 @@ Widget appbarteacher(BuildContext context, String thfname, String thlname, Strin
         style: IconButton.styleFrom(
           highlightColor: const Color.fromARGB(255, 170, 205, 238),
         ),
-        onPressed: () => navigateTo(Score_T_body(username: username)), // ส่ง username
+        onPressed: () => navigateTo(Score_T_body(thfname: thfname, thlname: thlname, username: username,)), // ส่ง username
         icon: const Icon(Icons.announcement),
         tooltip: 'แจ้งเตือน',
       ),
@@ -67,6 +67,7 @@ Widget appbarteacher(BuildContext context, String thfname, String thlname, Strin
                 assignmentsonechoice: [],
                 assignmentsmanychoice: [],
                 username: username, // ส่ง username
+                thfname: thfname, thlname: thlname
               )),
               icon: const Icon(Icons.edit_document),
               tooltip: 'งานที่ได้รับ',
@@ -75,7 +76,7 @@ Widget appbarteacher(BuildContext context, String thfname, String thlname, Strin
               style: IconButton.styleFrom(
                 highlightColor: const Color.fromARGB(255, 170, 205, 238),
               ),
-              onPressed: () => navigateTo(Score_T_body(username: username)), // ส่ง username
+              onPressed: () => navigateTo(Score_T_body(thfname: thfname, thlname: thlname, username: username)), // ส่ง username
               icon: const Icon(Icons.list_alt),
               tooltip: 'รายชื่อนักเรียน',
             ),

@@ -6,8 +6,10 @@ import 'package:http/http.dart' as http;
 
 class List_classroom_inclass extends StatefulWidget {
   final String username;
+  final String thfname;
+  final String thlname;
 
-  const List_classroom_inclass({super.key, required this.username});
+  const List_classroom_inclass({super.key, required this.username, required this.thfname, required this.thlname});
 
   @override
   State<List_classroom_inclass> createState() => _List_classroomState();
@@ -98,7 +100,7 @@ class _List_classroomState extends State<List_classroom_inclass> {
                             classroomMajor: classrooms[index]['classroom_major'],
                             classroomYear: classrooms[index]['classroom_year'],
                             classroomNumRoom: classrooms[index]['classroom_numroom'],
-                            username: widget.username, thfname: '', thlname: '',
+                            username: widget.username, thfname: widget.thfname, thlname: widget.thlname,
                           ),
                         ),
                       );

@@ -84,7 +84,7 @@ class _main_home_TState extends State<main_home_T> {
                                     bottomRight: Radius.circular(20),
                                   ),
                                 ),
-                                child: Menuu_class(username:widget.username),
+                                child: Menuu_class(thfname: widget.thfname, thlname: widget.thlname, username: widget.username,),
                               ),
                               Container(
                                 height: 1000,

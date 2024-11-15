@@ -80,7 +80,7 @@ class _homeState extends State<main_home_S> {
                           bottomRight: Radius.circular(20)
                         ),
                       ),
-                      child:Menuu_class_s(username:widget.username),//menu.dart
+                      child:Menuu_class_s(thfname: widget.thfname, thlname: widget.thlname, username: widget.username),//menu.dart
                       ),
 
 

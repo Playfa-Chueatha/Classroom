@@ -5,7 +5,10 @@ import 'package:flutter_esclass_2/work/asign_work_T.dart';
 import 'package:intl/intl.dart';
 
 class many_choice extends StatefulWidget {
-  const many_choice({super.key});
+  final String username;
+  final String thfname;
+  final String thlname;
+  const many_choice({super.key, required this.username, required this.thfname, required this.thlname});
 
   @override
   _many_choice createState() => _many_choice();
@@ -137,7 +140,10 @@ class _many_choice extends State<many_choice> with SingleTickerProviderStateMixi
           assignmentsonechoice: [], 
           assignmentsauswerq: [], 
           assignmentsupfile: [], 
-          assignmentsmanychoice: [newManyChoice], username: '',),
+          assignmentsmanychoice: [newManyChoice],
+          username: widget.username, thfname: widget.thfname,thlname: widget.thlname
+          ),
+
       ),
     );
   }

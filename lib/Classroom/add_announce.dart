@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
-import 'package:flutter_esclass_2/Data/data_calssroom.dart';
+import 'dart:io' as io;
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
@@ -18,7 +18,7 @@ class AnnounceClass extends StatefulWidget {
     super.key,
     required this.thfname,
     required this.thlname,
-    required this.username, 
+    required this.username,
     required this.classroomName,
     required this.classroomMajor,
     required this.classroomYear,
@@ -34,54 +34,79 @@ class _AnnounceClassState extends State<AnnounceClass> {
   String annoncetext = '';
   String? filePath;
   String? link;
-  TextEditingController linkController = TextEditingController();
   var fileBytes;
 
-  Future<void> _sendDataToPHP(String title, String? filePath, String? link) async {
+  TextEditingController linkController = TextEditingController();
+
+  Future<void> _sendDataToPHP(String title, dynamic file, String? link) async {
   String classroomName = widget.classroomName;
   String classroomMajor = widget.classroomMajor;
   String classroomYear = widget.classroomYear;
   String classroomNumRoom = widget.classroomNumRoom;
   String usertUsername = widget.username;
 
+  
+
+  // แสดงข้อมูลที่เตรียมจะส่งไปยัง PHP
+  print('Preparing data to send to PHP:');
+  print('Title: $title');
+  print('Link: ${link ?? 'ไม่มี'}');
+  print('Classroom Name: $classroomName');
+  print('Classroom Major: $classroomMajor');
+  print('Classroom Year: $classroomYear');
+  print('Classroom NumRoom: $classroomNumRoom');
+  print('User Username: $usertUsername');
+  print("File path: $filePath");
+  print("File bytes length: ${fileBytes?.length}");
+
   try {
     var request = http.MultipartRequest('POST', Uri.parse('https://www.edueliteroom.com/connect/save_post.php'));
 
-    // Add text fields
-    request.fields['title'] = title;
-    request.fields['link'] = link ?? '';
+    request.fields['posts_title'] = title;
+    request.fields['posts_link'] = link ?? 'ไม่มี';
     request.fields['classroom_name'] = classroomName;
     request.fields['classroom_major'] = classroomMajor;
     request.fields['classroom_year'] = classroomYear;
     request.fields['classroom_numroom'] = classroomNumRoom;
     request.fields['usert_username'] = usertUsername;
 
-    // Handle file upload
-    if (filePath != null) {
-      if (kIsWeb && fileBytes != null) {
-        var file = http.MultipartFile.fromBytes('file', fileBytes!, filename: 'uploadfile');
-        request.files.add(file);
-        print("File path: $filePath");
-        print("File bytes length: ${fileBytes?.length}");
-      } else {
-        var file = await http.MultipartFile.fromPath('file', filePath);
-        request.files.add(file);
-        print("No file selected");
+    // เพิ่มไฟล์จาก bytes สำหรับเว็บ
+    if (kIsWeb) {
+      if (fileBytes == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('เกิดข้อผิดพลาด: ไม่มีข้อมูลไฟล์')),
+        );
+        return;
       }
+      var fileRequest = http.MultipartFile.fromBytes(
+        'posts_file',
+        fileBytes!,
+        filename: 'uploaded_file',
+      );
+      request.files.add(fileRequest);
+    } else {
+      // เพิ่มไฟล์จาก path สำหรับมือถือ
+      var fileRequest = await http.MultipartFile.fromPath('posts_file', file.path);
+      request.files.add(fileRequest);
     }
 
     var response = await request.send();
 
     if (response.statusCode == 200) {
-      print('Data saved successfully');
-      // Optionally, capture the response body if needed
-      var responseBody = await response.stream.bytesToString();
-      print(responseBody);
+      String responseBody = await response.stream.bytesToString();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('บันทึกข้อมูลสำเร็จ')),
+      );
+      print('Response from server: $responseBody');  // แสดงผลตอบกลับจากเซิร์ฟเวอร์
     } else {
-      print('Failed to save data');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('บันทึกข้อมูลล้มเหลว: ${response.statusCode}')),
+      );
     }
   } catch (e) {
-    print('Error: $e');
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('เกิดข้อผิดพลาด: $e')),
+    );
   }
 }
 
@@ -94,7 +119,7 @@ class _AnnounceClassState extends State<AnnounceClass> {
       backgroundColor: Color.fromARGB(255, 152, 186, 218),
       title: Center(child: Text("สร้างประกาศใหม่ใน วิชา ${widget.classroomName} ${widget.classroomYear}/${widget.classroomNumRoom} (${widget.classroomMajor}) ")),
       content: SizedBox(
-        width: MediaQuery.of(context).size.width * 0.8, 
+        width: MediaQuery.of(context).size.width * 0.8,
         child: Form(
           key: formKey,
           child: Column(
@@ -140,30 +165,33 @@ class _AnnounceClassState extends State<AnnounceClass> {
                   ),
                   IconButton(
                     onPressed: () async {
-                    FilePickerResult? result = await FilePicker.platform.pickFiles();
-                    if (result != null) {
-                      if (kIsWeb) {
-                        fileBytes = result.files.first.bytes;
-                        setState(() {});
-                      } else {
-                        filePath = result.files.first.path;
-                        setState(() {});
+                      FilePickerResult? result = await FilePicker.platform.pickFiles();
+                      if (result != null) {
+                        if (kIsWeb) {
+                          var selectedFile = result.files.first;
+                          setState(() {
+                            fileBytes = selectedFile.bytes;
+                            filePath = null;
+                          });
+                        } else {
+                          setState(() {
+                            filePath = result.files.single.path;
+                            fileBytes = null;
+                          });
+                        }
                       }
-                    }
-                    }, 
+                    },
                     icon: Icon(Icons.upload, size: 30),
-                  ),
+                  )
                 ],
               ),
-              // แสดงตัวอย่างลิงค์ที่เพิ่มไป
-              if (link != null && link!.isNotEmpty) 
+              if (link != null && link!.isNotEmpty)
                 Text("ลิงค์ที่เพิ่ม: $link"),
               SizedBox(height: 10),
-              // แสดงตัวอย่างไฟล์ที่เลือก
-              if (filePath != null) 
+              if (filePath != null)
                 Text("ไฟล์ที่เลือก: ${filePath!.split('/').last}"),
               if (kIsWeb && fileBytes != null)
-                Text("ไฟล์ที่เลือก (Web): ${fileBytes.length} bytes"),
+                Text("ไฟล์ที่เลือก (Web): ${fileBytes!.length} bytes"),
               SizedBox(height: 20),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -178,7 +206,7 @@ class _AnnounceClassState extends State<AnnounceClass> {
                       onPressed: () async {
                         if (formKey.currentState!.validate()) {
                           formKey.currentState!.save();
-                           await _sendDataToPHP(annoncetext, filePath, link);
+                          await _sendDataToPHP(annoncetext, filePath as dynamic, link);
                           formKey.currentState!.reset();
                           Navigator.pop(context);
                         } else {
@@ -213,7 +241,6 @@ class _AnnounceClassState extends State<AnnounceClass> {
     );
   }
 
-  // ฟังก์ชันแสดง dialog สำหรับเพิ่มลิงค์
   void _showLinkDialog() {
     showDialog(
       context: context,
@@ -228,15 +255,15 @@ class _AnnounceClassState extends State<AnnounceClass> {
             TextButton(
               onPressed: () {
                 setState(() {
-                  link = linkController.text; // กำหนดลิงค์ที่เพิ่ม
+                  link = linkController.text;
                 });
-                Navigator.pop(context);
+                Navigator.of(context).pop();
               },
               child: Text("ตกลง"),
             ),
             TextButton(
               onPressed: () {
-                Navigator.pop(context);
+                Navigator.of(context).pop();
               },
               child: Text("ยกเลิก"),
             ),
@@ -246,5 +273,3 @@ class _AnnounceClassState extends State<AnnounceClass> {
     );
   }
 }
-
-

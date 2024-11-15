@@ -8,7 +8,10 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/services.dart';
 
 class upfilework extends StatefulWidget {
-  const upfilework({super.key});
+  final String username;
+  final String thfname;
+  final String thlname;
+  const upfilework({super.key, required this.username, required this.thfname, required this.thlname});
 
   @override
   State<upfilework> createState() => _Answer_QuestionState();
@@ -132,7 +135,13 @@ class _Answer_QuestionState extends State<upfilework> with SingleTickerProviderS
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => AssignWork_class_T(assignmentsupfile: [Newupfile], assignmentsauswerq: [], assignmentsonechoice: [], assignmentsmanychoice: [], username: '',),
+        builder: (context) => AssignWork_class_T(
+          assignmentsupfile: [Newupfile], 
+          assignmentsauswerq: [], 
+          assignmentsonechoice: [], 
+          assignmentsmanychoice: [], 
+          thfname: widget.thfname, thlname: widget.thlname, username: widget.username,
+        ),
       ),
     );
   }

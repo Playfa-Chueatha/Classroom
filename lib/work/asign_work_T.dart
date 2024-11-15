@@ -13,8 +13,10 @@ import 'package:url_launcher/url_launcher.dart';
 import '../Classroom/classT.dart';
 
 class AssignWork_class_T extends StatefulWidget {
-  final String? username;
-  const AssignWork_class_T ({super.key, required this.username, required this.assignmentsauswerq, required this.assignmentsupfile, required this.assignmentsonechoice, required this.assignmentsmanychoice});
+  final String username;
+  final String thfname;
+  final String thlname;
+  const AssignWork_class_T ({super.key, required this.username, required this.assignmentsauswerq, required this.assignmentsupfile, required this.assignmentsonechoice, required this.assignmentsmanychoice, required this.thfname, required this.thlname});
 
 
   final List<auswerq> assignmentsauswerq;
@@ -42,7 +44,7 @@ class _AssignWork_class_TState extends State<AssignWork_class_T> {
         backgroundColor: Color.fromARGB(255, 152, 186, 218),
         title: Text('Edueliteroom'),
         actions: [
-          // appbarteacher(context, widget.username),
+          appbarteacher(context, widget.thfname, widget.thlname, widget.username),
         ],
       ),
       body: SingleChildScrollView(
@@ -69,7 +71,7 @@ class _AssignWork_class_TState extends State<AssignWork_class_T> {
                           bottomRight: Radius.circular(20)
                         ),
                       ),
-                      child: Menuu_class(username: '',),//menu.dart,
+                      child: Menuu_class(username: widget.username, thfname: widget.thfname, thlname: widget.thlname),//menu.dart,
                       ),
                       SizedBox(width: 50,),
 
@@ -93,7 +95,7 @@ class _AssignWork_class_TState extends State<AssignWork_class_T> {
                                 onPressed: (){
                                   Navigator.push(
                                       context,
-                                      MaterialPageRoute(builder: (context) => const Type_work()),); //add_work.dart
+                                      MaterialPageRoute(builder: (context) =>  Type_work(username: widget.username, thfname: widget.thfname,thlname: widget.thlname,)),); //add_work.dart
                                 },
                                 style: IconButton.styleFrom(
                                       backgroundColor: Color.fromARGB(255, 147, 185, 221),

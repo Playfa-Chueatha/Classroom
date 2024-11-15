@@ -5,8 +5,11 @@ import 'package:flutter_esclass_2/Score/Tab.dart';
 import 'package:flutter_esclass_2/Score/checkinclassroom.dart';
 
 class Score_T_body extends StatefulWidget {
-  final String? username;
-  const Score_T_body ({super.key, required this.username});
+  final String username;
+  final String thfname;
+  final String thlname;
+
+  const Score_T_body ({super.key, required this.username, required this.thfname, required this.thlname});
 
 
   @override
@@ -51,7 +54,7 @@ class _Score_T_bodyState extends State<Score_T_body> {
                           bottomRight: Radius.circular(20)
                         ),
                       ),
-                      child:Menuu_class(username: '',),//menu.dart
+                      child:Menuu_class(thfname: widget.thfname, thlname: widget.thlname, username: widget.username,),//menu.dart
                       ),
                       SizedBox(width: 50,),
 

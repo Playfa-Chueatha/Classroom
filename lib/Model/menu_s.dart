@@ -11,8 +11,10 @@ import 'dart:convert';
 
 class Menuu_class_s extends StatefulWidget {
   final String username;
+  final String thfname;
+  final String thlname;
 
-  const Menuu_class_s({super.key, required this.username});
+  const Menuu_class_s({super.key, required this.username, required this.thfname, required this.thlname});
 
   @override
   State<Menuu_class_s> createState() => _MenuState();
@@ -129,7 +131,7 @@ class _MenuState extends State<Menuu_class_s> {
                     bottomRight: Radius.circular(20)
                   )
                 ),
-                child:  List_classroom_S(username: widget.username),//Menu_listclassroom.dart
+                child:  List_classroom_S(thfname: widget.thfname, thlname: widget.thlname, username: widget.username)
               ),
               SizedBox(height: 5),
             ],

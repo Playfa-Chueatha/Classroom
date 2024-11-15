@@ -5,7 +5,10 @@ import 'package:flutter_esclass_2/work/asign_work_T.dart';
 import 'package:intl/intl.dart';
 
 class OneChoice_test extends StatefulWidget {
-  const OneChoice_test({super.key});
+  final String username;
+  final String thfname;
+  final String thlname;
+  const OneChoice_test({super.key, required this.username, required this.thfname, required this.thlname});
 
   @override
   _OneChoiceState createState() => _OneChoiceState();
@@ -151,7 +154,8 @@ void _deleteQuestion(int index) {
         builder: (context) => AssignWork_class_T(
           assignmentsonechoice: [newOneChoice],
           assignmentsauswerq: [],
-          assignmentsupfile: [], assignmentsmanychoice: [], username: '',
+          assignmentsupfile: [], assignmentsmanychoice: [],
+          thfname: widget.thfname, thlname: widget.thlname, username: widget.username,
         ),
       ),
     );

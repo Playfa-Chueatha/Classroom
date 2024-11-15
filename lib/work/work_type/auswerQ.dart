@@ -8,7 +8,10 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/services.dart';
 
 class Auswer_Question extends StatefulWidget {
-  const Auswer_Question({super.key});
+  final String username;
+  final String thfname;
+  final String thlname;
+  const Auswer_Question({super.key, required this.username, required this.thfname, required this.thlname});
 
   @override
   State<Auswer_Question> createState() => _Answer_QuestionState();
@@ -163,7 +166,8 @@ class _Answer_QuestionState extends State<Auswer_Question> with SingleTickerProv
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => AssignWork_class_T(assignmentsauswerq: [newauswerq], assignmentsupfile: [], assignmentsonechoice: [], assignmentsmanychoice: [], username: '',),
+        builder: (context) => AssignWork_class_T(assignmentsauswerq: [newauswerq], assignmentsupfile: [], assignmentsonechoice: [], assignmentsmanychoice: [], 
+        username: widget.username, thfname: widget.thfname,thlname: widget.thlname,),
       ),
     );
   }

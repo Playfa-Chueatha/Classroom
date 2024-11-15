@@ -8,8 +8,10 @@ import 'package:http/http.dart' as http;
 
 class Menuu_class extends StatefulWidget {
   final String username;
+  final String thfname;
+  final String thlname;
 
-  const Menuu_class({super.key, required this.username});
+  const Menuu_class({super.key, required this.username, required this.thfname, required this.thlname});
 
   @override
   State<Menuu_class> createState() => _MenuState();
@@ -116,7 +118,7 @@ class _MenuState extends State<Menuu_class> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => SettingCalss(username: widget.username, classroomName: '', classroomMajor: '', classroomYear: '', classroomNumRoom: '', thfname: '', thlname: '',),
+                            builder: (context) => SettingCalss(thfname: widget.thfname, thlname: widget.thlname, username: widget.username,classroomMajor: '',classroomName: '',classroomNumRoom: '',classroomYear: '',),
                           ),
                         );
                       },
@@ -126,7 +128,7 @@ class _MenuState extends State<Menuu_class> {
                   SizedBox(
                     height: 250,
                     width: 300,
-                    child: List_classroom_inclass(username: widget.username), // Menu_listclassroom.dart
+                    child: List_classroom_inclass(thfname: widget.thfname, thlname: widget.thlname, username: widget.username,), // Menu_listclassroom.dart
                   ),
                 ],
               ),

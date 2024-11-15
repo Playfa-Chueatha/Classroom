@@ -1,12 +1,15 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter_esclass_2/Classroom/calssS.dart';
 import 'package:flutter_esclass_2/Classroom/setting_calss.dart';
 import 'package:http/http.dart' as http;
 
 class List_classroom_S extends StatefulWidget {
   final String username;
+  final String thfname;
+  final String thlname;
 
-  const List_classroom_S({super.key, required this.username});
+  const List_classroom_S({super.key, required this.username, required this.thfname, required this.thlname});
 
   @override
   State<List_classroom_S> createState() => _List_classroomState();
@@ -89,7 +92,18 @@ class _List_classroomState extends State<List_classroom_S> {
                       foregroundColor: Colors.black,
                     ),
                     onPressed: () {
-                      
+                       Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => class_S_body(
+                            classroomName: classrooms[index]['classroom_name'],
+                            classroomMajor: classrooms[index]['classroom_major'],
+                            classroomYear: classrooms[index]['classroom_year'],
+                            classroomNumRoom: classrooms[index]['classroom_numroom'],
+                            username: widget.username, thfname: widget.thfname, thlname: widget.thlname,
+                          ),
+                        ),
+                      );
                     },
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,

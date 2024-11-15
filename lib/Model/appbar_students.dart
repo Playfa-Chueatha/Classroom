@@ -66,7 +66,7 @@ Widget appbarstudents(BuildContext context, String thfname, String thlname, Stri
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) =>  class_S_body(thfname: thfname, thlname: thlname, username: username)),
+                  MaterialPageRoute(builder: (context) =>  class_S_body(thfname: thfname, thlname: thlname, username: username,classroomMajor: '', classroomName: '', classroomYear: '', classroomNumRoom: '',)),
                 );
               },
               icon: const Icon(Icons.class_outlined),
@@ -79,8 +79,7 @@ Widget appbarstudents(BuildContext context, String thfname, String thlname, Stri
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const work_body_S(
-                  )),
+                  MaterialPageRoute(builder: (context) => work_body_S(thfname: thfname, thlname: thlname, username: username)),
                 );
               },
               icon: const Icon(Icons.edit_document),

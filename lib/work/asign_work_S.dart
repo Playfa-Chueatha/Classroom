@@ -4,7 +4,10 @@ import 'package:flutter_esclass_2/Model/menu_t.dart';
 import 'package:flutter_esclass_2/Model/menu_s.dart';
 
 class work_body_S extends StatefulWidget {
-  const work_body_S({super.key});
+  final String thfname;
+  final String thlname;
+  final String username;
+  const work_body_S({super.key, required this.thfname, required this.thlname, required this.username});
 
   @override
   State<work_body_S> createState() => _work_body_SState();
@@ -45,7 +48,7 @@ class _work_body_SState extends State<work_body_S> {
                           bottomRight: Radius.circular(20)
                         ),
                       ),
-                      child:Menuu_class_s(username: '',),//menu.dart,
+                      child:Menuu_class_s(thfname: widget.thfname, thlname: widget.thlname, username: widget.username),//menu.dart,
                       ),
                       SizedBox(width: 50,),
                     

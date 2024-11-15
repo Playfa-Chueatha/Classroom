@@ -6,7 +6,10 @@ import 'package:flutter_esclass_2/work/work_type/one_choice.dart';
 import 'package:flutter_esclass_2/work/work_type/upfile.dart';
 
 class Type_work extends StatefulWidget {
-  const Type_work({super.key});
+  final String username;
+  final String thfname;
+  final String thlname;
+  const Type_work({super.key, required this.username, required this.thfname, required this.thlname});
 
   @override
   State<Type_work> createState() => _Type_workState();
@@ -57,10 +60,10 @@ class _Type_workState extends State<Type_work> {
             Expanded(
               child: TabBarView(
                 children: [
-                  Center(child: Auswer_Question()),
-                  Center(child: OneChoice_test()),
-                  Center(child: many_choice()),
-                  Center(child: upfilework()),
+                  Center(child: Auswer_Question(username: widget.username, thfname: widget.thfname,thlname: widget.thlname,)),
+                  Center(child: OneChoice_test(username: widget.username, thfname: widget.thfname,thlname: widget.thlname,)),
+                  Center(child: many_choice(username: widget.username, thfname: widget.thfname,thlname: widget.thlname,)),
+                  Center(child: upfilework(username: widget.username, thfname: widget.thfname,thlname: widget.thlname,)),
                 ],
               ),
             ),
