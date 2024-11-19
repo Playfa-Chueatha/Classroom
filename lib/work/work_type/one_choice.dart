@@ -155,7 +155,7 @@ void _deleteQuestion(int index) {
           assignmentsonechoice: [newOneChoice],
           assignmentsauswerq: [],
           assignmentsupfile: [], assignmentsmanychoice: [],
-          thfname: widget.thfname, thlname: widget.thlname, username: widget.username,
+          thfname: widget.thfname, thlname: widget.thlname, username: widget.username, classroomMajor: '', classroomName: '', classroomYear: '', classroomNumRoom: '',
         ),
       ),
     );

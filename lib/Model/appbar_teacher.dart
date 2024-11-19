@@ -17,7 +17,7 @@ Widget appbarteacher(BuildContext context, String thfname, String thlname, Strin
   return Row(
     children: [
       Text(
-        "$username $thfname $thlname", // แสดงชื่อผู้ใช้จากฐานข้อมูล
+        "$thfname $thlname", // แสดงชื่อผู้ใช้จากฐานข้อมูล
         style: TextStyle(fontSize: 20),
       ),
       IconButton(
@@ -67,7 +67,7 @@ Widget appbarteacher(BuildContext context, String thfname, String thlname, Strin
                 assignmentsonechoice: [],
                 assignmentsmanychoice: [],
                 username: username, // ส่ง username
-                thfname: thfname, thlname: thlname
+                thfname: thfname, thlname: thlname, classroomMajor: '', classroomName: '', classroomYear: '', classroomNumRoom: '',
               )),
               icon: const Icon(Icons.edit_document),
               tooltip: 'งานที่ได้รับ',

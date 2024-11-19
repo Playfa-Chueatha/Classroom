@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
+import 'package:file_picker/file_picker.dart';
 class add_wprk_T extends StatefulWidget {
   const add_wprk_T({super.key});
 
@@ -9,6 +9,7 @@ class add_wprk_T extends StatefulWidget {
 }
 
 class _add_workState extends State<add_wprk_T> {
+  List<PlatformFile> selectedFiles = [];
 
   @override
   Widget build(BuildContext context) {

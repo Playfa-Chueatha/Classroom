@@ -16,8 +16,8 @@ class Type_work extends StatefulWidget {
 }
 
 class _Type_workState extends State<Type_work> {
-   List<String> tabData = ['', '', '', ''];  // ใช้เก็บข้อมูลจากแต่ละแท็บ
-
+  List<String> tabData = ['', '', '', ''];  // ใช้เก็บข้อมูลจากแต่ละแท็บ
+  
 
   @override
   Widget build(BuildContext context) {

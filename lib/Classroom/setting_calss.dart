@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_esclass_2/Classroom/add_classroom.dart';
 import 'package:flutter_esclass_2/Classroom/dialog_searchStudents.dart';
 import 'package:flutter_esclass_2/Data/Data_students.dart';
-import 'package:flutter_esclass_2/Data/data_calssroom.dart';
 import 'package:flutter_esclass_2/Model/Menu_listclassroom_T.dart';
 import 'package:flutter_esclass_2/Model/appbar_teacher.dart';
 import 'package:http/http.dart' as http;
@@ -220,7 +219,7 @@ void sortStudentsremove() {
                               decoration: const BoxDecoration(
                                 color: Color.fromARGB(255, 147, 185, 221),
                               ),
-                              child: List_classroom(username: widget.username),
+                              child: List_classroom(username: widget.username, thfname: widget.thfname, thlname: widget.thlname),
                             ),
                           ],
                         ),
@@ -272,8 +271,8 @@ void sortStudentsremove() {
                                                           classroomMajor: widget.classroomMajor,
                                                           classroomNumRoom: widget.classroomNumRoom,
                                                           classroomYear: widget.classroomYear,
-                                                          thfname: '',
-                                                          thlname: '',
+                                                          thfname: widget.thfname,
+                                                          thlname: widget.thlname,
                                                           username: widget.username,
                                                         );
                                                       },

@@ -1,22 +1,22 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:flutter_esclass_2/Classroom/calssS.dart';
+import 'package:flutter_esclass_2/Classroom/classT.dart';
 import 'package:flutter_esclass_2/Classroom/setting_calss.dart';
-import 'package:flutter_esclass_2/Model/appbar_students.dart';
+import 'package:flutter_esclass_2/work/asign_work_T.dart';
 import 'package:http/http.dart' as http;
 
-class List_classroom_S extends StatefulWidget {
+class List_classroom_Assignwork extends StatefulWidget {
   final String username;
   final String thfname;
   final String thlname;
 
-  const List_classroom_S({super.key, required this.username, required this.thfname, required this.thlname});
+  const List_classroom_Assignwork({super.key, required this.username, required this.thfname, required this.thlname});
 
   @override
-  State<List_classroom_S> createState() => _List_classroomState();
+  State<List_classroom_Assignwork> createState() => _List_classroomState();
 }
 
-class _List_classroomState extends State<List_classroom_S> {
+class _List_classroomState extends State<List_classroom_Assignwork> {
   List<dynamic> classrooms = [];
 
   @override
@@ -27,7 +27,7 @@ class _List_classroomState extends State<List_classroom_S> {
 
   Future<void> fetchClassrooms() async {
     try {
-      final response = await http.get(Uri.parse('https://www.edueliteroom.com/connect/get_classrooms_students.php?username=${widget.username}'));
+      final response = await http.get(Uri.parse('https://www.edueliteroom.com/connect/get_classrooms_teacher.php?username=${widget.username}'));
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
@@ -76,7 +76,7 @@ class _List_classroomState extends State<List_classroom_S> {
         itemCount: classrooms.length,
         itemBuilder: (context, index) {
           return Container(
-            padding: EdgeInsets.fromLTRB(0, 5, 5, 5),
+            padding: EdgeInsets.fromLTRB(20, 5, 5, 5),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -93,15 +93,15 @@ class _List_classroomState extends State<List_classroom_S> {
                       foregroundColor: Colors.black,
                     ),
                     onPressed: () {
-                       Navigator.push(
+                      Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => classS(
+                          builder: (context) => AssignWork_class_T(
                             classroomName: classrooms[index]['classroom_name'],
                             classroomMajor: classrooms[index]['classroom_major'],
                             classroomYear: classrooms[index]['classroom_year'],
                             classroomNumRoom: classrooms[index]['classroom_numroom'],
-                            username: widget.username, thfname: widget.thfname, thlname: widget.thlname,
+                            username: widget.username, thfname: widget.thfname, thlname: widget.thlname, assignmentsauswerq: [], assignmentsupfile: [], assignmentsonechoice: [], assignmentsmanychoice: [],
                           ),
                         ),
                       );

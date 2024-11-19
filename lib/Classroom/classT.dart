@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_esclass_2/Classroom/add_announce.dart';
 import 'package:flutter_esclass_2/Classroom/comment.dart';
 import 'package:flutter_esclass_2/Classroom/setting_calss.dart';
-import 'package:flutter_esclass_2/Data/Data_announce.dart';
+import 'package:flutter_esclass_2/Data/Data.dart';
 import 'package:flutter_esclass_2/Home/homeT.dart';
 import 'package:flutter_esclass_2/Login/login.dart';
 import 'package:flutter_esclass_2/Model/Chat.dart';
@@ -41,64 +41,45 @@ class ClassT extends StatefulWidget {
 }
 
 class ClassTState extends State<ClassT> {
-  Future<void> fetchPosts() async {
-  final response = await http.post(
-    Uri.parse('https://www.edueliteroom.com/connect/fetch_posts.php'),
-    body: {
-      'classroomName': widget.classroomName,
-      'classroomMajor': widget.classroomMajor,
-      'classroomYear': widget.classroomYear,
-      'classroomNumRoom': widget.classroomNumRoom,
-    },
-  );
-
-  try {
-    if (response.statusCode == 200) {
-      var responseData = json.decode(response.body);
-      if (responseData is List) {
-        setState(() {
-          dataAnnounce = responseData.map((item) {
-            String file = item['posts_file'];
-            String link = item['posts_link'];
-
-            return DataAnnounce(
-              classroomid: item['classroom_id'],
-              annonceid:item['posts_auto'],
-              annoncetext: item['posts_title'],
-              file: file == 'ไม่มี' ? ' - ' : file,
-              link: link == 'ไม่มี' ? ' - ' : link, 
-              usertThfname: item['usert_thfname'], 
-              usertThlname: item['usert_thlname'],
-            );
-          }).toList();
-        });
-      } else {
-        print('Invalid response data format');
-      }
-    } else {
-      print("Error: ${response.statusCode}");
-      throw Exception('Failed to load data');
-    }
-  } catch (e) {
-    print('Error parsing JSON: $e');
-  }
-}
-
-
-  void launchURL(String url) async {
-    Uri uri = Uri.parse(url);  // Convert String to Uri
-    if (await canLaunch(uri.toString())) {
-      await launch(uri.toString());
-    } else {
-      throw 'Could not launch $url';
-    }
-  }
+  late Future<List<dynamic>> futurePosts;
 
   @override
   void initState() {
     super.initState();
-    fetchPosts(); // เรียก fetchPosts ใน initState
+    futurePosts = fetchPosts();
   }
+
+  Future<List<dynamic>> fetchPosts() async {
+    final response = await http.post(
+      Uri.parse('https://www.edueliteroom.com/connect/fetch_posts.php'),
+      body: {
+        'classroomName': widget.classroomName,
+        'classroomMajor': widget.classroomMajor,
+        'classroomYear': widget.classroomYear,
+        'classroomNumRoom': widget.classroomNumRoom,
+      },
+    );
+
+    if (response.statusCode == 200) {
+      return json.decode(response.body);
+    } else {
+      throw Exception('Failed to load posts');
+    }
+  }
+
+  void _openFile(String fileUrl) {
+    launch(fileUrl);
+  }
+
+
+  void _launchURL(String url) async {
+  if (await canLaunch(url)) {
+    await launch(url);
+  } else {
+    throw 'ไม่สามารถเปิดลิงค์ได้: $url';
+  }
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -106,7 +87,7 @@ class ClassTState extends State<ClassT> {
       backgroundColor: Color.fromARGB(255, 195, 238, 250),
       appBar: AppBar(
         backgroundColor: Color.fromARGB(255, 152, 186, 218),
-        title: Text('Edueliteroom'),
+        title: Text('ห้องเรียน ${widget.classroomName} ${widget.classroomYear}/${widget.classroomNumRoom} (${widget.classroomMajor})'),
         actions: [
           appbarteacher(context, widget.thfname, widget.thlname, widget.username),
         ],
@@ -115,7 +96,7 @@ class ClassTState extends State<ClassT> {
         scrollDirection: Axis.vertical,
         child: Column(
           children: [
-            SizedBox(height: 10,),
+            SizedBox(height: 10),
             Column(
               children: [
                 SizedBox(height: 30),
@@ -123,7 +104,6 @@ class ClassTState extends State<ClassT> {
                   scrollDirection: Axis.horizontal,
                   child: Row(
                     children: [
-                      // menu
                       Container(
                         height: 1000,
                         width: 400,
@@ -131,48 +111,45 @@ class ClassTState extends State<ClassT> {
                           color: Color.fromARGB(255, 147, 185, 221),
                           borderRadius: BorderRadius.only(
                             topRight: Radius.circular(20),
-                            bottomRight: Radius.circular(20)
+                            bottomRight: Radius.circular(20),
                           ),
                         ),
-                        child: Menuu_class(thfname: widget.thfname, thlname: widget.thlname, username: widget.username,),
+                        child: Menuu_class(
+                          thfname: widget.thfname,
+                          thlname: widget.thlname,
+                          username: widget.username,
+                        ),
                       ),
-                      SizedBox(width: 50,),
-
-
-                      // ประกาศ
+                      SizedBox(width: 50),
                       Container(
                         height: 1000,
                         width: 750,
                         decoration: BoxDecoration(
                           color: Colors.white,
-                          borderRadius: BorderRadius.circular(20)
+                          borderRadius: BorderRadius.circular(20),
                         ),
                         child: Column(
                           children: [
-                            SizedBox(height: 20,),
-                            SizedBox(
-                              height: 50,
-                              width: 700,
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text('${widget.classroomName} ${widget.classroomYear}/${widget.classroomNumRoom} (${widget.classroomMajor})', style: TextStyle(fontSize: 20)),
-                                  IconButton(
+                            SizedBox(height: 20),
+                            Padding(
+                              padding: EdgeInsets.fromLTRB(650,5,5,5),
+                              child:  IconButton(
                                     color: Color.fromARGB(255, 0, 0, 0),
                                     icon: const Icon(Icons.add),
                                     iconSize: 30,
                                     onPressed: () {
                                       showDialog(
-                                        context: context, 
-                                        builder: (BuildContext context) => AnnounceClass(
-                                          username: widget.username, 
-                                          classroomMajor: widget.classroomMajor, 
-                                          classroomName: widget.classroomName, 
-                                          classroomNumRoom: widget.classroomNumRoom, 
-                                          classroomYear: widget.classroomYear, 
-                                          thfname: '', 
-                                          thlname: '',
-                                        )
+                                        context: context,
+                                        builder: (BuildContext context) =>
+                                            AnnounceClass(
+                                          username: widget.username,
+                                          classroomMajor: widget.classroomMajor,
+                                          classroomName: widget.classroomName,
+                                          classroomNumRoom: widget.classroomNumRoom,
+                                          classroomYear: widget.classroomYear,
+                                          thfname: widget.thfname,
+                                          thlname: widget.thlname,
+                                        ),
                                       );
                                     },
                                     style: IconButton.styleFrom(
@@ -181,180 +158,192 @@ class ClassTState extends State<ClassT> {
                                     ),
                                     tooltip: 'เพิ่มประกาศ',
                                   ),
-                                ],
-                              ),
                             ),
-
-                            Text("ประกาศ", style: TextStyle(fontSize: 40),),
+                            
+                            Text(
+                              "ประกาศ",
+                              style: TextStyle(fontSize: 40),
+                            ),
                             SizedBox(height: 20),
                             Container(
                               height: 800,
                               width: 700,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(20),
-                                color: const Color.fromARGB(255, 255, 255, 255)
+                                color: const Color.fromARGB(255, 255, 255, 255),
                               ),
-                              child: ListView.builder(
-                                itemCount: dataAnnounce.length,
-                                itemBuilder: (context, index) {
-                                  return Card(
-                                    margin: EdgeInsets.all(5),
-                                    color: Color.fromARGB(255, 152, 186, 218),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12.0),
-                                    ),
-                                    elevation: 8,
-                                    child: Row(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
+                              child: FutureBuilder<List<dynamic>>(
+                                future: futurePosts,
+                                builder: (context, snapshot) {
+                                  if (snapshot.connectionState == ConnectionState.waiting) {
+                                    return Center(child: CircularProgressIndicator());
+                                  } else if (snapshot.hasError) {
+                                    return Center(child: Text('Error: ${snapshot.error}'));
+                                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                                    return Center(child: Text('No announcements available.'));
+                                  } else {
+                                    final dataAnnounce = snapshot.data!;
+                                    return ListView.builder(
+                                      itemCount: dataAnnounce.length,
+                                      itemBuilder: (context, index) {
+                                        final post = dataAnnounce[index];
+                                        
 
 
-                                        Padding(
-                                          padding: EdgeInsets.fromLTRB(20, 5, 0, 5),
-                                          child: Image.asset("assets/images/ครู.png", height: 50, width: 50),
-                                        ),
+                                        //ไฟล์ 
+                                        final files = post['files'] != null
+                                            ? (post['files'] as List).map<Widget>((file) {
+                                                final fileName = file['file_name'] ?? 'Unknown';
+                                                final fileSize = file['file_size'] ?? ' ';
+                                                final fileUrl = file['file_url'] ?? '';
+                                                return GestureDetector(
+                                                  onTap: () => _openFile(fileUrl),
+                                                  child: Text(
+                                                    "$fileName ($fileSize)",
+                                                    style: TextStyle(color: Colors.blue,fontSize: 16),
+                                                  ),
+                                                );
+                                              }).toList()
+                                            : [Text('ไม่มีไฟล์แนบ',style: TextStyle(fontSize: 14,color: Color.fromARGB(255, 80, 79, 79)),)]; 
 
 
 
-
-                                        Expanded(
-                                          child: Column(
-                                            mainAxisAlignment: MainAxisAlignment.start,
+                                        return Card(
+                                          margin: EdgeInsets.all(5),
+                                          color: Color.fromARGB(255, 152, 186, 218),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(12.0),
+                                          ),
+                                          elevation: 8,
+                                          child: Row(
                                             crossAxisAlignment: CrossAxisAlignment.start,
                                             children: [
 
-
-                                              Text(
-                                                'โดย: ${dataAnnounce[index].usertThfname} ${dataAnnounce[index].usertThlname}',
-                                                style: TextStyle(fontSize: 14),
-                                              ), 
-
-
-
-                                              Container(
-                                                width: 600,
-                                                decoration: BoxDecoration(
-                                                  borderRadius: BorderRadius.circular(20),
-                                                  color: Colors.white
-                                                ),
-                                                padding: EdgeInsets.all(20),
-                                                child:  Text(dataAnnounce[index].annoncetext, style: TextStyle(fontSize: 20),),
+                                              Padding(
+                                                padding: EdgeInsets.fromLTRB(20, 5, 20, 5),
+                                                child: Image.asset("assets/images/ครู.png", height: 50, width: 50),
                                               ),
 
+
+                                              Column(
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                mainAxisAlignment: MainAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                  "โดย ${post['usert_thfname']} ${post['usert_thlname']}}",
+                                                  style: TextStyle( fontSize: 14,color: const Color.fromARGB(255, 66, 65, 65)),
+                                                ),
+                                                SizedBox(height: 10),
+                                                Container(
+                                                  width: 550,
+                                                  padding: EdgeInsets.all(20),
+                                                  decoration: BoxDecoration(
+                                                    borderRadius: BorderRadius.circular(20),
+                                                    color: Colors.white
+                                                  ),
+                                                  child:Text(post['posts_title'], style: TextStyle(fontSize: 20)),
+                                                ),
+                                                Text("ลิงค์ที่แนบมา:", style: TextStyle(fontSize: 18)),
+                                                SizedBox(height: 10),
+
+                                                InkWell(
+                                                  onTap: post['posts_link'] != null
+                                                      ? () {
+                                                          _launchURL(post['posts_link']);
+                                                        }
+                                                      : null, // ไม่สามารถกดได้ถ้าไม่มีลิงก์
+                                                  child: Text(
+                                                    post['posts_link'] ?? 'ไม่มี',
+                                                    style: TextStyle(
+                                                      color: post['posts_link'] != null
+                                                          ? Colors.blue // สีลิงก์เมื่อมีลิงก์
+                                                          : Color.fromARGB(255, 80, 79, 79), // สีเทาเมื่อไม่มีลิงก์
+                                                    ),
+                                                  ),
+                                                ),
+
+                                                Text("ไฟล์ที่แนบมา:", style: TextStyle(fontSize: 18)), 
+                                                SizedBox(height: 10),
+                                                Column(crossAxisAlignment: CrossAxisAlignment.start,children: files),
+                                                ],
+                                              ),
+
+                                              IconButton(
+                                                onPressed: () {
+                                                  showDialog(
+                                                    context: context,
+                                                    builder: (BuildContext context) => Comment_inclass(
+                                                      username: widget.username,
+                                                      postId: post['posts_auto'],
+                                                      ClassroomID: post['classroom_id'],
+                                                      
+                                                    ),
+                                                  );
+                                                  print("Username: ${widget.username}");
+                                                  print('ClassroomID: ${post['classroom_id']}');
+                                                  print('PostID: ${post['posts_auto']}');
+                                                },
+                                                icon: Icon(Icons.comment, size: 25),
+                                              )
                                               
-                                              Padding(
-                                                padding: EdgeInsets.fromLTRB(20, 10, 0, 5),
-                                                child: Column(
-                                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                                  children: [
-                                                    Text('ลิงค์ที่แนบมา',style: TextStyle(fontSize: 16),),
-                                                    dataAnnounce[index].link == ' - '
-                                                      ? Text('ไม่มี',style: TextStyle(fontSize: 14,color: Color.fromARGB(255, 80, 79, 79)),) // ถ้า link เป็น 'ไม่มี' แสดงข้อความ '-'
-                                                      : GestureDetector(
-                                                          onTap: () {
-                                                            launchURL(dataAnnounce[index].link); // เปิดลิงค์เมื่อคลิก
-                                                          },
-                                                          child: Text(
-                                                            dataAnnounce[index].link,
-                                                            style: TextStyle(fontSize: 14, color: Colors.blue),
-                                                          ),
-                                                        ),
-                                                  ],
-                                                ),
-                                              ),
-
-                                              Padding(
-                                                padding: EdgeInsets.fromLTRB(20, 5, 0, 10),
-                                                child: Column(
-                                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                                  children: [
-                                                    Text('ไฟล์ที่แนบมา',style: TextStyle(fontSize: 16),),
-                                                    dataAnnounce[index].file == ' - '
-                                                      ? Text('ไม่มี',style: TextStyle(fontSize: 14,color: Color.fromARGB(255, 80, 79, 79)),) 
-                                                      : GestureDetector(
-                                                          onTap: () {
-                                                            launchURL(dataAnnounce[index].file); // ดาวน์โหลดไฟล์เมื่อคลิก
-                                                          },
-                                                          child: Text(
-                                                            'ดาวน์โหลดไฟล์',
-                                                            style: TextStyle(fontSize: 14, color: Colors.blue),
-                                                          ),
-                                                        ),
-                                                  ],
-                                                ),
-                                              )                                                                               
                                             ],
-                                          ),
-                                        ),
-                                        IconButton(
-                                          onPressed: () {
-                                            showDialog(
-                                              context: context,
-                                              builder: (BuildContext context) => Comment_inclass(
-                                                username: widget.username,
-                                                postId: dataAnnounce[index].annonceid,
-                                                ClassroomID: dataAnnounce[index].classroomid
-
-                                              ),
-                                            );
-                                          },
-                                          icon: Icon(Icons.comment, size: 25),
-                                        )
-                                      ],
-                                    ),
-                                  );
+                                          )
+                                                          
+                                          );
+                                      
+                                        
+                                      },
+                                    );
+                                  }
                                 },
                               ),
                             ),
-                          ]
+                          ],
                         ),
                       ),
-                      SizedBox(width: 50,),
-
-
-                      // งานที่มอบหมาย
+                      SizedBox(width: 50),
                       Container(
                         height: 1000,
-                        width: 650,
-                        margin: EdgeInsets.all(20),
-                        alignment: Alignment.topCenter,
+                        width: 400,
                         decoration: BoxDecoration(
-                          color: Color.fromARGB(255, 152, 186, 218),
-                          borderRadius: BorderRadius.circular(20)
+                          color: Color.fromARGB(255, 147, 185, 221),
+                          borderRadius: BorderRadius.only(
+                            topRight: Radius.circular(20),
+                            bottomRight: Radius.circular(20),
+                          ),
                         ),
                         child: Column(
                           children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                SizedBox(width: 560,height: 80),
-                                IconButton(
-                                  onPressed: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(builder: (context) => Type_work(username: widget.username, thfname: widget.thfname,thlname: widget.thlname,)),
-                                    );
-                                  },
-                                  tooltip: 'มอบหมายงาน',
-                                  icon: Icon(Icons.add_circle_outline_sharp, size: 50),
-                                )
-                              ],
+                            SizedBox(height: 10),
+                            Text(
+                              'งานที่มอบหมาย',
+                              style: TextStyle(fontSize: 30),
                             ),
-                            Text("งานที่มอบหมาย", style: TextStyle(fontSize: 30),),
-                            Container(
-                              alignment: Alignment.center,
-                              height: 400,
-                              width: 600,
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(20)
+                            SizedBox(height: 20),
+                            IconButton(
+                              color: Color.fromARGB(255, 0, 0, 0),
+                              icon: const Icon(Icons.add),
+                              iconSize: 30,
+                              onPressed: () {
+                                // showDialog(
+                                //   context: context,
+                                //   builder: (BuildContext context) =>
+                                //       AssignWorkT(
+                                //     username: widget.username,
+                                //     classroomMajor: widget.classroomMajor,
+                                //     classroomName: widget.classroomName,
+                                //     classroomNumRoom: widget.classroomNumRoom,
+                                //     classroomYear: widget.classroomYear,
+                                //     thfname: '',
+                                //     thlname: '',
+                                //   ),
+                                // );
+                              },
+                              style: IconButton.styleFrom(
+                                backgroundColor: Color.fromARGB(255, 147, 185, 221),
+                                highlightColor: Color.fromARGB(255, 56, 105, 151),
                               ),
-                              child: Column(
-                                children: [
-                                  SizedBox(height: 20),
-                                  Text("ไม่มีงานที่มอบหมาย", style: TextStyle(fontSize: 20),),
-                                ],
-                              ),
+                              tooltip: 'เพิ่มงาน',
                             ),
                           ],
                         ),

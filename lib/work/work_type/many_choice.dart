@@ -141,7 +141,7 @@ class _many_choice extends State<many_choice> with SingleTickerProviderStateMixi
           assignmentsauswerq: [], 
           assignmentsupfile: [], 
           assignmentsmanychoice: [newManyChoice],
-          username: widget.username, thfname: widget.thfname,thlname: widget.thlname
+          username: widget.username, thfname: widget.thfname,thlname: widget.thlname, classroomMajor: '', classroomName: '', classroomYear: '', classroomNumRoom: '',
           ),
 
       ),

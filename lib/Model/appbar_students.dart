@@ -118,3 +118,6 @@ Widget appbarstudents(BuildContext context, String thfname, String thlname, Stri
     ],
   );
 }
+
+class_S_body({required String thfname, required String thlname, required String username, required String classroomMajor, required String classroomName, required String classroomYear, required String classroomNumRoom}) {
+}

@@ -167,7 +167,7 @@ class _Answer_QuestionState extends State<Auswer_Question> with SingleTickerProv
       context,
       MaterialPageRoute(
         builder: (context) => AssignWork_class_T(assignmentsauswerq: [newauswerq], assignmentsupfile: [], assignmentsonechoice: [], assignmentsmanychoice: [], 
-        username: widget.username, thfname: widget.thfname,thlname: widget.thlname,),
+        username: widget.username, thfname: widget.thfname,thlname: widget.thlname, classroomMajor: '', classroomName: '', classroomYear: '', classroomNumRoom: '',),
       ),
     );
   }

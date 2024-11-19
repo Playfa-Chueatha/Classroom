@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
-import 'dart:io' as io;
+import 'package:flutter/foundation.dart' show Uint8List;
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'dart:io';
+import 'package:dio/dio.dart';
 
 class AnnounceClass extends StatefulWidget {
   final String thfname;
@@ -32,81 +33,136 @@ class AnnounceClass extends StatefulWidget {
 class _AnnounceClassState extends State<AnnounceClass> {
   final formKey = GlobalKey<FormState>();
   String annoncetext = '';
-  String? filePath;
   String? link;
-  var fileBytes;
-
+  List<PlatformFile> selectedFiles = []; // เปลี่ยนจาก single file เป็น list
   TextEditingController linkController = TextEditingController();
 
-  Future<void> _sendDataToPHP(String title, dynamic file, String? link) async {
+Future<void> _sendDataToPHP(String title, List<PlatformFile> files, String? link) async {
   String classroomName = widget.classroomName;
   String classroomMajor = widget.classroomMajor;
   String classroomYear = widget.classroomYear;
   String classroomNumRoom = widget.classroomNumRoom;
   String usertUsername = widget.username;
 
-  
-
-  // แสดงข้อมูลที่เตรียมจะส่งไปยัง PHP
-  print('Preparing data to send to PHP:');
-  print('Title: $title');
-  print('Link: ${link ?? 'ไม่มี'}');
-  print('Classroom Name: $classroomName');
-  print('Classroom Major: $classroomMajor');
-  print('Classroom Year: $classroomYear');
-  print('Classroom NumRoom: $classroomNumRoom');
-  print('User Username: $usertUsername');
-  print("File path: $filePath");
-  print("File bytes length: ${fileBytes?.length}");
-
   try {
-    var request = http.MultipartRequest('POST', Uri.parse('https://www.edueliteroom.com/connect/save_post.php'));
+    var request = http.MultipartRequest(
+      'POST',
+      Uri.parse('https://www.edueliteroom.com/connect/save_post.php'),
+    );
 
-    request.fields['posts_title'] = title;
-    request.fields['posts_link'] = link ?? 'ไม่มี';
-    request.fields['classroom_name'] = classroomName;
-    request.fields['classroom_major'] = classroomMajor;
-    request.fields['classroom_year'] = classroomYear;
-    request.fields['classroom_numroom'] = classroomNumRoom;
-    request.fields['usert_username'] = usertUsername;
+    // เพิ่มข้อมูลฟอร์ม
+    request.fields.addAll({
+      'posts_title': title,
+      'posts_link': link ?? 'ไม่มี',
+      'classroom_name': classroomName,
+      'classroom_major': classroomMajor,
+      'classroom_year': classroomYear,
+      'classroom_numroom': classroomNumRoom,
+      'usert_username': usertUsername,
+    });
 
-    // เพิ่มไฟล์จาก bytes สำหรับเว็บ
-    if (kIsWeb) {
-      if (fileBytes == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('เกิดข้อผิดพลาด: ไม่มีข้อมูลไฟล์')),
-        );
-        return;
-      }
-      var fileRequest = http.MultipartFile.fromBytes(
-        'posts_file',
-        fileBytes!,
-        filename: 'uploaded_file',
-      );
-      request.files.add(fileRequest);
-    } else {
-      // เพิ่มไฟล์จาก path สำหรับมือถือ
-      var fileRequest = await http.MultipartFile.fromPath('posts_file', file.path);
-      request.files.add(fileRequest);
-    }
-
-    var response = await request.send();
-
+    // ส่งคำขอไปที่เซิร์ฟเวอร์
+    final response = await request.send();
+    
+    // ตรวจสอบผลลัพธ์จากการตอบกลับ
     if (response.statusCode == 200) {
       String responseBody = await response.stream.bytesToString();
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('บันทึกข้อมูลสำเร็จ')),
-      );
-      print('Response from server: $responseBody');  // แสดงผลตอบกลับจากเซิร์ฟเวอร์
+      
+      // แปลงข้อมูล JSON ที่ได้รับจากเซิร์ฟเวอร์
+      var jsonResponse = json.decode(responseBody);
+      int postId = int.parse(jsonResponse['post_id']); 
+
+      print('Post saved successfully, Post ID: $postId');
+
+      // อัปโหลดไฟล์ที่เกี่ยวข้องกับโพสต์
+      for (var file in files) {
+        await _saveFileToPost(postId, file);  // ส่งไฟล์ไปยังเซิร์ฟเวอร์
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('บันทึกข้อมูลสำเร็จ')));
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('บันทึกข้อมูลล้มเหลว: ${response.statusCode}')),
-      );
+      throw 'Server error: ${response.statusCode}';
     }
   } catch (e) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text('เกิดข้อผิดพลาด: $e')),
     );
+    print('Error: $e');
+  }
+}
+
+Future<void> _saveFileToPost(int postId, PlatformFile file) async {
+  try {
+    var request = http.MultipartRequest(
+      'POST',
+      Uri.parse('https://www.edueliteroom.com/connect/save_file.php'), // URL สำหรับอัปโหลดไฟล์
+    );
+
+    // เพิ่มข้อมูลไฟล์ในคำขอ
+    request.fields['post_id'] = postId.toString();
+
+    // ใช้ `bytes` แทน `path` สำหรับการอัปโหลดไฟล์ใน Web
+    request.files.add(http.MultipartFile.fromBytes(
+      'file',
+      file.bytes!,
+      filename: file.name,
+    ));
+
+    // ส่งคำขอไปที่เซิร์ฟเวอร์
+    final response = await request.send();
+    
+    if (response.statusCode == 200) {
+      print('File uploaded successfully');
+    } else {
+      throw 'Error uploading file: ${response.statusCode}';
+    }
+  } catch (e) {
+    print('Error: $e');
+  }
+}
+
+
+
+
+Future<void> pickAndUploadFile() async {
+  // เลือกไฟล์
+  FilePickerResult? result = await FilePicker.platform.pickFiles(allowMultiple: true);
+
+  if (result != null) {
+    // ไฟล์ที่เลือกมา
+    List<File> files = result.paths.map((path) => File(path!)).toList();
+
+    // ส่งไฟล์ทั้งหมดไปยังเซิร์ฟเวอร์
+    for (var file in files) {
+      await uploadFileToServer(file);
+    }
+  } else {
+    // ผู้ใช้ยกเลิกการเลือกไฟล์
+    print("ผู้ใช้ยกเลิกการเลือกไฟล์");
+  }
+}
+
+Future<void> uploadFileToServer(File file) async {
+  // สร้าง request สำหรับการอัปโหลดไฟล์
+  var request = http.MultipartRequest('POST', Uri.parse('YOUR_SERVER_URL'));
+  
+  // เพิ่มไฟล์เข้าไปใน request
+  var fileBytes = await file.readAsBytes();
+  var multipartFile = http.MultipartFile.fromBytes(
+    'file', 
+    fileBytes, 
+    filename: file.uri.pathSegments.last
+  );
+  
+  request.files.add(multipartFile);
+  
+  // ส่งข้อมูลไปยังเซิร์ฟเวอร์
+  var response = await request.send();
+  
+  if (response.statusCode == 200) {
+    print("ไฟล์ถูกอัปโหลดสำเร็จ");
+  } else {
+    print("การอัปโหลดไฟล์ล้มเหลว");
   }
 }
 
@@ -165,33 +221,41 @@ class _AnnounceClassState extends State<AnnounceClass> {
                   ),
                   IconButton(
                     onPressed: () async {
-                      FilePickerResult? result = await FilePicker.platform.pickFiles();
+                      FilePickerResult? result = await FilePicker.platform.pickFiles(allowMultiple: true); // allowMultiple: true เพื่อเลือกหลายไฟล์
                       if (result != null) {
-                        if (kIsWeb) {
-                          var selectedFile = result.files.first;
-                          setState(() {
-                            fileBytes = selectedFile.bytes;
-                            filePath = null;
-                          });
-                        } else {
-                          setState(() {
-                            filePath = result.files.single.path;
-                            fileBytes = null;
-                          });
-                        }
+                        setState(() {
+                          selectedFiles = result.files; // เก็บไฟล์ที่เลือกทั้งหมดในรายการ
+                        });
                       }
                     },
                     icon: Icon(Icons.upload, size: 30),
-                  )
+                  ),
                 ],
               ),
-              if (link != null && link!.isNotEmpty)
-                Text("ลิงค์ที่เพิ่ม: $link"),
               SizedBox(height: 10),
-              if (filePath != null)
-                Text("ไฟล์ที่เลือก: ${filePath!.split('/').last}"),
-              if (kIsWeb && fileBytes != null)
-                Text("ไฟล์ที่เลือก (Web): ${fileBytes!.length} bytes"),
+              // แสดงชื่อไฟล์ที่เลือก
+              if (selectedFiles.isNotEmpty)
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    ...selectedFiles.map((file) {
+                      return Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text("ไฟล์ที่เลือก: ${file.name}"),
+                          IconButton(
+                            icon: Icon(Icons.delete, size: 20),
+                            onPressed: () {
+                              setState(() {
+                                selectedFiles.remove(file); // ลบไฟล์ออกจากรายการ
+                              });
+                            },
+                          ),
+                        ],
+                      );
+                    }),
+                  ],
+                ),
               SizedBox(height: 20),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -206,7 +270,7 @@ class _AnnounceClassState extends State<AnnounceClass> {
                       onPressed: () async {
                         if (formKey.currentState!.validate()) {
                           formKey.currentState!.save();
-                          await _sendDataToPHP(annoncetext, filePath as dynamic, link);
+                          await _sendDataToPHP(annoncetext, selectedFiles, link);
                           formKey.currentState!.reset();
                           Navigator.pop(context);
                         } else {

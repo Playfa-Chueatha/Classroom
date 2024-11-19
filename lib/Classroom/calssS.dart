@@ -1,7 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_esclass_2/Classroom/comment.dart';
-import 'package:flutter_esclass_2/Data/Data_announce.dart';
+import 'package:flutter_esclass_2/Data/Data.dart';
 import 'package:flutter_esclass_2/Model/appbar_students.dart';
 import 'package:flutter_esclass_2/Model/menu_t.dart';
 import 'package:flutter_esclass_2/Model/menu_s.dart';
@@ -9,7 +9,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:url_launcher/url_launcher.dart';
 
-class class_S_body extends StatefulWidget {
+class classS extends StatefulWidget {
   final String thfname;
   final String thlname;
   final String username;
@@ -18,7 +18,7 @@ class class_S_body extends StatefulWidget {
   final String classroomYear;
   final String classroomNumRoom;
 
-  const class_S_body({
+  const classS({
     super.key,
     required this.thfname,
     required this.thlname,
@@ -30,70 +30,49 @@ class class_S_body extends StatefulWidget {
   });
 
   @override
-  State<class_S_body> createState() => _class_S_bodyState();
+  State<classS> createState() => _class_S_bodyState();
 }
 
-class _class_S_bodyState extends State<class_S_body> {
+class _class_S_bodyState extends State<classS> {
+  late Future<List<dynamic>> futurePosts;
 
-    int counter = 0;
-
-  Future<void> fetchPosts() async {
-  final response = await http.post(
-    Uri.parse('https://www.edueliteroom.com/connect/fetch_posts.php'),
-    body: {
-      'classroomName': widget.classroomName,
-      'classroomMajor': widget.classroomMajor,
-      'classroomYear': widget.classroomYear,
-      'classroomNumRoom': widget.classroomNumRoom,
-    },
-  );
-
-  try {
-    if (response.statusCode == 200) {
-      var responseData = json.decode(response.body);
-      if (responseData is List) {
-        setState(() {
-          dataAnnounce = responseData.map((item) {
-            String file = item['posts_file'];
-            String link = item['posts_link'];
-
-            return DataAnnounce(
-              classroomid: item['classroom_id'],
-              annonceid:item['posts_auto'],
-              annoncetext: item['posts_title'],
-              file: file == 'ไม่มี' ? ' - ' : file,
-              link: link == 'ไม่มี' ? ' - ' : link, 
-              usertThfname: item['usert_thfname'], 
-              usertThlname: item['usert_thlname'],
-            );
-          }).toList();
-        });
-      } else {
-        print('Invalid response data format');
-      }
-    } else {
-      print("Error: ${response.statusCode}");
-      throw Exception('Failed to load data');
-    }
-  } catch (e) {
-    print('Error parsing JSON: $e');
-  }
-}
-
-void launchURL(String url) async {
-    Uri uri = Uri.parse(url);  // Convert String to Uri
-    if (await canLaunch(uri.toString())) {
-      await launch(uri.toString());
-    } else {
-      throw 'Could not launch $url';
-    }
-  }
 
   @override
   void initState() {
     super.initState();
-    fetchPosts(); // เรียก fetchPosts ใน initState
+    futurePosts = fetchPosts();
   }
+
+  Future<List<dynamic>> fetchPosts() async {
+    final response = await http.post(
+      Uri.parse('https://www.edueliteroom.com/connect/fetch_posts.php'),
+      body: {
+        'classroomName': widget.classroomName,
+        'classroomMajor': widget.classroomMajor,
+        'classroomYear': widget.classroomYear,
+        'classroomNumRoom': widget.classroomNumRoom,
+      },
+    );
+
+    if (response.statusCode == 200) {
+      return json.decode(response.body);
+    } else {
+      throw Exception('Failed to load posts');
+    }
+  }
+
+  void _openFile(String fileUrl) {
+    launch(fileUrl);
+  }
+
+
+  void _launchURL(String url) async {
+  if (await canLaunch(url)) {
+    await launch(url);
+  } else {
+    throw 'ไม่สามารถเปิดลิงค์ได้: $url';
+  }
+}
 
     
   @override
@@ -159,11 +138,44 @@ void launchURL(String url) async {
                               height: 800,
                               width: 700,
                               decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(20)
+                                borderRadius: BorderRadius.circular(20),
+                                color: const Color.fromARGB(255, 255, 255, 255),
                               ),
-                              child: ListView.builder(
-                                itemCount: dataAnnounce.length,
-                                itemBuilder: (context, index) {
+                              child: FutureBuilder<List<dynamic>>(
+                                future: futurePosts,
+                                builder: (context, snapshot) {
+                                  if (snapshot.connectionState == ConnectionState.waiting) {
+                                    return Center(child: CircularProgressIndicator());
+                                  } else if (snapshot.hasError) {
+                                    return Center(child: Text('Error: ${snapshot.error}'));
+                                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                                    return Center(child: Text('No announcements available.'));
+                                  } else {
+                                    final dataAnnounce = snapshot.data!;
+                                    return ListView.builder(
+                                      itemCount: dataAnnounce.length,
+                                      itemBuilder: (context, index) {
+                                        final post = dataAnnounce[index];
+
+                                        //ไฟล์ 
+                                        final files = post['files'] != null
+                                            ? (post['files'] as List).map<Widget>((file) {
+                                                final fileName = file['file_name'] ?? 'Unknown';
+                                                final fileSize = file['file_size'] ?? ' ';
+                                                final fileUrl = file['file_url'] ?? '';
+                                                return GestureDetector(
+                                                  onTap: () => _openFile(fileUrl),
+                                                  child: Text(
+                                                    "$fileName ($fileSize)",
+                                                    style: TextStyle(color: Colors.blue),
+                                                  ),
+                                                );
+                                              }).toList()
+                                            : [Text('ไม่มีไฟล์แนบ')]; 
+
+
+
+                                
                                   return Card(
                                     margin: EdgeInsets.all(5),
                                     color: Color.fromARGB(255, 152, 186, 218),
@@ -184,95 +196,74 @@ void launchURL(String url) async {
 
 
 
-                                        Expanded(
-                                          child: Column(
-                                            mainAxisAlignment: MainAxisAlignment.start,
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            children: [
-
-
-                                              Text(
-                                                'โดย: ${dataAnnounce[index].usertThfname} ${dataAnnounce[index].usertThlname} ${dataAnnounce[index].annonceid}',
-                                                style: TextStyle(fontSize: 14),
-                                              ),
-
-
-
-                                              Container(
-                                                width: 600,
-                                                decoration: BoxDecoration(
-                                                  borderRadius: BorderRadius.circular(20),
-                                                  color: Colors.white
+                                        Column(
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                mainAxisAlignment: MainAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                  "โดย ${post['usert_thfname']} ${post['usert_thlname']}",
+                                                  style: TextStyle( fontSize: 14,color: const Color.fromARGB(255, 66, 65, 65)),
                                                 ),
-                                                padding: EdgeInsets.all(20),
-                                                child:  Text(dataAnnounce[index].annoncetext, style: TextStyle(fontSize: 20),),
+                                                SizedBox(height: 10),
+                                                Container(
+                                                  width: 550,
+                                                  padding: EdgeInsets.all(20),
+                                                  decoration: BoxDecoration(
+                                                    borderRadius: BorderRadius.circular(20),
+                                                    color: Colors.white
+                                                  ),
+                                                  child:Text(post['posts_title'], style: TextStyle(fontSize: 20)),
+                                                ),
+                                                Text("ลิงค์ที่แนบมา:", style: TextStyle(fontSize: 18)),
+                                                SizedBox(height: 10),
+
+                                                InkWell(
+                                                  onTap: post['posts_link'] != null
+                                                      ? () {
+                                                          _launchURL(post['posts_link']);
+                                                        }
+                                                      : null, // ไม่สามารถกดได้ถ้าไม่มีลิงก์
+                                                  child: Text(
+                                                    post['posts_link'] ?? 'ไม่มี',
+                                                    style: TextStyle(
+                                                      color: post['posts_link'] != null
+                                                          ? Colors.blue // สีลิงก์เมื่อมีลิงก์
+                                                          : Color.fromARGB(255, 80, 79, 79), // สีเทาเมื่อไม่มีลิงก์
+                                                    ),
+                                                  ),
+                                                ),
+
+                                                Text("ไฟล์ที่แนบมา:", style: TextStyle(fontSize: 18)), 
+                                                SizedBox(height: 10),
+                                                Column(crossAxisAlignment: CrossAxisAlignment.start,children: files),
+                                                ],
                                               ),
 
-                                              
-                                              Padding(
-                                                padding: EdgeInsets.fromLTRB(20, 10, 0, 5),
-                                                child: Column(
-                                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                                  children: [
-                                                    Text('ลิงค์ที่แนบมา',style: TextStyle(fontSize: 16),),
-                                                    dataAnnounce[index].link == ' - '
-                                                      ? Text('ไม่มี',style: TextStyle(fontSize: 14,color: Color.fromARGB(255, 80, 79, 79)),) // ถ้า link เป็น 'ไม่มี' แสดงข้อความ '-'
-                                                      : GestureDetector(
-                                                          onTap: () {
-                                                            launchURL(dataAnnounce[index].link); // เปิดลิงค์เมื่อคลิก
-                                                          },
-                                                          child: Text(
-                                                            dataAnnounce[index].link,
-                                                            style: TextStyle(fontSize: 14, color: Colors.blue),
-                                                          ),
-                                                        ),
-                                                  ],
-                                                ),
-                                              ),
-
-                                              Padding(
-                                                padding: EdgeInsets.fromLTRB(20, 5, 0, 10),
-                                                child: Column(
-                                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                                  children: [
-                                                    Text('ไฟล์ที่แนบมา',style: TextStyle(fontSize: 16),),
-                                                    dataAnnounce[index].file == ' - '
-                                                      ? Text('ไม่มี',style: TextStyle(fontSize: 14,color: Color.fromARGB(255, 80, 79, 79)),) 
-                                                      : GestureDetector(
-                                                          onTap: () {
-                                                            launchURL(dataAnnounce[index].file); // ดาวน์โหลดไฟล์เมื่อคลิก
-                                                          },
-                                                          child: Text(
-                                                            'ดาวน์โหลดไฟล์',
-                                                            style: TextStyle(fontSize: 14, color: Colors.blue),
-                                                          ),
-                                                        ),
-                                                  ],
-                                                ),
-                                              )                                                                               
-                                            ],
-                                          ),
-                                        ),
-                                        IconButton(
-                                          onPressed: () {
-                                            showDialog(
-                                              context: context,
-                                              builder: (BuildContext context) => Comment_inclass(
-                                                username: widget.username,
-                                                postId: dataAnnounce[index].annonceid,
-                                                ClassroomID : dataAnnounce[index].classroomid,
-                                              ),
-                                            );
-                                            print('ClassroomID: ${dataAnnounce[index].classroomid}');
-                                            print('PostID: ${dataAnnounce[index].annonceid}');
-                                          },
-                                          icon: Icon(Icons.comment, size: 25),
-                                        )
+                                         IconButton(
+                                                onPressed: () {
+                                                  showDialog(
+                                                    context: context,
+                                                    builder: (BuildContext context) => Comment_inclass(
+                                                      username: widget.username,
+                                                      postId: post['posts_auto'],
+                                                      ClassroomID: post['classroom_id'],
+                                                      
+                                                    ),
+                                                  );
+                                                  print("Username: ${widget.username}");
+                                                  print('ClassroomID: ${post['classroom_id']}');
+                                                  print('PostID: ${post['posts_auto']}');
+                                                },
+                                                icon: Icon(Icons.comment, size: 25),
+                                              )
                                       ],
                                     ),
                                   );
                                 },
-                              ),
+                              );
+                              }
+                            }                               
+                            )
                             )
                           ]
                         ),

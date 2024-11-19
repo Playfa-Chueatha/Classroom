@@ -42,73 +42,57 @@ class _CommentState extends State<Comment_inclass> {
     });
 
     if (response.statusCode == 200) {
-
       print('Comment_inclass added successfully');
-      // print(response.body);
-
       _fetchComments();
       textdatacomment.clear();  
+      FocusScope.of(context).unfocus(); // Hide keyboard after comment is added
     } else {
-
       print('Failed to add comment');
     }
   }
 
   Future<void> _fetchComments() async {
-  setState(() {
-    isLoading = true;
-  });
-
-  try {
-    final response = await http.post(
-      Uri.parse('https://www.edueliteroom.com/connect/fetch_comment.php'),
-      body: {
-        'postId': widget.postId.toString(),
-        'classroomId': widget.ClassroomID.toString(),
-      },
-    );
-
     setState(() {
-      isLoading = false;
+      isLoading = true;
     });
 
-    // print("Response Status Code: ${response.statusCode}");
-    // print("Response Body: ${response.body}");  
+    try {
+      final response = await http.post(
+        Uri.parse('https://www.edueliteroom.com/connect/fetch_comment.php'),
+        body: {
+          'postId': widget.postId.toString(),
+          'classroomId': widget.ClassroomID.toString(),
+        },
+      );
 
-    if (response.statusCode == 200) {
+      setState(() {
+        isLoading = false;
+      });
 
-      try {
-   
-        final data = json.decode(response.body);
+      if (response.statusCode == 200) {
+        try {
+          final data = json.decode(response.body); // Decode JSON response
 
-
-        if (data is Map && data.containsKey('error')) {
-          print('Error from server: ${data['error']}');
-          return; 
+          if (data is List) {
+            setState(() {
+              comments = List.from(data); // Update comments list
+            });
+          } else {
+            print("Error: Expected list but got something else");
+          }
+        } catch (e) {
+          print("Error parsing response body: $e");
         }
-
-
-        setState(() {
-          comments = List.from(data); 
-        });
-      } catch (e) {
-
-        print("Error parsing response body: $e");
+      } else {
+        throw Exception('Failed to load comments. Status code: ${response.statusCode}');
       }
-    } else {
-      throw Exception('Failed to load comments. Status code: ${response.statusCode}');
+    } catch (e) {
+      print("Error during HTTP request: $e");
+      setState(() {
+        isLoading = false;
+      });
     }
-  } catch (e) {
-
-    print("Error during HTTP request: $e");
-    setState(() {
-      isLoading = false; 
-    });
   }
-}
-
-
-
 
   @override
   void initState() {
@@ -162,6 +146,7 @@ class _CommentState extends State<Comment_inclass> {
                                         child: Image.asset("assets/images/นักเรียน.png", height: 50, width: 50),
                                       ),
                                       Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
                                           Text('By: ${comments[index]["thfname"]} ${comments[index]["thlname"]}', style: TextStyle(fontSize: 14, fontStyle: FontStyle.italic)),
                                           Text(comments[index]["comment_title"], style: TextStyle(fontSize: 20)),

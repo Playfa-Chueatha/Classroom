@@ -140,7 +140,9 @@ class _Answer_QuestionState extends State<upfilework> with SingleTickerProviderS
           assignmentsauswerq: [], 
           assignmentsonechoice: [], 
           assignmentsmanychoice: [], 
-          thfname: widget.thfname, thlname: widget.thlname, username: widget.username,
+          thfname: widget.thfname, thlname: widget.thlname, 
+          username: widget.username, 
+          classroomMajor: '', classroomName: '', classroomYear: '', classroomNumRoom: '',
         ),
       ),
     );
