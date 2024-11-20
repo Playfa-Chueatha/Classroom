@@ -126,7 +126,6 @@ void _deleteQuestion(int index) {
   }
 
   void _assignWork() {
-    final DateFormat formatter = DateFormat('dd MMM yyyy');
 
     if (_direction.isEmpty || _fullMarks <= 0 ) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -142,19 +141,11 @@ void _deleteQuestion(int index) {
       return;
     }
 
-    final newOneChoice = OneChoice(
-      directionone: _direction,
-      fullMarkone: _fullMarks,
-      dueDateone: _dueDate != null ? formatter.format(_dueDate!) : 'ไม่กำหนด',
-    );
 
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => AssignWork_class_T(
-          assignmentsonechoice: [newOneChoice],
-          assignmentsauswerq: [],
-          assignmentsupfile: [], assignmentsmanychoice: [],
           thfname: widget.thfname, thlname: widget.thlname, username: widget.username, classroomMajor: '', classroomName: '', classroomYear: '', classroomNumRoom: '',
         ),
       ),

@@ -62,10 +62,6 @@ Widget appbarteacher(BuildContext context, String thfname, String thlname, Strin
                 highlightColor: const Color.fromARGB(255, 170, 205, 238),
               ),
               onPressed: () => navigateTo(AssignWork_class_T(
-                assignmentsauswerq: [],
-                assignmentsupfile: [],
-                assignmentsonechoice: [],
-                assignmentsmanychoice: [],
                 username: username, // ส่ง username
                 thfname: thfname, thlname: thlname, classroomMajor: '', classroomName: '', classroomYear: '', classroomNumRoom: '',
               )),

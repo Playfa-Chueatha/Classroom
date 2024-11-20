@@ -27,11 +27,8 @@ class AssignWork_class_T extends StatefulWidget {
   final String classroomYear;
   final String classroomNumRoom;
   const AssignWork_class_T ({
-    super.key, required this.username, 
-    required this.assignmentsauswerq, 
-    required this.assignmentsupfile, 
-    required this.assignmentsonechoice, 
-    required this.assignmentsmanychoice, 
+    super.key, 
+    required this.username, 
     required this.thfname, 
     required this.thlname, 
     required this.classroomName, 
@@ -40,11 +37,6 @@ class AssignWork_class_T extends StatefulWidget {
     required this.classroomNumRoom, 
   });
 
-
-  final List<auswerq> assignmentsauswerq;
-  final List<upfile> assignmentsupfile;
-  final List<OneChoice> assignmentsonechoice;
-  final List<Manychoice> assignmentsmanychoice;
   
   
 
@@ -266,7 +258,15 @@ class _AssignWork_class_TState extends State<AssignWork_class_T> {
                                 onPressed: (){
                                   Navigator.push(
                                       context,
-                                      MaterialPageRoute(builder: (context) =>  Type_work(username: widget.username, thfname: widget.thfname,thlname: widget.thlname,)),); //add_work.dart
+                                      MaterialPageRoute(builder: (context) =>  Type_work(
+                                        username: widget.username, 
+                                        thfname: widget.thfname,
+                                        thlname: widget.thlname,
+                                        classroomName: widget.classroomName,
+                                        classroomMajor: widget.classroomMajor,
+                                        classroomNumRoom: widget.classroomNumRoom,
+                                        classroomYear: widget.classroomYear,
+                                      )),); //add_work.dart
                                 },
                                 style: IconButton.styleFrom(
                                       backgroundColor: Color.fromARGB(255, 147, 185, 221),
@@ -300,122 +300,122 @@ class _AssignWork_class_TState extends State<AssignWork_class_T> {
 
 
                                   // ถาม- ตอบ
-                                  Expanded(
-                                child: ListView.builder(
-                                  itemCount: widget.assignmentsauswerq.length + widget.assignmentsupfile.length + widget.assignmentsonechoice.length + widget.assignmentsmanychoice.length,
-                                  itemBuilder: (context, index) {
-                                    if (index < widget.assignmentsauswerq.length) {
-                                      final auswerq = widget.assignmentsauswerq[index];
-                                      return Card(
-                                      color: Color.fromARGB(255, 255, 255, 255),
-                                      child: 
-                                      ListTile(
-                                        title: Text(auswerq.directionauswerq,style: TextStyle(fontSize: 16),),
-                                        subtitle: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            Text('คะแนนเต็ม: ${auswerq.fullMarksauswerq}'),
-                                            Text('กำหนดส่ง: ${auswerq.dueDateauswerq}'),
-                                              Align(
-                                                alignment: Alignment.centerRight,
-                                                child: ElevatedButton(
-                                                  onPressed: () {
+                              //     Expanded(
+                              //   child: ListView.builder(
+                              //     itemCount: widget.assignmentsauswerq.length + widget.assignmentsupfile.length + widget.assignmentsonechoice.length + widget.assignmentsmanychoice.length,
+                              //     itemBuilder: (context, index) {
+                              //       if (index < widget.assignmentsauswerq.length) {
+                              //         final auswerq = widget.assignmentsauswerq[index];
+                              //         return Card(
+                              //         color: Color.fromARGB(255, 255, 255, 255),
+                              //         child: 
+                              //         ListTile(
+                              //           title: Text(auswerq.directionauswerq,style: TextStyle(fontSize: 16),),
+                              //           subtitle: Column(
+                              //             crossAxisAlignment: CrossAxisAlignment.start,
+                              //             children: [
+                              //               Text('คะแนนเต็ม: ${auswerq.fullMarksauswerq}'),
+                              //               Text('กำหนดส่ง: ${auswerq.dueDateauswerq}'),
+                              //                 Align(
+                              //                   alignment: Alignment.centerRight,
+                              //                   child: ElevatedButton(
+                              //                     onPressed: () {
                                                     
-                                                  },
-                                                  child: Text('รายละเอียด'),
-                                                ),
-                                              )
-                                          ],
-                                        ),
-                                      )
-                                    );
-                                    } 
+                              //                     },
+                              //                     child: Text('รายละเอียด'),
+                              //                   ),
+                              //                 )
+                              //             ],
+                              //           ),
+                              //         )
+                              //       );
+                              //       } 
 
 
-                                    // upfile
-                                    else if (index < widget.assignmentsauswerq.length + widget.assignmentsupfile.length){
-                                      final upfile = widget.assignmentsupfile[index - widget.assignmentsauswerq.length];
-                                      return Card(
-                                      color: Color.fromARGB(255, 255, 255, 255),
-                                      child: 
-                                      ListTile(
-                                        title: Text(upfile.directionupfile,style: TextStyle(fontSize: 16),),
-                                        subtitle: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            Text('คะแนนเต็ม: ${upfile.fullMarksupfile}'),
-                                            Text('กำหนดส่ง: ${upfile.dueDateupfile}'),
-                                              Align(
-                                                alignment: Alignment.centerRight,
-                                                child: ElevatedButton(
-                                                  onPressed: () {
+                              //       // upfile
+                              //       else if (index < widget.assignmentsauswerq.length + widget.assignmentsupfile.length){
+                              //         final upfile = widget.assignmentsupfile[index - widget.assignmentsauswerq.length];
+                              //         return Card(
+                              //         color: Color.fromARGB(255, 255, 255, 255),
+                              //         child: 
+                              //         ListTile(
+                              //           title: Text(upfile.directionupfile,style: TextStyle(fontSize: 16),),
+                              //           subtitle: Column(
+                              //             crossAxisAlignment: CrossAxisAlignment.start,
+                              //             children: [
+                              //               Text('คะแนนเต็ม: ${upfile.fullMarksupfile}'),
+                              //               Text('กำหนดส่ง: ${upfile.dueDateupfile}'),
+                              //                 Align(
+                              //                   alignment: Alignment.centerRight,
+                              //                   child: ElevatedButton(
+                              //                     onPressed: () {
                                                     
-                                                  },
-                                                  child: Text('รายละเอียด'),
-                                                ),
-                                              )
-                                          ],
-                                        ),
-                                      )
-                                    );
-                                    } 
-                                    //onechoice
-                                    else if (index < widget.assignmentsauswerq.length + widget.assignmentsupfile.length + widget.assignmentsonechoice.length){
-                                      final OneChoice = widget.assignmentsonechoice[index - widget.assignmentsauswerq.length - widget.assignmentsupfile.length];
-                                      return Card(
-                                      color: Color.fromARGB(255, 255, 255, 255),
-                                      child: 
-                                      ListTile(
-                                        title: Text(OneChoice.directionone,style: TextStyle(fontSize: 16),),
-                                        subtitle: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            Text('คะแนนเต็ม: ${OneChoice.fullMarkone}'),
-                                            Text('กำหนดส่ง: ${OneChoice.dueDateone}'),
-                                              Align(
-                                                alignment: Alignment.centerRight,
-                                                child: ElevatedButton(
-                                                  onPressed: () {
+                              //                     },
+                              //                     child: Text('รายละเอียด'),
+                              //                   ),
+                              //                 )
+                              //             ],
+                              //           ),
+                              //         )
+                              //       );
+                              //       } 
+                              //       //onechoice
+                              //       else if (index < widget.assignmentsauswerq.length + widget.assignmentsupfile.length + widget.assignmentsonechoice.length){
+                              //         final OneChoice = widget.assignmentsonechoice[index - widget.assignmentsauswerq.length - widget.assignmentsupfile.length];
+                              //         return Card(
+                              //         color: Color.fromARGB(255, 255, 255, 255),
+                              //         child: 
+                              //         ListTile(
+                              //           title: Text(OneChoice.directionone,style: TextStyle(fontSize: 16),),
+                              //           subtitle: Column(
+                              //             crossAxisAlignment: CrossAxisAlignment.start,
+                              //             children: [
+                              //               Text('คะแนนเต็ม: ${OneChoice.fullMarkone}'),
+                              //               Text('กำหนดส่ง: ${OneChoice.dueDateone}'),
+                              //                 Align(
+                              //                   alignment: Alignment.centerRight,
+                              //                   child: ElevatedButton(
+                              //                     onPressed: () {
                                                     
-                                                  },
-                                                  child: Text('รายละเอียด'),
-                                                ),
-                                              )
-                                          ],
-                                        ),
-                                      )
-                                    );
-                                    }  
-                                    else {
-                                      final ManyChoice = widget.assignmentsmanychoice[index - widget.assignmentsauswerq.length - widget.assignmentsupfile.length - widget.assignmentsonechoice.length];
-                                      return Card(
-                                      color: Color.fromARGB(255, 255, 255, 255),
-                                      child: 
-                                      ListTile(
-                                        title: Text(ManyChoice.directionmany,style: TextStyle(fontSize: 16),),
-                                        subtitle: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            Text('คะแนนเต็ม: ${ManyChoice.fullMarkmany}'),
-                                            Text('กำหนดส่ง: ${ManyChoice.dueDatemany}'),
-                                              Align(
-                                                alignment: Alignment.centerRight,
-                                                child: ElevatedButton(
-                                                  onPressed: () {
+                              //                     },
+                              //                     child: Text('รายละเอียด'),
+                              //                   ),
+                              //                 )
+                              //             ],
+                              //           ),
+                              //         )
+                              //       );
+                              //       }  
+                              //       else {
+                              //         final ManyChoice = widget.assignmentsmanychoice[index - widget.assignmentsauswerq.length - widget.assignmentsupfile.length - widget.assignmentsonechoice.length];
+                              //         return Card(
+                              //         color: Color.fromARGB(255, 255, 255, 255),
+                              //         child: 
+                              //         ListTile(
+                              //           title: Text(ManyChoice.directionmany,style: TextStyle(fontSize: 16),),
+                              //           subtitle: Column(
+                              //             crossAxisAlignment: CrossAxisAlignment.start,
+                              //             children: [
+                              //               Text('คะแนนเต็ม: ${ManyChoice.fullMarkmany}'),
+                              //               Text('กำหนดส่ง: ${ManyChoice.dueDatemany}'),
+                              //                 Align(
+                              //                   alignment: Alignment.centerRight,
+                              //                   child: ElevatedButton(
+                              //                     onPressed: () {
                                                     
-                                                  },
-                                                  child: Text('รายละเอียด'),
-                                                ),
-                                              )
-                                          ],
-                                        ),
-                                      )
-                                    );
-                                    }        
+                              //                     },
+                              //                     child: Text('รายละเอียด'),
+                              //                   ),
+                              //                 )
+                              //             ],
+                              //           ),
+                              //         )
+                              //       );
+                              //       }        
                                     
-                                  },
-                                ),
-                              ),
+                              //     },
+                              //   ),
+                              // ),
                                 ],
                               )
                               

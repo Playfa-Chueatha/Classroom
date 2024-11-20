@@ -101,7 +101,7 @@ class _List_classroomState extends State<List_classroom_Assignwork> {
                             classroomMajor: classrooms[index]['classroom_major'],
                             classroomYear: classrooms[index]['classroom_year'],
                             classroomNumRoom: classrooms[index]['classroom_numroom'],
-                            username: widget.username, thfname: widget.thfname, thlname: widget.thlname, assignmentsauswerq: [], assignmentsupfile: [], assignmentsonechoice: [], assignmentsmanychoice: [],
+                            username: widget.username, thfname: widget.thfname, thlname: widget.thlname,
                           ),
                         ),
                       );

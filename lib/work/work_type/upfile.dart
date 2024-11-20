@@ -114,8 +114,7 @@ class _Answer_QuestionState extends State<upfilework> with SingleTickerProviderS
     );
   }
 
-  void _assignWork() {
-    final DateFormat formatter = DateFormat('dd MMM yyyy');
+  Future<void> _assignWork() async {
 
     if (_direction.isEmpty || _fullMarks <= 0 ) {
     ScaffoldMessenger.of(context).showSnackBar(
@@ -124,22 +123,11 @@ class _Answer_QuestionState extends State<upfilework> with SingleTickerProviderS
     return;
   }
 
-    final Newupfile= upfile(
-      directionupfile: _direction,
-      fullMarksupfile: _fullMarks,
-      dueDateupfile: _dueDate != null ? formatter.format(_dueDate!) : 'ไม่กำหนด',
-      filesupfile: _files.map((file) => file.name).toList(),
-      linksupfile: _links,
-    );
 
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => AssignWork_class_T(
-          assignmentsupfile: [Newupfile], 
-          assignmentsauswerq: [], 
-          assignmentsonechoice: [], 
-          assignmentsmanychoice: [], 
           thfname: widget.thfname, thlname: widget.thlname, 
           username: widget.username, 
           classroomMajor: '', classroomName: '', classroomYear: '', classroomNumRoom: '',

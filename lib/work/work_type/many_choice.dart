@@ -110,7 +110,6 @@ class _many_choice extends State<many_choice> with SingleTickerProviderStateMixi
   }
 
   void _assignWork() {
-    final DateFormat formatter = DateFormat('dd MMM yyyy');
 
       if (_direction.isEmpty || _fullMarks <=0 ) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -127,20 +126,11 @@ class _many_choice extends State<many_choice> with SingleTickerProviderStateMixi
     }
 
 
-    final newManyChoice = Manychoice(
-      directionmany: _direction,
-      fullMarkmany: _fullMarks,
-      dueDatemany: _dueDate != null ? formatter.format(_dueDate!) : 'ไม่กำหนด',
-    );
 
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => AssignWork_class_T(
-          assignmentsonechoice: [], 
-          assignmentsauswerq: [], 
-          assignmentsupfile: [], 
-          assignmentsmanychoice: [newManyChoice],
           username: widget.username, thfname: widget.thfname,thlname: widget.thlname, classroomMajor: '', classroomName: '', classroomYear: '', classroomNumRoom: '',
           ),
 

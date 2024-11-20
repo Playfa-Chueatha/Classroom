@@ -9,7 +9,20 @@ class Type_work extends StatefulWidget {
   final String username;
   final String thfname;
   final String thlname;
-  const Type_work({super.key, required this.username, required this.thfname, required this.thlname});
+  final String classroomName;
+  final String classroomMajor;
+  final String classroomYear;
+  final String classroomNumRoom;
+  const Type_work({
+    super.key, 
+    required this.username,
+    required this.thfname, 
+    required this.thlname, 
+    required this.classroomName, 
+    required this.classroomMajor, 
+    required this.classroomYear, 
+    required this.classroomNumRoom
+  });
 
   @override
   State<Type_work> createState() => _Type_workState();
@@ -30,7 +43,7 @@ class _Type_workState extends State<Type_work> {
       child: Scaffold(
         backgroundColor: Color.fromARGB(255, 255, 255, 255),
          appBar: AppBar(
-            title: Text("มอบหมายงาน"),
+            title: Text("มอบหมายงาน ${widget.classroomName} ${widget.classroomYear}/${widget.classroomNumRoom} (${widget.classroomMajor})"),
             centerTitle: true,
             backgroundColor: Color.fromARGB(255, 195, 238, 250),
           ),
@@ -60,7 +73,16 @@ class _Type_workState extends State<Type_work> {
             Expanded(
               child: TabBarView(
                 children: [
-                  Center(child: Auswer_Question(username: widget.username, thfname: widget.thfname,thlname: widget.thlname,)),
+                  Center(child: Auswer_Question(
+                    username: widget.username, 
+                    thfname: widget.thfname,
+                    thlname: widget.thlname,
+                    classroomName: widget.classroomName,
+                    classroomMajor: widget.classroomMajor,
+                    classroomNumRoom: widget.classroomNumRoom,
+                    classroomYear: widget.classroomYear,
+                  )
+                  ),
                   Center(child: OneChoice_test(username: widget.username, thfname: widget.thfname,thlname: widget.thlname,)),
                   Center(child: many_choice(username: widget.username, thfname: widget.thfname,thlname: widget.thlname,)),
                   Center(child: upfilework(username: widget.username, thfname: widget.thfname,thlname: widget.thlname,)),

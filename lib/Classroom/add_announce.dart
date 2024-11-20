@@ -32,7 +32,7 @@ class AnnounceClass extends StatefulWidget {
 
 class _AnnounceClassState extends State<AnnounceClass> {
   final formKey = GlobalKey<FormState>();
-  String annoncetext = '';
+  late String annoncetext ;
   String? link;
   List<PlatformFile> selectedFiles = []; // เปลี่ยนจาก single file เป็น list
   TextEditingController linkController = TextEditingController();
@@ -98,10 +98,10 @@ Future<void> _saveFileToPost(int postId, PlatformFile file) async {
       Uri.parse('https://www.edueliteroom.com/connect/save_file.php'), // URL สำหรับอัปโหลดไฟล์
     );
 
-    // เพิ่มข้อมูลไฟล์ในคำขอ
+
     request.fields['post_id'] = postId.toString();
 
-    // ใช้ `bytes` แทน `path` สำหรับการอัปโหลดไฟล์ใน Web
+
     request.files.add(http.MultipartFile.fromBytes(
       'file',
       file.bytes!,
@@ -120,52 +120,6 @@ Future<void> _saveFileToPost(int postId, PlatformFile file) async {
     print('Error: $e');
   }
 }
-
-
-
-
-Future<void> pickAndUploadFile() async {
-  // เลือกไฟล์
-  FilePickerResult? result = await FilePicker.platform.pickFiles(allowMultiple: true);
-
-  if (result != null) {
-    // ไฟล์ที่เลือกมา
-    List<File> files = result.paths.map((path) => File(path!)).toList();
-
-    // ส่งไฟล์ทั้งหมดไปยังเซิร์ฟเวอร์
-    for (var file in files) {
-      await uploadFileToServer(file);
-    }
-  } else {
-    // ผู้ใช้ยกเลิกการเลือกไฟล์
-    print("ผู้ใช้ยกเลิกการเลือกไฟล์");
-  }
-}
-
-Future<void> uploadFileToServer(File file) async {
-  // สร้าง request สำหรับการอัปโหลดไฟล์
-  var request = http.MultipartRequest('POST', Uri.parse('YOUR_SERVER_URL'));
-  
-  // เพิ่มไฟล์เข้าไปใน request
-  var fileBytes = await file.readAsBytes();
-  var multipartFile = http.MultipartFile.fromBytes(
-    'file', 
-    fileBytes, 
-    filename: file.uri.pathSegments.last
-  );
-  
-  request.files.add(multipartFile);
-  
-  // ส่งข้อมูลไปยังเซิร์ฟเวอร์
-  var response = await request.send();
-  
-  if (response.statusCode == 200) {
-    print("ไฟล์ถูกอัปโหลดสำเร็จ");
-  } else {
-    print("การอัปโหลดไฟล์ล้มเหลว");
-  }
-}
-
 
 
 
@@ -224,7 +178,7 @@ Future<void> uploadFileToServer(File file) async {
                       FilePickerResult? result = await FilePicker.platform.pickFiles(allowMultiple: true); // allowMultiple: true เพื่อเลือกหลายไฟล์
                       if (result != null) {
                         setState(() {
-                          selectedFiles = result.files; // เก็บไฟล์ที่เลือกทั้งหมดในรายการ
+                          selectedFiles = result.files; 
                         });
                       }
                     },
