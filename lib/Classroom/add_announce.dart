@@ -95,7 +95,7 @@ Future<void> _saveFileToPost(int postId, PlatformFile file) async {
   try {
     var request = http.MultipartRequest(
       'POST',
-      Uri.parse('https://www.edueliteroom.com/connect/save_file.php'), // URL สำหรับอัปโหลดไฟล์
+      Uri.parse('https://www.edueliteroom.com/connect/save_file.php'),
     );
 
 
@@ -201,7 +201,7 @@ Future<void> _saveFileToPost(int postId, PlatformFile file) async {
                             icon: Icon(Icons.delete, size: 20),
                             onPressed: () {
                               setState(() {
-                                selectedFiles.remove(file); // ลบไฟล์ออกจากรายการ
+                                selectedFiles.remove(file); 
                               });
                             },
                           ),

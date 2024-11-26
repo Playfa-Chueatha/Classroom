@@ -84,12 +84,12 @@ class _Answer_QuestionState extends State<Auswer_Question> {
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         if (data['success']) {
-          final auswerAuto = int.tryParse(data['auswer_auto']);
+          final examsetsAuto = int.tryParse(data['examsets_auto']);
 
-          if (auswerAuto != null) {
-            return auswerAuto; 
+          if (examsetsAuto != null) {
+            return examsetsAuto; 
           } else {
-            throw Exception("Failed to parse auswer_auto as int");
+            throw Exception("Failed to parse examsets_auto as int");
           }
         } else {
           print(data['message']);
@@ -110,7 +110,7 @@ class _Answer_QuestionState extends State<Auswer_Question> {
 
       if (_direction != null && _fullMarks != null && _dueDate != null) {
         try {
-          final auswerId = await saveAssignment(
+          final examsetsId = await saveAssignment(
             direction: _direction!,
             fullMark: _fullMarks!,
             deadline: _dueDate!,
@@ -121,8 +121,8 @@ class _Answer_QuestionState extends State<Auswer_Question> {
             classroomNumRoom: widget.classroomNumRoom,
           );
 
-          if (auswerId != null) {
-            await _submitQuestions(auswerId); 
+          if (examsetsId != null) {
+            await _submitQuestions(examsetsId); 
 
             Navigator.pushReplacement(
               context,
@@ -150,13 +150,13 @@ class _Answer_QuestionState extends State<Auswer_Question> {
     }
   }
 
-  Future<void> _submitQuestions(int auswerId) async {
+  Future<void> _submitQuestions(int examsetsId) async {
     try {
       final response = await http.post(
         Uri.parse('https://www.edueliteroom.com/connect/auswer_question.php'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
-          'auswer_id': auswerId,
+          'examsets_id': examsetsId,
           'questions': _questions,
         }),
       );

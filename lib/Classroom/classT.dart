@@ -11,7 +11,7 @@ import 'package:flutter_esclass_2/Model/menu_t.dart';
 import 'package:flutter_esclass_2/Profile/ProfileT.dart';
 import 'package:flutter_esclass_2/work/add_worktype.dart';
 import 'package:flutter_esclass_2/work/asign_work_T.dart';
-import 'package:flutter_esclass_2/work/work_type/Detail_work.dart';
+import 'package:flutter_esclass_2/work/Detail_work_teacher.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:url_launcher/url_launcher.dart';

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_esclass_2/test.dart';
-import 'package:flutter_esclass_2/work/work_type/auswerQ.dart';
-import 'package:flutter_esclass_2/work/work_type/many_choice.dart';
-import 'package:flutter_esclass_2/work/work_type/one_choice.dart';
-import 'package:flutter_esclass_2/work/work_type/upfile.dart';
+import 'package:flutter_esclass_2/work/auswer/auswerQ.dart';
+import 'package:flutter_esclass_2/work/manychoice/many_choice.dart';
+import 'package:flutter_esclass_2/work/onechoice/one_choice.dart';
+import 'package:flutter_esclass_2/work/upfile/upfile.dart';
 
 class Type_work extends StatefulWidget {
   final String username;
@@ -83,9 +83,33 @@ class _Type_workState extends State<Type_work> {
                     classroomYear: widget.classroomYear,
                   )
                   ),
-                  Center(child: OneChoice_test(username: widget.username, thfname: widget.thfname,thlname: widget.thlname,)),
-                  Center(child: many_choice(username: widget.username, thfname: widget.thfname,thlname: widget.thlname,)),
-                  Center(child: upfilework(username: widget.username, thfname: widget.thfname,thlname: widget.thlname,)),
+                  Center(child: OneChoice_test(
+                    username: widget.username, 
+                    thfname: widget.thfname,
+                    thlname: widget.thlname,
+                    classroomName: widget.classroomName,
+                    classroomMajor: widget.classroomMajor,
+                    classroomNumRoom: widget.classroomNumRoom,
+                    classroomYear: widget.classroomYear,
+                  )),
+                  Center(child: many_choice(
+                    username: widget.username, 
+                    thfname: widget.thfname,
+                    thlname: widget.thlname,
+                    classroomName: widget.classroomName,
+                    classroomMajor: widget.classroomMajor,
+                    classroomNumRoom: widget.classroomNumRoom,
+                    classroomYear: widget.classroomYear,
+                  )),
+                  Center(child: upfilework(
+                    username: widget.username, 
+                    thfname: widget.thfname,
+                    thlname: widget.thlname,
+                    classroomName: widget.classroomName,
+                    classroomMajor: widget.classroomMajor,
+                    classroomNumRoom: widget.classroomNumRoom,
+                    classroomYear: widget.classroomYear,
+                  )),
                 ],
               ),
             ),

@@ -1,5 +1,10 @@
 
 // comment----------------------------------------
+import 'dart:typed_data';
+
+import 'package:file_picker/file_picker.dart';
+import 'package:flutter/material.dart';
+
 class Comment {
   final String commentTime;
   final String commentTitle;
@@ -114,3 +119,100 @@ final List<String> sectionOptions = [
     'สายศิลป์-สังคม',
   ];
 
+
+//-------------------------------------------
+class FileData {
+  final String name;
+  final List<int> bytes;
+
+  FileData({required this.name, required this.bytes});
+
+  // สร้าง constructor ที่ใช้แปลงจาก PlatformFile เป็น FileData
+  FileData.fromPlatformFile(PlatformFile file)
+      : name = file.name,
+        bytes = file.bytes!;
+}
+
+//-----------------------------------------------------
+
+class Examset {
+  final int autoId;
+  final String direction;
+  final int fullMark;
+  final String deadline;
+  final String time;
+  final String type;
+
+  Examset({
+    required this.autoId,
+    required this.direction,
+    required this.fullMark,
+    required this.deadline,
+    required this.time,
+    required this.type,
+  });
+
+  factory Examset.fromJson(Map<String, dynamic> json) {
+    return Examset(
+      autoId: int.parse(json['examsets_auto']),
+      direction: json['examsets_direction'],
+      fullMark: int.parse(json['examsets_fullmark']),
+      deadline: json['examsets_deadline'],
+      time: json['examsets_time'],
+      type: json['examsets_type'],
+    );
+  }
+}
+
+
+//---------------------------------------------
+class Upfile {
+  final int upfileAuto;
+  final int examsetsId;
+  final String upfileName;
+  final int upfileSize;
+  final String upfileType;
+  final String upfileUrl;
+
+  Upfile({
+    required this.upfileAuto,
+    required this.examsetsId,
+    required this.upfileName,
+    required this.upfileSize,
+    required this.upfileType,
+    required this.upfileUrl,
+  });
+
+  factory Upfile.fromJson(Map<String, dynamic> json) {
+    return Upfile(
+      upfileAuto: int.parse(json['upfile_auto']),
+      examsetsId: int.parse(json['examsets_id']),
+      upfileName: json['upfile_name'],
+      upfileSize: int.parse(json['upfile_size']),
+      upfileType: json['upfile_type'],
+      upfileUrl: json['upfile_url'],
+    );
+  }
+}
+
+//------------------------------------------------------------
+
+class AuswerQuestion {
+  final int questionAuto;
+  final int examsetsId;
+  final String questionDetail;
+
+  AuswerQuestion({
+    required this.questionAuto,
+    required this.examsetsId,
+    required this.questionDetail,
+  });
+
+  factory AuswerQuestion.fromJson(Map<String, dynamic> json) {
+    return AuswerQuestion(
+      questionAuto: int.parse(json['question_auto']),
+      examsetsId: int.parse(json['examsets_id']),
+      questionDetail: json['question_detail'],
+    );
+  }
+}

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_esclass_2/Classroom/setting_calss.dart';
-import 'package:flutter_esclass_2/Data/Data_assignwork.dart';
+import 'package:flutter_esclass_2/Data/Data.dart';
 import 'package:flutter_esclass_2/Home/Even.dart';
 import 'package:flutter_esclass_2/Home/homeT.dart';
 import 'package:flutter_esclass_2/Login/login.dart';
@@ -11,8 +11,9 @@ import 'package:flutter_esclass_2/Model/menu_t.dart';
 import 'package:flutter_esclass_2/Profile/ProfileT.dart';
 import 'package:flutter_esclass_2/work/Menu_listclassroom_T_AssignWork.dart';
 import 'package:flutter_esclass_2/work/add_worktype.dart';
-import 'package:flutter_esclass_2/work/work_type/Detail_work.dart';
-import 'package:flutter_esclass_2/work/work_type/auswerQ.dart';
+import 'package:flutter_esclass_2/work/Detail_work_teacher.dart';
+import 'package:flutter_esclass_2/work/auswer/auswerQ.dart';
+import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../Classroom/classT.dart';
 import 'package:http/http.dart' as http;
@@ -47,7 +48,34 @@ class AssignWork_class_T extends StatefulWidget {
 class _AssignWork_class_TState extends State<AssignWork_class_T> {
   late final Map<DateTime, List<Map<String, String>>> _events = {};
   List<Even_teacher> dataevent = [];
-  bool isLoading = true; // Loading state
+  List<Examset> examsets = [];
+  List<Examset> futurexamsets = [];
+  List<Examset> pastDeadlines = [];
+  bool isLoading = true;
+  bool isLoadingExamset = true;
+  final today = DateTime.now();
+  Examset? selectedExam;
+
+  Future<List<Examset>> fetchExamsets(String classroomName, String classroomMajor, String classroomYear, String classroomNumRoom, String username) async {
+  final response = await http.post(
+    Uri.parse('https://www.edueliteroom.com/connect/fetch_examsets.php'),
+    body: {
+      'classroomName': classroomName,
+      'classroomMajor': classroomMajor,
+      'classroomYear': classroomYear,
+      'classroomNumRoom': classroomNumRoom,
+      'username': username,
+    },
+  );
+
+  if (response.statusCode == 200) {
+    List jsonResponse = json.decode(response.body);
+    return jsonResponse.map((data) => Examset.fromJson(data)).toList();
+  } else {
+    throw Exception('ไม่สามารถโหลดงานที่มอบหมายได้');
+  }
+}
+
 
 
 
@@ -65,14 +93,13 @@ class _AssignWork_class_TState extends State<AssignWork_class_T> {
             dataevent.clear();
             isLoading = false;
 
-            List<Even_teacher> todayEvents = []; // Current day's events
-            List<Even_teacher> futureEvents = []; // Future events
+            List<Even_teacher> todayEvents = []; 
+            List<Even_teacher> futureEvents = []; 
 
             for (var event in responseData['data']) {
               DateTime eventDate = DateTime.parse(event['event_usert_date']);
               DateTime today = DateTime.now();
               
-              // Check if the event date is today (ignoring the time)
               if (eventDate.year == today.year && eventDate.month == today.month && eventDate.day == today.day) {
                 todayEvents.add(Even_teacher(
                   Title: event['event_usert_title'],
@@ -88,11 +115,10 @@ class _AssignWork_class_TState extends State<AssignWork_class_T> {
               }
             }
             
-            // Sort today’s and future events by date
             todayEvents.sort((a, b) => DateTime.parse(a.Date).compareTo(DateTime.parse(b.Date)));
             futureEvents.sort((a, b) => DateTime.parse(a.Date).compareTo(DateTime.parse(b.Date)));
 
-            // Combine today’s and future events
+
             dataevent = todayEvents + futureEvents;
           });
         } else {
@@ -113,7 +139,64 @@ class _AssignWork_class_TState extends State<AssignWork_class_T> {
     }
   }
 
-  
+  Future<void> loadExamsets() async {
+  setState(() {
+    isLoadingExamset = true;
+  });
+
+  try {
+    examsets = await fetchExamsets(
+      widget.classroomName,
+      widget.classroomMajor,
+      widget.classroomYear,
+      widget.classroomNumRoom,
+      widget.username,
+    );
+    await filterExamsets(examsets);
+
+  } catch (e) {
+    print("Error fetching examsets: $e");
+  } finally {
+    setState(() {
+      isLoadingExamset = false;
+    });
+  }
+}
+
+
+Future<void> filterExamsets(List<Examset> examsets) async {
+  DateTime currentDate = DateTime.now();
+  DateTime yesterdayDate = currentDate.subtract(Duration(days: 1));
+
+  List<Examset> futureExamsetsTemp = [];
+  List<Examset> pastDeadlinesTemp = [];
+
+  for (var examset in examsets) {
+    DateTime deadlineDate = DateTime.parse(examset.deadline);
+
+    if (deadlineDate.isAfter(currentDate) || deadlineDate.isAtSameMomentAs(currentDate)) {
+      futureExamsetsTemp.add(examset);
+    } else if (deadlineDate.isBefore(yesterdayDate)) {
+      pastDeadlinesTemp.add(examset);
+    }
+  }
+
+
+  setState(() {
+    futurexamsets = futureExamsetsTemp;
+    pastDeadlines = pastDeadlinesTemp;
+  });
+
+}
+
+
+
+
+@override
+void initState() {
+  super.initState();
+  loadExamsets();
+}
 
   @override
   Widget build(BuildContext context) {
@@ -157,7 +240,7 @@ class _AssignWork_class_TState extends State<AssignWork_class_T> {
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
                             Container(
-                              height: 550,
+                              height: 590,
                               width: 350,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(20),
@@ -182,7 +265,7 @@ class _AssignWork_class_TState extends State<AssignWork_class_T> {
                                   ),
                                   
                                   SizedBox(
-                                    height: 400,
+                                    height: 500,
                                     width: 350,
                                     child: List_classroom_Assignwork(thfname: widget.thfname, thlname: widget.thlname, username: widget.username,), // Menu_listclassroom.dart
                                   ),
@@ -290,155 +373,159 @@ class _AssignWork_class_TState extends State<AssignWork_class_T> {
                               margin: EdgeInsets.fromLTRB(0, 0, 0, 50),
                               decoration: BoxDecoration(
                                 color: Color.fromARGB(255, 147, 185, 221),
-                                borderRadius: BorderRadius.circular(20)
+                                borderRadius: BorderRadius.circular(20),
                               ),
                               child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text("งานที่มอบหมาย", style: TextStyle(fontSize: 20),),
+                                  Text(
+                                    "งานที่มอบหมายทั้งหมด (${futurexamsets.length} งาน)",
+                                    style: TextStyle(fontSize: 20),
+                                  ),
+                                  const SizedBox(height: 10),
+                                  isLoadingExamset
+                                      ? Center(
+                                          child: CircularProgressIndicator(),
+                                        )
+                                      : futurexamsets.isEmpty
+                                          ? Center(
+                                              child: Text("ไม่มีงานที่มอบหมาย"),
+                                            )
+                                          : Expanded(
+                                              child: ListView.builder(
+                                                itemCount: futurexamsets.length,
+                                                itemBuilder: (context, index) {
+                                                  final exam = futurexamsets[index];
+                                                  return Card(
+                                                    color: Colors.white,
+                                                    margin: const EdgeInsets.symmetric(vertical: 8),
+                                                    shape: RoundedRectangleBorder(
+                                                      borderRadius: BorderRadius.circular(15),
+                                                    ),
+                                                    elevation: 4,
+                                                    child: Padding(
+                                                      padding: const EdgeInsets.all(16.0),
+                                                      child: Column(
+                                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                                        children: [
+                                                          Text(
+                                                            " ${exam.direction}",
+                                                            style: TextStyle(
+                                                              fontSize: 18,
+                                                              fontWeight: FontWeight.bold,
+                                                            ),
+                                                          ),
+                                                          Row(
+                                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                            children: [
+                                                              Text("คะแนนเต็ม: ${exam.fullMark}"),
+                                                              IconButton(
+                                                              onPressed: () {
+                                                                setState(() {
+                                                                  selectedExam = exam;
+                                                                });
+                                                              }, 
+                                                              icon: Icon(Icons.search),
+                                                            )
 
 
-
-
-                                  // ถาม- ตอบ
-                              //     Expanded(
-                              //   child: ListView.builder(
-                              //     itemCount: widget.assignmentsauswerq.length + widget.assignmentsupfile.length + widget.assignmentsonechoice.length + widget.assignmentsmanychoice.length,
-                              //     itemBuilder: (context, index) {
-                              //       if (index < widget.assignmentsauswerq.length) {
-                              //         final auswerq = widget.assignmentsauswerq[index];
-                              //         return Card(
-                              //         color: Color.fromARGB(255, 255, 255, 255),
-                              //         child: 
-                              //         ListTile(
-                              //           title: Text(auswerq.directionauswerq,style: TextStyle(fontSize: 16),),
-                              //           subtitle: Column(
-                              //             crossAxisAlignment: CrossAxisAlignment.start,
-                              //             children: [
-                              //               Text('คะแนนเต็ม: ${auswerq.fullMarksauswerq}'),
-                              //               Text('กำหนดส่ง: ${auswerq.dueDateauswerq}'),
-                              //                 Align(
-                              //                   alignment: Alignment.centerRight,
-                              //                   child: ElevatedButton(
-                              //                     onPressed: () {
-                                                    
-                              //                     },
-                              //                     child: Text('รายละเอียด'),
-                              //                   ),
-                              //                 )
-                              //             ],
-                              //           ),
-                              //         )
-                              //       );
-                              //       } 
-
-
-                              //       // upfile
-                              //       else if (index < widget.assignmentsauswerq.length + widget.assignmentsupfile.length){
-                              //         final upfile = widget.assignmentsupfile[index - widget.assignmentsauswerq.length];
-                              //         return Card(
-                              //         color: Color.fromARGB(255, 255, 255, 255),
-                              //         child: 
-                              //         ListTile(
-                              //           title: Text(upfile.directionupfile,style: TextStyle(fontSize: 16),),
-                              //           subtitle: Column(
-                              //             crossAxisAlignment: CrossAxisAlignment.start,
-                              //             children: [
-                              //               Text('คะแนนเต็ม: ${upfile.fullMarksupfile}'),
-                              //               Text('กำหนดส่ง: ${upfile.dueDateupfile}'),
-                              //                 Align(
-                              //                   alignment: Alignment.centerRight,
-                              //                   child: ElevatedButton(
-                              //                     onPressed: () {
-                                                    
-                              //                     },
-                              //                     child: Text('รายละเอียด'),
-                              //                   ),
-                              //                 )
-                              //             ],
-                              //           ),
-                              //         )
-                              //       );
-                              //       } 
-                              //       //onechoice
-                              //       else if (index < widget.assignmentsauswerq.length + widget.assignmentsupfile.length + widget.assignmentsonechoice.length){
-                              //         final OneChoice = widget.assignmentsonechoice[index - widget.assignmentsauswerq.length - widget.assignmentsupfile.length];
-                              //         return Card(
-                              //         color: Color.fromARGB(255, 255, 255, 255),
-                              //         child: 
-                              //         ListTile(
-                              //           title: Text(OneChoice.directionone,style: TextStyle(fontSize: 16),),
-                              //           subtitle: Column(
-                              //             crossAxisAlignment: CrossAxisAlignment.start,
-                              //             children: [
-                              //               Text('คะแนนเต็ม: ${OneChoice.fullMarkone}'),
-                              //               Text('กำหนดส่ง: ${OneChoice.dueDateone}'),
-                              //                 Align(
-                              //                   alignment: Alignment.centerRight,
-                              //                   child: ElevatedButton(
-                              //                     onPressed: () {
-                                                    
-                              //                     },
-                              //                     child: Text('รายละเอียด'),
-                              //                   ),
-                              //                 )
-                              //             ],
-                              //           ),
-                              //         )
-                              //       );
-                              //       }  
-                              //       else {
-                              //         final ManyChoice = widget.assignmentsmanychoice[index - widget.assignmentsauswerq.length - widget.assignmentsupfile.length - widget.assignmentsonechoice.length];
-                              //         return Card(
-                              //         color: Color.fromARGB(255, 255, 255, 255),
-                              //         child: 
-                              //         ListTile(
-                              //           title: Text(ManyChoice.directionmany,style: TextStyle(fontSize: 16),),
-                              //           subtitle: Column(
-                              //             crossAxisAlignment: CrossAxisAlignment.start,
-                              //             children: [
-                              //               Text('คะแนนเต็ม: ${ManyChoice.fullMarkmany}'),
-                              //               Text('กำหนดส่ง: ${ManyChoice.dueDatemany}'),
-                              //                 Align(
-                              //                   alignment: Alignment.centerRight,
-                              //                   child: ElevatedButton(
-                              //                     onPressed: () {
-                                                    
-                              //                     },
-                              //                     child: Text('รายละเอียด'),
-                              //                   ),
-                              //                 )
-                              //             ],
-                              //           ),
-                              //         )
-                              //       );
-                              //       }        
-                                    
-                              //     },
-                              //   ),
-                              // ),
+                                                            ],
+                                                          )
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  );
+                                                },
+                                              ),
+                                            ),
                                 ],
-                              )
-                              
+                              ),
                             ),
+
+
 
                             //งานที่เลยกำหนด
                             Container(
                               height: 400,
                               width: 500,
                               padding: EdgeInsets.all(20),
-                              margin: EdgeInsets.fromLTRB(0, 0, 0, 20),
+                              margin: EdgeInsets.fromLTRB(0, 0, 0, 50),
                               decoration: BoxDecoration(
                                 color: Color.fromARGB(255, 147, 185, 221),
-                                borderRadius: BorderRadius.circular(20)
+                                borderRadius: BorderRadius.circular(20),
                               ),
                               child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text("งานที่เลยกำหนดแล้ว", style: TextStyle(fontSize: 20),),
-                                  
-                                  
+                                  Text(
+                                    "งานที่เลยกำหนดแล้วทั้งหมด (${pastDeadlines.length} งาน)",
+                                    style: TextStyle(fontSize: 20),
+                                  ),
+                                  const SizedBox(height: 10),
+                                  isLoadingExamset
+                                      ? Center(
+                                          child: CircularProgressIndicator(),
+                                        )
+                                      : pastDeadlines.isEmpty
+                                          ? Center(
+                                              child: Text("ไม่มีงานที่มอบหมาย"),
+                                            )
+                                          : Expanded(
+                                              child: ListView.builder(
+                                                itemCount: pastDeadlines.length,
+                                                itemBuilder: (context, index) {
+                                                  final exam = pastDeadlines[index];
+                                                  return Card(
+                                                    color: Colors.white,
+                                                    margin: const EdgeInsets.symmetric(vertical: 8),
+                                                    shape: RoundedRectangleBorder(
+                                                      borderRadius: BorderRadius.circular(15),
+                                                    ),
+                                                    elevation: 4,
+                                                    child: Padding(
+                                                      padding: const EdgeInsets.all(16.0),
+                                                      child: Column(
+                                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                                        children: [
+                                                          Text(
+                                                            " ${exam.direction} ",
+                                                            style: TextStyle(
+                                                              fontSize: 18,
+                                                              fontWeight: FontWeight.bold,
+                                                            ),
+                                                          ),
+
+                                                          Row(
+                                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                            children: [
+                                                              Text("คะแนนเต็ม: ${exam.fullMark}"),
+                                                              IconButton(onPressed: (){
+                                                                setState(() {
+                                                                  selectedExam = exam;
+                                                                });
+                                                              }, 
+                                                              icon: Icon(Icons.search))
+
+                                                            ],
+                                                          )
+                                                          
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  );
+                                                },
+                                              ),
+                                            ),
                                 ],
-                              )
+                              ),
                             ),
+
+                            
+
+
+
+
+
                           ]
                         ),
                       ),
@@ -459,6 +546,7 @@ class _AssignWork_class_TState extends State<AssignWork_class_T> {
                           children: [
                             SizedBox(height: 50,),
                             Text("รายละเอียดงาน", style: TextStyle(fontSize: 30),),
+                 
                             Container(
                               alignment: Alignment.center,
                               height: 900,
@@ -467,7 +555,14 @@ class _AssignWork_class_TState extends State<AssignWork_class_T> {
                                 color: Colors.white,
                                 borderRadius: BorderRadius.circular(20)
                               ),
-                              child: Detail_work(),
+                              child: selectedExam != null
+                                    ? Padding(
+                                        padding: EdgeInsets.all(20),
+                                        child: Detail_work(exam: selectedExam!),
+                                      )
+                                    : Center(child: Text("กรุณาเลือกงาน")),
+                              
+                              
                             ),
                           ],
                         ),
@@ -484,3 +579,6 @@ class _AssignWork_class_TState extends State<AssignWork_class_T> {
     );
   }
 }
+
+
+
