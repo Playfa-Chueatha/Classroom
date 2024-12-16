@@ -26,6 +26,12 @@ class _Login_TState extends State<Login_T> {
     super.initState();
   }
 
+  void loginWithPredefinedCredentials() {
+    usert_username.text = "paiyfa11";  
+    usert_password.text = "mild39840";  
+    signIn();  
+  }
+
   Future<void> signIn() async {
     try {
       var client = http.Client();
@@ -176,6 +182,14 @@ class _Login_TState extends State<Login_T> {
                     child: Text("เข้าสู่ระบบ", style: TextStyle(fontSize: size.height * 0.03)),
                   ),
                   SizedBox(height: size.height * 0.05),
+                  
+                  FilledButton(
+                    onPressed: loginWithPredefinedCredentials,
+                    style: FilledButton.styleFrom(
+                      backgroundColor: Color.fromARGB(255, 82, 104, 10),
+                    ),
+                    child: Text("Login"),
+                  ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [

@@ -28,6 +28,12 @@ class _LogintState extends State<Login_S> {
     _isObscurd = true;
   }
 
+  void loginWithPredefinedCredentials() {
+    users_username.text = "Marisa";  
+    users_password.text = "test_student06";  
+    signIn();  
+  }
+
   Future signIn() async {
     try {
       var client = http.Client();
@@ -169,7 +175,14 @@ class _LogintState extends State<Login_S> {
                     ),
                     child: const Text("เข้าสู่ระบบ", style: TextStyle(fontSize: 20)),
                   ),
-                  SizedBox(height: 90),
+                  SizedBox(height: 70),
+                  FilledButton(
+                    onPressed: loginWithPredefinedCredentials,
+                    style: FilledButton.styleFrom(
+                      backgroundColor: Color.fromARGB(255, 82, 104, 10),
+                    ),
+                    child: Text("Login"),
+                  ),
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisAlignment: MainAxisAlignment.center,

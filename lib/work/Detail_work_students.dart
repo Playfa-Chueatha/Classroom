@@ -21,6 +21,8 @@ class _Detail_workState extends State<Detail_work_S> {
   final List<String> links = [];
   List<Upfile> fileData = [];
   List<AuswerQuestion> questionData = [];
+  bool hasSubmitted = false;
+  bool isLoading = true;
 
   Future<void> _fetchData() async {
     final exam = widget.exam;
@@ -50,8 +52,29 @@ class _Detail_workState extends State<Detail_work_S> {
     }
   }
 
+
+
+  Future<bool> _checkSubmitAuswer() async {
+  final response = await http.post(
+    Uri.parse('https://www.edueliteroom.com/connect/check_submit_auswer.php'),
+    body: {
+      'username': widget.username,
+      'examType': widget.exam.type,
+      'examId': widget.exam.autoId.toString(),
+    },
+  );
+
+  if (response.statusCode == 200) {
+    final data = jsonDecode(response.body);
+    return data['exists'] == true; 
+  } else {
+    throw Exception('Failed to check data in submit_auswer');
+  }
+}
+
+
   void _openFile(Upfile file) async {
-    final url = file.upfileUrl; // เปลี่ยนเป็น URL ที่ถูกต้องจาก Upfile
+    final url = file.upfileUrl; 
     if (await canLaunch(url)) {
       await launch(url);
     } else {
@@ -63,18 +86,44 @@ class _Detail_workState extends State<Detail_work_S> {
   void initState() {
     super.initState();
     _fetchData();
+     _checkSubmitAuswer().then((value) {
+    setState(() {
+      hasSubmitted = value;
+      isLoading = false;
+    });
+  });
   }
 
   @override
   void didUpdateWidget(covariant Detail_work_S oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.exam != oldWidget.exam) {
-      _fetchData(); // รีเฟรชข้อมูลใหม่เมื่อ `exam` เปลี่ยนแปลง
+      setState(() {
+        isLoading = true;
+        hasSubmitted = false;
+        fileData.clear();
+        questionData.clear();
+      });
+      _fetchData();
+      _checkSubmitAuswer().then((value) {
+        setState(() {
+          hasSubmitted = value;
+          isLoading = false;
+        });
+      });
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    if (isLoading) {
+    return Scaffold(
+        backgroundColor: Colors.white,
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
     final exam = widget.exam;
 
     return Scaffold(
@@ -132,40 +181,44 @@ class _Detail_workState extends State<Detail_work_S> {
               SizedBox(height: 8),
               Text('ไม่มีไฟล์แนบ'),
               Row(
-                mainAxisAlignment: MainAxisAlignment.end,  // ชิดขวา
+                mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  OutlinedButton(
-                    onPressed: () {
-                     
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => Doauswerstudents(
-                            thfname: widget.thfname,
-                            thlname: widget.thlname,
-                            username: widget.username,
-                            exam: widget.exam, 
-                            questions: questionData,
-                          ), // Replace with your widget
+                  hasSubmitted
+                      ? Text(
+                          'คุณตอบคำถามเรียบร้อยแล้ว',
+                          style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold),
+                        )
+                      : OutlinedButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => Doauswerstudents(
+                                  thfname: widget.thfname,
+                                  thlname: widget.thlname,
+                                  username: widget.username,
+                                  exam: widget.exam,
+                                  questions: questionData,
+                                ),
+                              ),
+                            );
+                          },
+                          child: Text('ไปตอบคำถาม'),
                         ),
-                      );
-
-                    },
-                    child: Text('ไปตอบคำถาม'),
-                  ),
                 ],
               ),
             ],
+
             if (exam.type == 'onechoice') ...[
               Text('ไฟล์ที่แนบมา:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
               SizedBox(height: 8),
               Text('ไม่มีไฟล์แนบ'),
               Row(
-                mainAxisAlignment: MainAxisAlignment.end,  // ชิดขวา
+                mainAxisAlignment: MainAxisAlignment.end, 
                 children: [
                   OutlinedButton(
                     onPressed: () {
-                      // ฟังก์ชันเมื่อกดปุ่ม
+                      
                     },
                     child: Text('แสดงตัวอย่างข้อสอบ'),
                   ),

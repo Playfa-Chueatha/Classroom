@@ -142,6 +142,10 @@ class Examset {
   final String deadline;
   final String time;
   final String type;
+  final String closed;
+  final String inspectionStatus;
+  final int classroomId;
+  final String usertUsername;
 
   Examset({
     required this.autoId,
@@ -150,6 +154,10 @@ class Examset {
     required this.deadline,
     required this.time,
     required this.type,
+    required this.closed,
+    required this.inspectionStatus,
+    required this.classroomId,
+    required this.usertUsername,
   });
 
   factory Examset.fromJson(Map<String, dynamic> json) {
@@ -160,6 +168,10 @@ class Examset {
       deadline: json['examsets_deadline'],
       time: json['examsets_time'],
       type: json['examsets_type'],
+      closed: json['examsets_closed'],
+      inspectionStatus: json['examsets_Inspection_status'],
+      classroomId: int.parse(json['classroom_id']),
+      usertUsername: json['usert_username'],
     );
   }
 }
@@ -201,11 +213,13 @@ class AuswerQuestion {
   final int questionAuto;
   final int examsetsId;
   final String questionDetail;
+  final int questionMark;
 
   AuswerQuestion({
     required this.questionAuto,
     required this.examsetsId,
     required this.questionDetail,
+    required this.questionMark
   });
 
   factory AuswerQuestion.fromJson(Map<String, dynamic> json) {
@@ -213,6 +227,40 @@ class AuswerQuestion {
       questionAuto: int.parse(json['question_auto']),
       examsetsId: int.parse(json['examsets_id']),
       questionDetail: json['question_detail'],
+      questionMark: int.parse(json['auswer_question_score']),
+      
     );
   }
 }
+
+//---------------------ตัวกรองห้องเรียนเพิ่มเพิ่มงาน----------------------------------------------
+class Classroom {
+  final int classroomId;
+  final String classroomName;
+  final String classroomMajor;
+  final String classroomYear;
+  final String classroomNumRoom;
+
+  Classroom({
+    required this.classroomId,
+    required this.classroomName,
+    required this.classroomMajor,
+    required this.classroomYear,
+    required this.classroomNumRoom,
+  });
+
+  factory Classroom.fromJson(Map<String, dynamic> json) {
+    return Classroom(
+      classroomId: json['classroom_id'],
+      classroomName: json['classroom_name'],
+      classroomMajor: json['classroom_major'],
+      classroomYear: json['classroom_year'],
+      classroomNumRoom: json['classroom_numroom'],
+    );
+  }
+}
+
+//-----------------------------------------------------------------------------
+
+
+

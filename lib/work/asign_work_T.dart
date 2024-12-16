@@ -51,10 +51,16 @@ class _AssignWork_class_TState extends State<AssignWork_class_T> {
   List<Examset> examsets = [];
   List<Examset> futurexamsets = [];
   List<Examset> pastDeadlines = [];
+  List<Examset> completeexamsets = [];
   bool isLoading = true;
   bool isLoadingExamset = true;
   final today = DateTime.now();
   Examset? selectedExam;
+  List<bool> successChecks =[];
+  bool isExpandedFuture = false;
+  bool isExpandedPast = false;
+  bool isExapandedcomplete = false;
+  
 
   Future<List<Examset>> fetchExamsets(String classroomName, String classroomMajor, String classroomYear, String classroomNumRoom, String username) async {
   final response = await http.post(
@@ -75,9 +81,6 @@ class _AssignWork_class_TState extends State<AssignWork_class_T> {
     throw Exception('ไม่สามารถโหลดงานที่มอบหมายได้');
   }
 }
-
-
-
 
   Future<void> fetchEvents() async {
     final url = Uri.parse('https://www.edueliteroom.com/connect/event_teacher.php?usert_username=${widget.username}');
@@ -153,6 +156,7 @@ class _AssignWork_class_TState extends State<AssignWork_class_T> {
       widget.username,
     );
     await filterExamsets(examsets);
+    successChecks = List<bool>.filled(futurexamsets.length, false);
 
   } catch (e) {
     print("Error fetching examsets: $e");
@@ -170,32 +174,97 @@ Future<void> filterExamsets(List<Examset> examsets) async {
 
   List<Examset> futureExamsetsTemp = [];
   List<Examset> pastDeadlinesTemp = [];
+  List<Examset> completeexamsets = [];
 
   for (var examset in examsets) {
     DateTime deadlineDate = DateTime.parse(examset.deadline);
-
-    if (deadlineDate.isAfter(currentDate) || deadlineDate.isAtSameMomentAs(currentDate)) {
-      futureExamsetsTemp.add(examset);
-    } else if (deadlineDate.isBefore(yesterdayDate)) {
-      pastDeadlinesTemp.add(examset);
+    
+    
+    if (examset.inspectionStatus == 'complete') {
+      completeexamsets.add(examset); 
+    } else {
+      if (deadlineDate.isAfter(currentDate) || 
+          (deadlineDate.year == currentDate.year &&
+           deadlineDate.month == currentDate.month &&
+           deadlineDate.day == currentDate.day)) {
+        
+        futureExamsetsTemp.add(examset);
+      } else if (deadlineDate.isBefore(yesterdayDate)) {
+       
+        pastDeadlinesTemp.add(examset);
+      }
     }
   }
 
-
+  print('Complete Examsets: ${completeexamsets.length}');
+  
   setState(() {
     futurexamsets = futureExamsetsTemp;
     pastDeadlines = pastDeadlinesTemp;
+    successChecks = List<bool>.filled(futurexamsets.length + pastDeadlines.length, false);
+    this.completeexamsets = completeexamsets;
   });
+}
 
+void showStatusConfirmationDialog(BuildContext context, String title, String message, 
+    VoidCallback onConfirm) {
+  showDialog(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: Text(title),
+      content: Text(message),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(), // ปิด Dialog
+          child: Text('ยกเลิก'),
+        ),
+        TextButton(
+          onPressed: () {
+            Navigator.of(context).pop(); // ปิด Dialog
+            onConfirm(); // เรียกฟังก์ชันเมื่อยืนยัน
+          },
+          child: Text('ยืนยัน'),
+        ),
+      ],
+    ),
+  );
 }
 
 
+
+
+Future<void> updateInspectionStatus(String autoId, bool isChecked) async {
+  try {
+    final response = await http.post(
+      Uri.parse('https://www.edueliteroom.com/connect/examsets_Inspection_status.php'),
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode({
+        'autoId': autoId,  
+        'status': isChecked ? 'complete' : 'Incomplete',  
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      if (data['success'] == true) {
+        print("Status updated successfully.");
+      } else {
+        throw Exception(data['message']);
+      }
+    } else {
+      throw Exception("Failed to update status.");
+    }
+  } catch (e) {
+    print("Error updating status: $e");
+  }
+}
 
 
 @override
 void initState() {
   super.initState();
   loadExamsets();
+  successChecks = List<bool>.filled(futurexamsets.length, false);
 }
 
   @override
@@ -323,7 +392,6 @@ void initState() {
                       ),
                       SizedBox(width: 50,),
 
-
                       //งานที่มอบหมาย
                       Container(
                       height: 1000,
@@ -366,11 +434,10 @@ void initState() {
 
 
                             //งานที่มอบหมาย
-                            Container(
-                              height: 400,
+                           Container(
                               width: 500,
                               padding: EdgeInsets.all(20),
-                              margin: EdgeInsets.fromLTRB(0, 0, 0, 50),
+                              margin: EdgeInsets.fromLTRB(0, 0, 0, 20),
                               decoration: BoxDecoration(
                                 color: Color.fromARGB(255, 147, 185, 221),
                                 borderRadius: BorderRadius.circular(20),
@@ -378,78 +445,128 @@ void initState() {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(
-                                    "งานที่มอบหมายทั้งหมด (${futurexamsets.length} งาน)",
-                                    style: TextStyle(fontSize: 20),
+                                  // Title and Toggle Button
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        "งานที่มอบหมายทั้งหมด (${futurexamsets.length} งาน)",
+                                        style: TextStyle(fontSize: 20),
+                                      ),
+                                      IconButton(
+                                        icon: Icon(
+                                          isExpandedFuture ? Icons.expand_less : Icons.expand_more,
+                                        ),
+                                        onPressed: () {
+                                          setState(() {
+                                            isExpandedFuture = !isExpandedFuture;
+                                          });
+                                        },
+                                      ),
+                                    ],
                                   ),
                                   const SizedBox(height: 10),
-                                  isLoadingExamset
-                                      ? Center(
-                                          child: CircularProgressIndicator(),
-                                        )
-                                      : futurexamsets.isEmpty
-                                          ? Center(
-                                              child: Text("ไม่มีงานที่มอบหมาย"),
-                                            )
-                                          : Expanded(
-                                              child: ListView.builder(
-                                                itemCount: futurexamsets.length,
-                                                itemBuilder: (context, index) {
-                                                  final exam = futurexamsets[index];
-                                                  return Card(
-                                                    color: Colors.white,
-                                                    margin: const EdgeInsets.symmetric(vertical: 8),
-                                                    shape: RoundedRectangleBorder(
-                                                      borderRadius: BorderRadius.circular(15),
-                                                    ),
-                                                    elevation: 4,
-                                                    child: Padding(
-                                                      padding: const EdgeInsets.all(16.0),
-                                                      child: Column(
-                                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                                        children: [
-                                                          Text(
-                                                            " ${exam.direction}",
-                                                            style: TextStyle(
-                                                              fontSize: 18,
-                                                              fontWeight: FontWeight.bold,
-                                                            ),
-                                                          ),
-                                                          Row(
-                                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                            children: [
-                                                              Text("คะแนนเต็ม: ${exam.fullMark}"),
-                                                              IconButton(
-                                                              onPressed: () {
-                                                                setState(() {
-                                                                  selectedExam = exam;
-                                                                });
-                                                              }, 
-                                                              icon: Icon(Icons.search),
-                                                            )
 
-
-                                                            ],
-                                                          )
-                                                        ],
+                                 
+                                  if (isExpandedFuture)
+                                    isLoadingExamset
+                                        ? Center(child: CircularProgressIndicator())
+                                        : futurexamsets.isEmpty
+                                            ? Center(child: Text("ไม่มีงานที่มอบหมาย"))
+                                            : SizedBox(
+                                                height: 500, 
+                                                child: ListView.builder(
+                                                  shrinkWrap: true,
+                                                  itemCount: futurexamsets.length,
+                                                  itemBuilder: (context, index) {
+                                                    final exam = futurexamsets[index];
+                                                    return Card(
+                                                      color: Colors.white,
+                                                      margin: const EdgeInsets.symmetric(vertical: 8),
+                                                      shape: RoundedRectangleBorder(
+                                                        borderRadius: BorderRadius.circular(15),
                                                       ),
-                                                    ),
-                                                  );
-                                                },
+                                                      elevation: 4,
+                                                      child: Padding(
+                                                        padding: const EdgeInsets.all(16.0),
+                                                        child: Column(
+                                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                                          children: [
+                                                            Row(
+                                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                              children: [
+                                                                Text(' ${exam.time}'),
+                                                                ElevatedButton(
+                                                                  onPressed: () {
+                                                                    const String title = 'ยืนยันการเปลี่ยนสถานะ';
+                                                                    const String message = 'คุณต้องการเปลี่ยนสถานะเป็น "ตรวจงานครบแล้ว" ใช่หรือไม่?';
+
+                                                                    showStatusConfirmationDialog(
+                                                                      context,
+                                                                      title,
+                                                                      message,
+                                                                      () async {
+                                                                        await updateInspectionStatus(exam.autoId.toString(), true);
+
+                                                                        setState(() {
+                                                                          successChecks[index] = true; 
+                                                                        });
+
+                                                                        ScaffoldMessenger.of(context).showSnackBar(
+                                                                          SnackBar(content: Text('สถานะเปลี่ยนเป็น "ตรวจงานครบแล้ว"')),
+                                                                        );
+                                                                      },
+                                                                    );
+                                                                  },
+                                                                  style: ElevatedButton.styleFrom(
+                                                                    backgroundColor: Colors.green,
+                                                                  ),
+                                                                  child: Text('ตรวจงานครบแล้ว',style: TextStyle(color: Colors.black),),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                            Text(' ${exam.autoId} Status: ${exam.inspectionStatus} '),
+                                                            Text(
+                                                              " ${exam.direction}",
+                                                              style: TextStyle(
+                                                                fontSize: 18,
+                                                                fontWeight: FontWeight.bold,
+                                                              ),
+                                                            ),
+                                                            Row(
+                                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                              children: [
+                                                                Text("คะแนนเต็ม: ${exam.fullMark}"),
+                                                                IconButton(
+                                                                  onPressed: () {
+                                                                    setState(() {
+                                                                      selectedExam = exam;
+                                                                    });
+                                                                  },
+                                                                  icon: Icon(Icons.search),
+                                                                )
+                                                              ],
+                                                            )
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    );
+                                                  },
+                                                ),
                                               ),
-                                            ),
-                                ],
-                              ),
-                            ),
+                                            ],
+                                          ),
+                                        ),
+
+                                        
 
 
 
                             //งานที่เลยกำหนด
                             Container(
-                              height: 400,
                               width: 500,
                               padding: EdgeInsets.all(20),
-                              margin: EdgeInsets.fromLTRB(0, 0, 0, 50),
+                              margin: EdgeInsets.fromLTRB(0, 0, 0, 20),
                               decoration: BoxDecoration(
                                 color: Color.fromARGB(255, 147, 185, 221),
                                 borderRadius: BorderRadius.circular(20),
@@ -457,36 +574,92 @@ void initState() {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(
-                                    "งานที่เลยกำหนดแล้วทั้งหมด (${pastDeadlines.length} งาน)",
-                                    style: TextStyle(fontSize: 20),
+                                  
+                                  
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        "งานที่เลยกำหนดแล้วทั้งหมด (${pastDeadlines.length} งาน)",
+                                        style: TextStyle(fontSize: 20),
+                                      ),
+                                      IconButton(
+                                        icon: Icon(
+                                          isExpandedPast ? Icons.expand_less : Icons.expand_more,
+                                        ),
+                                        onPressed: () {
+                                          setState(() {
+                                            isExpandedPast = !isExpandedPast;
+                                          });
+                                        },
+                                      ),
+                                    ],
                                   ),
                                   const SizedBox(height: 10),
-                                  isLoadingExamset
-                                      ? Center(
-                                          child: CircularProgressIndicator(),
-                                        )
-                                      : pastDeadlines.isEmpty
-                                          ? Center(
-                                              child: Text("ไม่มีงานที่มอบหมาย"),
-                                            )
-                                          : Expanded(
+
+                                  // Content
+                                  if (isExpandedPast)
+                                    isLoadingExamset
+                                        ? Center(child: CircularProgressIndicator())
+                                        : pastDeadlines.isEmpty
+                                            ? Center(child: Text("ไม่มีงานที่มอบหมาย"))
+                                            : SizedBox( 
+                                              height: 500, 
                                               child: ListView.builder(
+                                                shrinkWrap: true,                                              
                                                 itemCount: pastDeadlines.length,
                                                 itemBuilder: (context, index) {
                                                   final exam = pastDeadlines[index];
-                                                  return Card(
-                                                    color: Colors.white,
-                                                    margin: const EdgeInsets.symmetric(vertical: 8),
-                                                    shape: RoundedRectangleBorder(
-                                                      borderRadius: BorderRadius.circular(15),
-                                                    ),
-                                                    elevation: 4,
-                                                    child: Padding(
-                                                      padding: const EdgeInsets.all(16.0),
-                                                      child: Column(
-                                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                                        children: [
+                                                  if (successChecks.length < pastDeadlines.length) {
+                                                    successChecks = List<bool>.filled(pastDeadlines.length, false);
+                                                  }
+                                                  return Card(  
+                                                    color: Colors.white,  
+                                                    margin: const EdgeInsets.symmetric(vertical: 8),  
+                                                    shape: RoundedRectangleBorder(  
+                                                      borderRadius: BorderRadius.circular(15),  
+                                                    ),  
+                                                    elevation: 4, 
+                                                    child: Padding( 
+                                                      padding: const EdgeInsets.all(16.0),  
+                                                      child: Column(  
+                                                        crossAxisAlignment: 
+                                                            CrossAxisAlignment.start, 
+                                                        children: [ 
+                                                          Row(
+                                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                            children: [
+                                                              Text(' ${exam.time}'),
+                                                              ElevatedButton(
+                                                              onPressed: () {
+                                                                const String title = 'ยืนยันการเปลี่ยนสถานะ';
+                                                                const String message = 'คุณต้องการเปลี่ยนสถานะเป็น "ตรวจงานครบแล้ว" ใช่หรือไม่?';
+
+                                                                showStatusConfirmationDialog(
+                                                                  context,
+                                                                  title,
+                                                                  message,
+                                                                  () async {
+                                                                    await updateInspectionStatus(exam.autoId.toString(), true);
+
+                                                                    setState(() {
+                                                                      successChecks[index] = true; 
+                                                                    });
+
+                                                                    ScaffoldMessenger.of(context).showSnackBar(
+                                                                      SnackBar(content: Text('สถานะเปลี่ยนเป็น "ตรวจงานครบแล้ว"')),
+                                                                    );
+                                                                  },
+                                                                );
+                                                              },
+                                                              style: ElevatedButton.styleFrom(
+                                                                backgroundColor: Colors.green,
+                                                              ),
+                                                              child: Text('ตรวจงานครบแล้ว',style: TextStyle(color: Colors.black),),
+                                                            ),
+                                                            ]),
+
+                                                          Text(' ${exam.autoId} Status: ${exam.inspectionStatus} '),
                                                           Text(
                                                             " ${exam.direction} ",
                                                             style: TextStyle(
@@ -494,45 +667,165 @@ void initState() {
                                                               fontWeight: FontWeight.bold,
                                                             ),
                                                           ),
-
                                                           Row(
-                                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment.spaceBetween,
                                                             children: [
                                                               Text("คะแนนเต็ม: ${exam.fullMark}"),
-                                                              IconButton(onPressed: (){
-                                                                setState(() {
-                                                                  selectedExam = exam;
-                                                                });
-                                                              }, 
-                                                              icon: Icon(Icons.search))
-
+                                                              IconButton(
+                                                                  onPressed: () {
+                                                                    setState(() {
+                                                                      selectedExam = exam;
+                                                                    });
+                                                                  },
+                                                                  icon: Icon(Icons.search))
                                                             ],
                                                           )
-                                                          
                                                         ],
                                                       ),
                                                     ),
                                                   );
                                                 },
+                                              ),)
+                                            ],
+                                          ),
+                                        ),
+
+                                        //งานที่ตรวจสอบแล้วทั้งหมด
+                                        Container(
+                                          width: 500,
+                                          padding: EdgeInsets.all(20),
+                                          margin: EdgeInsets.fromLTRB(0, 0, 0, 20),
+                                          decoration: BoxDecoration(
+                                            color: Color.fromARGB(255, 147, 185, 221),
+                                            borderRadius: BorderRadius.circular(20),
+                                          ),
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Row(
+                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                children: [
+                                                  Text(
+                                                    "งานที่ตรวจสอบแล้วทั้งหมด (${completeexamsets.length} งาน)",
+                                                    style: TextStyle(fontSize: 20),
+                                                  ),
+                                                  IconButton(
+                                                    icon: Icon(
+                                                      isExapandedcomplete ? Icons.expand_less : Icons.expand_more,
+                                                    ),
+                                                    onPressed: () {
+                                                      setState(() {
+                                                        isExapandedcomplete = !isExapandedcomplete;
+                                                      });
+                                                    },
+                                                  ),
+                                                ],
                                               ),
-                                            ),
-                                ],
-                              ),
-                            ),
+                                              const SizedBox(height: 10),
+
+                                              // Content
+                                              if (isExapandedcomplete)
+                                                isLoadingExamset
+                                                    ? Center(child: CircularProgressIndicator())
+                                                    : completeexamsets.isEmpty
+                                                        ? Center(child: Text("ไม่มีงานที่ตรวจสอบแล้ว"))
+                                                        : SizedBox(
+                                                            height: 500,
+                                                            child: ListView.builder(
+                                                              shrinkWrap: true,
+                                                              itemCount: completeexamsets.length,
+                                                              itemBuilder: (context, index) {
+                                                                final exam = completeexamsets[index];
+                                                                if (successChecks.length < completeexamsets.length) {
+                                                                  successChecks = List<bool>.filled(
+                                                                      completeexamsets.length, false);
+                                                                }
+                                                                return Card(
+                                                                  color: Colors.white,
+                                                                  margin: const EdgeInsets.symmetric(vertical: 8),
+                                                                  shape: RoundedRectangleBorder(
+                                                                    borderRadius: BorderRadius.circular(15),
+                                                                  ),
+                                                                  elevation: 4,
+                                                                  child: Padding(
+                                                                    padding: const EdgeInsets.all(16.0),
+                                                                    child: Column(
+                                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                                      children: [
+                                                                        Row(
+                                                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                                          children: [
+                                                                            Text(' ${exam.time}'),
+                                                                           ElevatedButton(
+                                                                              onPressed: () {
+                                                                                const String title = 'ยืนยันการเปลี่ยนสถานะ';
+                                                                                const String message = 'คุณต้องการเปลี่ยนสถานะเป็น "ยังตรวจงานไม่ครบ" ใช่หรือไม่?';
+
+                                                                                showStatusConfirmationDialog(
+                                                                                  context,
+                                                                                  title,
+                                                                                  message,
+                                                                                  () async {
+                                                                                    await updateInspectionStatus(exam.autoId.toString(), false);
+
+                                                                                    setState(() {
+                                                                                      successChecks[index] = false; // อัปเดตสถานะปุ่มในแอป
+                                                                                    });
+
+                                                                                    ScaffoldMessenger.of(context).showSnackBar(
+                                                                                      SnackBar(content: Text('สถานะเปลี่ยนเป็น "ยังตรวจงานไม่ครบ"')),
+                                                                                    );
+                                                                                  },
+                                                                                );
+                                                                              },
+                                                                              style: ElevatedButton.styleFrom(
+                                                                                backgroundColor: Colors.red,
+                                                                              ),
+                                                                              child: Text('ยังตรวจงานไม่ครบ',style: TextStyle(color: Colors.black),),
+                                                                            ),
+
+                                                                          ],
+                                                                        ),
+                                                                        Text(' ${exam.autoId} Status: ${exam.inspectionStatus} '),
+                                                                        Text(
+                                                                          " ${exam.direction} ",
+                                                                          style: TextStyle(
+                                                                            fontSize: 18,
+                                                                            fontWeight: FontWeight.bold,
+                                                                          ),
+                                                                        ),
+                                                                        Row(
+                                                                          mainAxisAlignment:
+                                                                              MainAxisAlignment.spaceBetween,
+                                                                          children: [
+                                                                            Text("คะแนนเต็ม: ${exam.fullMark}"),
+                                                                            IconButton(
+                                                                              onPressed: () {
+                                                                                setState(() {
+                                                                                  selectedExam = exam;
+                                                                                });
+                                                                              },
+                                                                              icon: Icon(Icons.search),
+                                                                            ),
+                                                                          ],
+                                                                        ),
+                                                                      ],
+                                                                    ),
+                                                                  ),
+                                                                );
+                                                              },
+                                                            ),
+                                                          ),
+                                            ],
+                                          ),
+                                        )                      
+                                      ]
+                                    ),
+                                  ),
+                                  SizedBox(width: 20,),
 
                             
-
-
-
-
-
-                          ]
-                        ),
-                      ),
-                      SizedBox(width: 50,),
-
-
-
                       //งายที่มอบหมาย รายละเอียด
                       Container(
                         height: 1000,
@@ -558,7 +851,12 @@ void initState() {
                               child: selectedExam != null
                                     ? Padding(
                                         padding: EdgeInsets.all(20),
-                                        child: Detail_work(exam: selectedExam!),
+                                        child: Detail_work(
+                                          exam: selectedExam!,
+                                          thfname: widget.thfname,
+                                          thlname: widget.thlname,
+                                          username: widget.username,                                
+                                        ),
                                       )
                                     : Center(child: Text("กรุณาเลือกงาน")),
                               

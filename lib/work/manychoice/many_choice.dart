@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_esclass_2/Data/Data.dart';
 import 'package:flutter_esclass_2/work/asign_work_T.dart';
+import 'package:flutter_esclass_2/work/auswer/ClassroomSearchDialog.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -36,17 +37,22 @@ class _many_choice extends State<many_choice> with SingleTickerProviderStateMixi
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   final List<Question> _questions = []; 
   final List<Question> _savedQuestions = []; 
-  late AnimationController _controller;
+
   String? selectedDueDate;
   DateTime? _dueDate;
   String? _direction;
   int? _fullMarks;
   bool isLoading = false;
+  int? totalMark;
+  bool isChecked = false;
+  bool isCheckeddueDate = false;
+  final List<Map<String, dynamic>> _selectedClassrooms = [];
 
   final TextEditingController fullMarksController = TextEditingController();
+  final TextEditingController defaultMark = TextEditingController();
 
 
-   Future<int?> saveAssignment({
+  Future<int?> saveAssignment({
     required String direction,
     required int fullMark,
     required DateTime deadline,
@@ -55,60 +61,64 @@ class _many_choice extends State<many_choice> with SingleTickerProviderStateMixi
     required String classroomMajor,
     required String classroomYear,
     required String classroomNumRoom,
-  }) async {
+    required String isClosed,
+}) async {
     const String apiUrl = "https://www.edueliteroom.com/connect/manychoice_direction.php";
 
-    print("Sending data to PHP: ");
-    print("Direction: $direction");
-    print("FullMark: $fullMark");
-    print("Deadline: ${DateFormat('yyyy-MM-dd').format(deadline)}");
-    print("Username: $username");
-    print("ClassroomName: $classroomName");
-    print("ClassroomMajor: $classroomMajor");
-    print("ClassroomYear: $classroomYear");
-    print("ClassroomNumRoom: $classroomNumRoom");
+    print("Direction: $_direction");
+    print("FullMark: $_fullMarks");
+    print("Deadline: ${DateFormat('yyyy-MM-dd').format(_dueDate!)}");
+    print("Username: ${widget.username}");
+    print("ClassroomName: ${widget.classroomName}");
+    print("ClassroomMajor: ${widget.classroomMajor}");
+    print("ClassroomYear: ${widget.classroomYear}");
+    print("ClassroomNumRoom: ${widget.classroomNumRoom}");
+    print("IsClosed: $isClosed");
+
 
     try {
-      final response = await http.post(
-        Uri.parse(apiUrl),
-        body: {
-          "direction": direction,
-          "fullMark": fullMark.toString(),
-          "deadline": DateFormat('yyyy-MM-dd').format(deadline),
-          "username": username,
-          "classroomName": classroomName,
-          "classroomMajor": classroomMajor,
-          "classroomYear": classroomYear,
-          "classroomNumRoom": classroomNumRoom.toString(),
-        },
-      );
+        final response = await http.post(
+            Uri.parse(apiUrl),
+            body: {
+                "direction": direction,
+                "fullMark": fullMark.toString(),
+                "deadline": DateFormat('yyyy-MM-dd').format(deadline),
+                "username": username,
+                "classroomName": classroomName,
+                "classroomMajor": classroomMajor,
+                "classroomYear": classroomYear,
+                "classroomNumRoom": classroomNumRoom.toString(),
+                "isClosed": isClosed,
+            },
+        );
 
-      print("Response status: ${response.statusCode}");
-      print("Response body: ${response.body}");
+        print("Response status: ${response.statusCode}");
+        print("Response body: ${response.body}");
 
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        if (data['success']) {
-          final examsetsAuto = int.tryParse(data['examsets_auto']);
-          print('$examsetsAuto');
+        if (response.statusCode == 200) {
+            final data = json.decode(response.body);
+            if (data['success']) {
+                final examsetsAuto = int.tryParse(data['examsets_auto']);
+                print('$examsetsAuto');
 
-          if (examsetsAuto != null) {
-            return examsetsAuto; 
-          } else {
-            throw Exception("Failed to parse examsets_auto as int");
-          }
+                if (examsetsAuto != null) {
+                    return examsetsAuto;
+                } else {
+                    throw Exception("ไม่สามารถแปลง examsets_auto เป็น int ได้");
+                }
+            } else {
+                print(data['message']);
+                throw Exception("ข้อผิดพลาดจากเซิร์ฟเวอร์: ${data['message']}");
+            }
         } else {
-          print(data['message']);
+            throw Exception("ไม่สามารถบันทึกการบ้านได้ เซิร์ฟเวอร์เกิดข้อผิดพลาด");
         }
-      } else {
-        print("Failed to save assignment. Server error.");
-      }
     } catch (error) {
-      print("Error: $error");
-      return null;
+        print("Error: $error");
+        return null;
     }
-    return null;
-  }
+}
+
 
 
   void _submitAssignment() async {
@@ -118,81 +128,88 @@ class _many_choice extends State<many_choice> with SingleTickerProviderStateMixi
     if (_direction != null && _fullMarks != null && _dueDate != null) {
       setState(() => isLoading = true);
 
-  
+      final isClosed = isCheckeddueDate ? 'Yes' : 'No'; 
       try {
-        final examsetsId = await saveAssignment(
-          direction: _direction!,
-          fullMark: _fullMarks!,
-          deadline: _dueDate!,
-          username: widget.username,
-          classroomName: widget.classroomName,
-          classroomMajor: widget.classroomMajor,
-          classroomYear: widget.classroomYear,
-          classroomNumRoom: widget.classroomNumRoom,
-        );
-        // print('ExamsetID: $examsetsId');
-        // print('$_savedQuestions');
-        if (examsetsId != null) {
-          List<Map<String, dynamic>> questionsAndChoices = [];
+        // วนลูปส่งข้อมูลไปยังห้องเรียนที่เลือก
+        for (var classroom in _selectedClassrooms) {
+          final examsetsId = await saveAssignment(
+            direction: _direction!,
+            fullMark: _fullMarks!,
+            deadline: _dueDate!,
+            username: widget.username,
+            classroomName: classroom['classroom_name'],
+            classroomMajor: classroom['classroom_major'],
+            classroomYear: classroom['classroom_year'],
+            classroomNumRoom: classroom['classroom_numroom'],
+            isClosed: isClosed, 
+          );
 
-          // เพิ่มคำถามและตัวเลือก
-          for (var question in _savedQuestions) {
-            int index = _savedQuestions.indexOf(question);
-            if (index >= 0 && question.choices.length >= 4) {
-              if (question.choices.every((choice) => choice.controller.text.isNotEmpty)) {
-                questionsAndChoices.add({
-                  'question': question.questionController.text,
-                  'a': question.choices[0].controller.text,
-                  'b': question.choices[1].controller.text,
-                  'c': question.choices[2].controller.text,
-                  'd': question.choices[3].controller.text,
-                  'e': (question.choices.length > 4) ? question.choices[4].controller.text : '',
-                  'f': (question.choices.length > 5) ? question.choices[5].controller.text : '',
-                  'g': (question.choices.length > 6) ? question.choices[6].controller.text : '',
-                  'h': (question.choices.length > 7) ? question.choices[7].controller.text : '',
-                  'answer': convertAnswer(question.selectedAnswers.join(',')),
-                });
+          if (examsetsId != null) {
+            List<Map<String, dynamic>> questionsAndChoices = [];
+
+            // เพิ่มคำถามและตัวเลือกสำหรับแต่ละห้องเรียน
+            for (var question in _savedQuestions) {
+              int index = _savedQuestions.indexOf(question);
+              if (index >= 0 && question.choices.length >= 4) {
+                if (question.choices.every((choice) => choice.controller.text.isNotEmpty)) {
+                  questionsAndChoices.add({
+                    'question': question.questionController.text,
+                    'a': question.choices[0].controller.text,
+                    'b': question.choices[1].controller.text,
+                    'c': question.choices[2].controller.text,
+                    'd': question.choices[3].controller.text,
+                    'e': (question.choices.length > 4) ? question.choices[4].controller.text : '',
+                    'f': (question.choices.length > 5) ? question.choices[5].controller.text : '',
+                    'g': (question.choices.length > 6) ? question.choices[6].controller.text : '',
+                    'h': (question.choices.length > 7) ? question.choices[7].controller.text : '',
+                    'answer': convertAnswer(question.selectedAnswers.join(',')),
+                    'score': question.fullMarkinchoiceController.text
+                  });
+                } else {
+                  debugPrint('ตัวเลือกไม่ครบสำหรับคำถาม: ${question.questionController.text}');
+                }
               } else {
-                debugPrint('ตัวเลือกไม่ครบสำหรับคำถาม: ${question.questionController.text}');
+                debugPrint('คำถามไม่ครบถ้วนหรือไม่มีตัวเลือก: ${question.questionController.text}');
               }
-            } else {
-              debugPrint('คำถามไม่ครบถ้วนหรือไม่มีตัวเลือก: ${question.questionController.text}');
             }
-          }
 
+            print('questionsAndChoices in _submitAssignment: $questionsAndChoices');
+            if (questionsAndChoices.isEmpty) {
+              print('$_savedQuestions');
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                content: Text('กรุณากรอกคำถามและตัวเลือกให้ครบถ้วน'),
+                backgroundColor: Colors.red,
+              ));
+              return;
+            }
 
-          print('questionsAndChoices in _submitAssignment: $questionsAndChoices');
-          if (questionsAndChoices.isEmpty) {
-            print('$_savedQuestions');
+            await saveQuestionsAndChoices(examsetsId, questionsAndChoices);
+          } else {
             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-              content: Text('กรุณากรอกคำถามและตัวเลือกให้ครบถ้วน'),
+              content: Text('ไม่สามารถบันทึกการบ้านได้'),
               backgroundColor: Colors.red,
             ));
-            return;
+            return; // ออกจากลูปหากไม่สามารถบันทึกการบ้านได้
           }
-
-          await saveQuestionsAndChoices(examsetsId, questionsAndChoices);
-
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => AssignWork_class_T(
-              username: widget.username, thfname: widget.thfname, thlname: widget.thlname,
-                classroomMajor: widget.classroomMajor,
-                classroomName: widget.classroomName,
-                classroomNumRoom: widget.classroomNumRoom,
-                classroomYear: widget.classroomYear,
-            )), );
-
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text('ไม่สามารถบันทึกการบ้านได้'),
-            backgroundColor: Colors.red,
-          ));
         }
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => AssignWork_class_T(
+            username: widget.username, 
+            thfname: widget.thfname, 
+            thlname: widget.thlname,
+            classroomMajor: widget.classroomMajor,
+            classroomName: widget.classroomName,
+            classroomNumRoom: widget.classroomNumRoom,
+            classroomYear: widget.classroomYear,
+          )),
+        );
+
       } catch (e) {
         print('$e');
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text('Error: $e'),
+          content: Text('เกิดข้อผิดพลาด: $e'),
           backgroundColor: Colors.red,
         ));
       } finally {
@@ -206,6 +223,8 @@ class _many_choice extends State<many_choice> with SingleTickerProviderStateMixi
     }
   }
 }
+
+
 
 String convertAnswer(String answer) {
   List<String> validAnswers = [];
@@ -280,6 +299,7 @@ Future<void> saveQuestionsAndChoices(
       'g': question['g']?.toString() ?? '',
       'h': question['h']?.toString() ?? '',
       'answer': convertAnswer(question['answer']), 
+      'score': int.tryParse(question['score'].toString()) ?? 0 
     };
   }).toList();
 
@@ -346,6 +366,7 @@ void _saveQuestion(int index) {
       setState(() {
         _savedQuestions.add(_questions[index]);
         _questions.removeAt(index); 
+        _calculateTotalMarks();
       });
 
       print("คำถามที่บันทึก _savedQuestions: ${_savedQuestions.last.questionController.text}");
@@ -355,6 +376,7 @@ void _saveQuestion(int index) {
       }
 
       print("คำตอบที่ถูกต้อง _savedQuestions: ${_savedQuestions.last.selectedAnswers}");
+      print("คะแนน: ${_savedQuestions.last.fullMarkinchoiceController.text}");
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('กรุณากรอกคำถาม ตัวเลือก และเลือกคำตอบที่ถูกต้อง'))
@@ -377,19 +399,34 @@ bool _isQuestionFilled(int index) {
 }
 
 
+  void _calculateTotalMarks() {
+    setState(() {
+      totalMark = _savedQuestions.fold<int?>(0, (sum, question) {
+        int questionMark = int.tryParse(question.fullMarkinchoiceController.text) ?? 0;
+        return sum! + questionMark;
+      });
+      
+      
+      if (totalMark == 0) {
+        totalMark = null;
+      }
+    });
+  }
+
 
 
   @override
   void initState() {
     super.initState();
      _addNewQuestion();
+      _selectedClassrooms.add({
+      'classroom_name': widget.classroomName,
+      'classroom_major': widget.classroomMajor,
+      'classroom_year': widget.classroomYear,
+      'classroom_numroom': widget.classroomNumRoom,
+    });
   }
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
+  
 
   void _addNewQuestion() {
     setState(() {
@@ -434,6 +471,8 @@ bool _isQuestionFilled(int index) {
       });
     }
   }
+
+  
 
 
   @override
@@ -502,21 +541,205 @@ bool _isQuestionFilled(int index) {
                             : null,
                       ),
                     ),
+
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Checkbox(
+                          value: isCheckeddueDate,
+                          onChanged: (bool? value) {
+                            setState(() {
+                              isCheckeddueDate = value ?? false;
+                            });
+                          },
+                        ),
+                        Text(
+                          'ปิดรับงานเมื่อครบกำหนด',
+                          style: const TextStyle(fontSize: 16),
+                        ),
+                      ],
+                    ),
+
                   ],
                 ),),
 
                 Padding(
-                      padding: EdgeInsets.only(top: 20),
-                      child: Align(
-                        alignment: Alignment.centerRight,
-                        child: ElevatedButton(
-                          onPressed: _submitAssignment,
-                          child: Text('มอบหมายงาน'),
+                  padding: EdgeInsets.all(10),
+                  child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Padding(
+                          padding: EdgeInsets.all(10),
+                          child: Row(
+                            children: [
+                              Checkbox(
+                                value: isChecked,
+                                onChanged: (bool? value) {
+                                  if (value != null) {
+                                    setState(() {
+                                      isChecked = value;
+
+                                      if (isChecked) {
+                                        for (var question in _questions) {
+                                          question.fullMarkinchoiceController.text = defaultMark.text;
+                                        }
+                                      }
+                                    });
+                                  }
+                                },
+                              ),
+
+                              Text('กำหนดคะแนนเริ่มต้น'),
+                              SizedBox(width: 10,),
+                              SizedBox(
+                                width: 100,
+                                child: TextFormField(
+                                  controller: defaultMark,
+                                  decoration: const InputDecoration(labelText: 'คะแนนเต็ม'),
+                                  keyboardType: TextInputType.number,
+                                  inputFormatters: [
+                                    FilteringTextInputFormatter.digitsOnly,
+                                  ],
+                                  enabled: isChecked, 
+                                  onChanged: (value) {
+                                      if (isChecked) {
+                                        setState(() {
+                                          for (var question in _questions) {
+                                            question.fullMarkinchoiceController.text = value;
+                                          }
+                                        });
+                                      }
+                                    },
+                                  validator: (value) {
+                                    if (isChecked) {
+                                      if (value == null || value.isEmpty) {
+                                        return 'กรุณากรอกคะแนนเต็ม';
+                                      }
+                                    }
+                                    return null;
+                                  },
+                                  onSaved: (value) {
+                                    defaultMark.text = value ?? '';
+                                  },
+                                ),
+                              ),
+                            ],
+                          )
                         ),
+                          
+                        Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              Text(
+                                'คะแนนรวมทั้งหมด:',
+                                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                              ),
+                              SizedBox(width: 10),
+                              Text(
+                                totalMark != null && totalMark! > 0
+                                    ? '$totalMark คะแนน'
+                                    : 'ยังไม่มีการกรอกคะแนนในแต่ละข้อ',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: totalMark != null && totalMark! > 0 ? Colors.green : Colors.red,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],    
+                    ),
+                ),
+
+                Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start, 
+                    children: [
+                      IconButton(
+                            onPressed: () async {
+                              final selectedClassrooms = await showDialog<List<Map<String, dynamic>>>(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return ClassroomSearchDialog(
+                                    initialSelectedClassrooms: _selectedClassrooms, username: widget.username, 
+                                  );
+                                },
+                              );
+
+                              if (selectedClassrooms != null) {
+                                setState(() {
+                                  _selectedClassrooms.addAll(selectedClassrooms); 
+                                });
+                              }
+                            },
+                            icon: const Icon(Icons.add),
+                          ),
+                          const SizedBox(width: 8),
+                          const Text(
+                            "เพิ่มห้องเรียน",
+                            style: TextStyle(fontSize: 16),
+                          ),
+                        ],
                       ),
                     ),
+                    ListView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: _selectedClassrooms.length,
+                      itemBuilder: (context, index) {
+                        final classroom = _selectedClassrooms[index];
+                        return ListTile(
+                          title: Text(
+                            '${classroom['classroom_name']} - ${classroom['classroom_major']} ',
+                          ),
+                          subtitle: Text(
+                            'ม. ${classroom['classroom_year']}/${classroom['classroom_numroom']}',
+                          ),
+                          trailing: IconButton(
+                            icon: const Icon(Icons.delete, color: Colors.red),
+                            onPressed: () {
+                            
+                              setState(() {
+                                _selectedClassrooms.removeAt(index);
+                              });
+                            },
+                          ),
+                        );
+                      },
+                    ),
 
+                Padding(
+                  padding: EdgeInsets.only(top: 20),
+                  child: Align(
+                    alignment: Alignment.centerRight,
+                    child: ElevatedButton(
+                      onPressed: () {
 
+                        final enteredFullMarks = int.tryParse(fullMarksController.text) ?? 0;
+
+                        if (totalMark != enteredFullMarks) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('คะแนนรวมทั้งหมด ($totalMark) ไม่ตรงกับคะแนนเต็ม (${fullMarksController.text})'),
+                              backgroundColor: Colors.red,
+                              duration: Duration(seconds: 3),
+                            ),
+                          );
+                        } else {
+                          _submitAssignment();
+                        }
+                      },
+                      child: Text('มอบหมายงาน'),
+                    ),
+                  ),
+                ),
+
+             
+                    
             Container(
               height: MediaQuery.of(context).size.height * 0.9,
               decoration: BoxDecoration(
@@ -656,8 +879,41 @@ bool _isQuestionFilled(int index) {
                   });
                 },
               ),
-            ElevatedButton(
-              onPressed: () => _saveQuestion(index),
+
+              Row(
+            children: [
+              if (!isChecked)
+                SizedBox(
+                  width: 100,
+                  child: TextFormField(
+                    controller: question.fullMarkinchoiceController,
+                    inputFormatters: [
+                      FilteringTextInputFormatter.digitsOnly,
+                    ],
+                    decoration: InputDecoration(
+                      labelText: 'คะแนน',
+                    ),
+                    keyboardType: TextInputType.number,
+                  ),
+                )
+              else 
+                Padding(
+                  padding: const EdgeInsets.only(top: 10),
+                  child: Text(
+                    'คะแนน: ${defaultMark.text.isNotEmpty ? defaultMark.text : '0'}',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                ),
+            ],
+          ),
+           ElevatedButton(
+              onPressed: () {
+                
+                if (isChecked) {
+                  question.fullMarkinchoiceController.text = defaultMark.text;
+                }
+                _saveQuestion(index);
+              },
               child: Text('บันทึกคำถาม'),
             ),
           ],
@@ -678,6 +934,7 @@ bool _isQuestionFilled(int index) {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
 
                 Text(
@@ -690,8 +947,14 @@ bool _isQuestionFilled(int index) {
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                 ),
-                
 
+                Expanded(child: Text(
+                  question.fullMarkinchoiceController.text,
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+
+                )
+                ),
+              
                 IconButton(
                   onPressed: () => _editmanyQuestion(questionIndex),
                   icon: Icon(Icons.edit, color: Colors.black,)
@@ -728,6 +991,7 @@ bool _isQuestionFilled(int index) {
 //---------------------------------------------------------
 class Question {
   TextEditingController questionController = TextEditingController();
+  TextEditingController fullMarkinchoiceController = TextEditingController();
   List<Choice> choices = [
     Choice('ก'),
     Choice('ข'),

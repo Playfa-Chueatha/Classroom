@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_esclass_2/Data/Data.dart';
 import 'package:flutter_esclass_2/Model/appbar_students.dart';
+import 'package:flutter_esclass_2/work/asign_work_S.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class Doauswerstudents extends StatefulWidget {
   final List<AuswerQuestion> questions;
@@ -25,10 +28,53 @@ class Doauswerstudents extends StatefulWidget {
 class _DoauswerstudentsState extends State<Doauswerstudents> {
   final Map<int, TextEditingController> _controllers = {}; 
 
+
+
+  void _submitAnswers() async {
+  const url = "https://www.edueliteroom.com/connect/submit_auswer.php";
+  final answers = <Map<String, dynamic>>[];
+
+  for (int i = 0; i < widget.questions.length; i++) {
+    answers.add({
+      'question_id': widget.questions[i].questionAuto,
+      'submit_auswer_reply': _controllers[i]?.text ?? '',
+    });
+  }
+
+  final data = {
+    'examsets_id': widget.exam.autoId,
+    'users_username': widget.username,
+    'answers': answers,
+  };
+
+  final response = await http.post(
+    Uri.parse(url),
+    headers: {"Content-Type": "application/json"},
+    body: jsonEncode(data),
+  );
+
+  if (response.statusCode == 200) {
+    final result = jsonDecode(response.body);
+    if (result['success']) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('ส่งคำตอบสำเร็จ')),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('เกิดข้อผิดพลาดในการส่งคำตอบ')),
+      );
+    }
+  } else {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้')),
+    );
+  }
+}
+
+
   @override
   void initState() {
     super.initState();
-    // สร้าง TextEditingController สำหรับคำถามแต่ละข้อ
     for (int i = 0; i < widget.questions.length; i++) {
       _controllers[i] = TextEditingController();
     }
@@ -36,7 +82,6 @@ class _DoauswerstudentsState extends State<Doauswerstudents> {
 
   @override
   void dispose() {
-    // ลบ TextEditingController เมื่อ Widget ถูกลบ
     for (var controller in _controllers.values) {
       controller.dispose();
     }
@@ -63,10 +108,19 @@ class _DoauswerstudentsState extends State<Doauswerstudents> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                ' ${exam.direction}',
-                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+
+              Row(
+                children: [
+                   Text(
+                      ' ${exam.direction}',
+                      style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    ),
+
+                    Text(' คะแนนเต็ม ${exam.fullMark} คะแนน', style: const TextStyle(fontSize: 18),),
+
+                ],
               ),
+             
               Text(
                 ' ข้อสอบทั้งหมดจำนวน ${widget.questions.length} ข้อ',
                 style: const TextStyle(fontSize: 14),
@@ -92,7 +146,7 @@ class _DoauswerstudentsState extends State<Doauswerstudents> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'คำถามที่ ${index + 1}: ${question.questionDetail}',
+                            'คำถามที่ ${index + 1}: ${question.questionDetail} คะแนน ${question.questionMark}',
                             style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                           ),
                           const SizedBox(height: 8),
@@ -111,7 +165,17 @@ class _DoauswerstudentsState extends State<Doauswerstudents> {
               const SizedBox(height: 20),
               Center(
                 child: ElevatedButton(
-                  onPressed: (){},
+                  onPressed: (){
+                    _submitAnswers();
+
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => work_body_S( classroomMajor: '', classroomName: '',thfname: widget.thfname,thlname: widget.thlname, classroomNumRoom: '', classroomYear: '',username: widget.username,), // เปลี่ยนให้เป็นหน้า WorkBody_S ที่คุณต้องการไป
+                      ),
+                    );
+
+                  },
                   child: const Text('ส่งคำตอบ'),
                 ),
               ),

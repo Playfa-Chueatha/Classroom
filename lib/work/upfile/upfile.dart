@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter_esclass_2/Data/Data.dart';
 import 'package:flutter_esclass_2/work/asign_work_T.dart';
+import 'package:flutter_esclass_2/work/auswer/ClassroomSearchDialog.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -39,6 +40,8 @@ class _Answer_QuestionState extends State<upfilework> {
   int? _fullMarks;
   String? selectedDueDate;
   DateTime? _dueDate;
+  bool isCheckeddueDate = false;
+  final List<Map<String, dynamic>> _selectedClassrooms = [];
 
   final TextEditingController fullMarksController = TextEditingController();
 
@@ -51,6 +54,8 @@ class _Answer_QuestionState extends State<upfilework> {
   required String classroomMajor,
   required String classroomYear,
   required String classroomNumRoom,
+  required String isClosed,
+  
 }) async {
   const String apiUrl = "https://www.edueliteroom.com/connect/upfile_direction.php";
 
@@ -66,6 +71,7 @@ class _Answer_QuestionState extends State<upfilework> {
         "classroomMajor": classroomMajor,
         "classroomYear": classroomYear,
         "classroomNumRoom": classroomNumRoom,
+        "isClosed": isClosed,
       },
     );
 
@@ -136,6 +142,17 @@ class _Answer_QuestionState extends State<upfilework> {
   }
 }
 
+  @override
+  void initState() {
+    super.initState();
+    fullMarksController.text = _fullMarks?.toString() ?? '';
+     _selectedClassrooms.add({
+      'classroom_name': widget.classroomName,
+      'classroom_major': widget.classroomMajor,
+      'classroom_year': widget.classroomYear,
+      'classroom_numroom': widget.classroomNumRoom,
+    });
+  }
 
 
   Future<void> _selectDueDate() async {
@@ -157,34 +174,50 @@ class _Answer_QuestionState extends State<upfilework> {
   void _submitAssignment() async {
   if (formKey.currentState!.validate()) {
     formKey.currentState!.save();
+
+    final isClosed = isCheckeddueDate ? 'Yes' : 'No'; 
     print("Direction: $_direction, Full Mark: $_fullMarks, Deadline: $_dueDate");
 
     if (_direction != null && _fullMarks != null && _dueDate != null) {
       try {
-        final examsetsId = await saveAssignment(
-          direction: _direction!,
-          fullMark: _fullMarks!,
-          deadline: _dueDate!,
-          username: widget.username,
-          classroomName: widget.classroomName,
-          classroomMajor: widget.classroomMajor,
-          classroomYear: widget.classroomYear,
-          classroomNumRoom: widget.classroomNumRoom,
-        );
+        // เริ่มการวนลูปผ่านห้องเรียนที่เลือก
+        for (var classroom in _selectedClassrooms) {
+          final examsetsId = await saveAssignment(
+            direction: _direction!,
+            fullMark: _fullMarks!,
+            deadline: _dueDate!,
+            username: widget.username,
+            classroomName: classroom['classroom_name'],
+            classroomMajor: classroom['classroom_major'],
+            classroomYear: classroom['classroom_year'],
+            classroomNumRoom: classroom['classroom_numroom'],
+            isClosed: isClosed, 
+          );
 
-        if (examsetsId != null) {
-          await _saveFileToPost(examsetsId, selectedFiles.cast<PlatformFile>());
-
-          Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (context) => AssignWork_class_T(
-                username: widget.username, thfname: widget.thfname, thlname: widget.thlname,
-                classroomMajor: widget.classroomMajor,
-                classroomName: widget.classroomName,
-                classroomNumRoom: widget.classroomNumRoom,
-                classroomYear: widget.classroomYear,
-              )),);
+          if (examsetsId != null) {
+            // บันทึกไฟล์ที่เลือกในแต่ละห้องเรียน
+            await _saveFileToPost(examsetsId, selectedFiles.cast<PlatformFile>());
+          } else {
+            // ถ้าไม่สามารถบันทึกการบ้านได้ ให้แสดงข้อความ
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              content: Text('ไม่สามารถบันทึกการบ้านสำหรับห้องเรียน ${classroom['classroom_name']} ได้'),
+              backgroundColor: Colors.red,
+            ));
+            return; // หยุดการทำงานเมื่อเกิดข้อผิดพลาด
+          }
         }
+
+        // ถ้าบันทึกสำเร็จแล้ว ไปที่หน้าถัดไป
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => AssignWork_class_T(
+            username: widget.username, thfname: widget.thfname, thlname: widget.thlname,
+            classroomMajor: widget.classroomMajor,
+            classroomName: widget.classroomName,
+            classroomNumRoom: widget.classroomNumRoom,
+            classroomYear: widget.classroomYear,
+          )),
+        );
       } catch (e) {
         print('Error: $e');
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -200,6 +233,7 @@ class _Answer_QuestionState extends State<upfilework> {
     }
   }
 }
+
 
   void _showLinkDialog() {
     showDialog(
@@ -279,6 +313,24 @@ class _Answer_QuestionState extends State<upfilework> {
                             _dueDate == null ? 'กรุณาเลือกวันที่กำหนดส่ง' : null,
                       ),
                     ),
+
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Checkbox(
+                          value: isCheckeddueDate,
+                          onChanged: (bool? value) {
+                            setState(() {
+                              isCheckeddueDate = value ?? false;
+                            });
+                          },
+                        ),
+                        Text(
+                          'ปิดรับงานเมื่อครบกำหนด',
+                          style: const TextStyle(fontSize: 16),
+                        ),
+                      ],
+                    ),
                   ],
                 ),
                 Row(
@@ -309,6 +361,64 @@ class _Answer_QuestionState extends State<upfilework> {
                         onPressed: () => setState(() => selectedFiles.remove(file)),
                       ),
                     )),
+
+                Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start, 
+                    children: [
+                      IconButton(
+                            onPressed: () async {
+                              final selectedClassrooms = await showDialog<List<Map<String, dynamic>>>(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return ClassroomSearchDialog(
+                                    initialSelectedClassrooms: _selectedClassrooms, username: widget.username, 
+                                  );
+                                },
+                              );
+
+                              if (selectedClassrooms != null) {
+                                setState(() {
+                                  _selectedClassrooms.addAll(selectedClassrooms); 
+                                });
+                              }
+                            },
+                            icon: const Icon(Icons.add),
+                          ),
+                          const SizedBox(width: 8),
+                          const Text(
+                            "เพิ่มห้องเรียน",
+                            style: TextStyle(fontSize: 16),
+                          ),
+                        ],
+                      ),
+                    ),
+                    ListView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: _selectedClassrooms.length,
+                      itemBuilder: (context, index) {
+                        final classroom = _selectedClassrooms[index];
+                        return ListTile(
+                          title: Text(
+                            '${classroom['classroom_name']} - ${classroom['classroom_major']} ',
+                          ),
+                          subtitle: Text(
+                            'ม. ${classroom['classroom_year']}/${classroom['classroom_numroom']}',
+                          ),
+                          trailing: IconButton(
+                            icon: const Icon(Icons.delete, color: Colors.red),
+                            onPressed: () {
+                            
+                              setState(() {
+                                _selectedClassrooms.removeAt(index);
+                              });
+                            },
+                          ),
+                        );
+                      },
+                    ),
                 ElevatedButton(
                   onPressed: _submitAssignment,
                   child: Text('มอบหมายงาน'),
