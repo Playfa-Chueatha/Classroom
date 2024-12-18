@@ -37,10 +37,16 @@ class _main_home_TState extends State<main_home_T> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color.fromARGB(255, 152, 186, 218),
-        title: Text('Edueliteroom'),
+        backgroundColor: const Color.fromARGB(255, 152, 186, 218),
+        title: Text(
+          'หน้าหลัก',
+        ),
         actions: [
-          appbarteacher(context, widget.thfname, widget.thlname, widget.username),
+          appbarteacher(
+            thfname: widget.thfname,
+            thlname: widget.thlname,
+            username: widget.username,
+          ),
         ],
       ),
       body: FutureBuilder<Map<String, String>>(

@@ -47,6 +47,7 @@ class _work_body_SState extends State<work_body_S> {
   bool isExpandedPast = false;
   bool isExapandedcomplete = false;
   bool hasTodayEvent = false; // เช็คว่ามีงานวันนี้หรือไม่
+  int unreadCount = 0;
 
 
 
@@ -127,6 +128,7 @@ Future<void> loadExamsets() async {
 Future<void> filterExamsets(List<Examset> examsets) async {
   DateTime currentDate = DateTime.now();
   DateTime yesterdayDate = currentDate.subtract(Duration(days: 1));
+   
 
   List<Examset> futureExamsetsTemp = [];
   List<Examset> pastDeadlinesTemp = [];
@@ -265,6 +267,28 @@ bool isToday(String eventDate) {
   );
 }
 
+Future<void> _getUnreadNotifications() async {
+    Notification notificationService = Notification();
+    try {
+      // ส่ง username ที่ได้รับมาจาก widget
+      List<NotificationData> fetchedNotifications =
+          await notificationService.fetchNotifications(widget.username);
+
+      if (fetchedNotifications.isNotEmpty) {
+        // นับจำนวนการแจ้งเตือนที่ยังไม่ได้อ่าน
+        int count = fetchedNotifications
+            .where((notification) => notification.user == 'notread')
+            .length;
+        setState(() {
+          unreadCount = count;
+        });
+      } else {
+        print("ไม่มีข้อมูลการแจ้งเตือน");
+      }
+    } catch (e) {
+      print("เกิดข้อผิดพลาดในการดึงข้อมูลการแจ้งเตือน: $e");
+    }
+  }
 
 
 
@@ -273,6 +297,7 @@ void initState() {
   super.initState();
   loadExamsets();
   fetchEvents();
+  _getUnreadNotifications();
 }
 
 
@@ -284,12 +309,19 @@ void initState() {
     return Scaffold(
       backgroundColor: Color.fromARGB(255, 195, 238, 250),
       appBar: AppBar(
-        backgroundColor: Color.fromARGB(255, 152, 186, 218),
-        title: Text('งานที่ได้รับ วิชา ${widget.classroomName} ${widget.classroomYear}/${widget.classroomNumRoom} (${widget.classroomMajor})'),
-        actions: [
-          appbarstudents(context, widget.thfname, widget.thlname, widget.username),
-        ],
+        backgroundColor: const Color.fromARGB(255, 152, 186, 218),
+        title: Text(
+          'งานที่ได้รับ',
         ),
+        actions: [
+          appbarstudents(
+            thfname: widget.thfname,
+            thlname: widget.thlname,
+            username: widget.username,
+            unreadCount: unreadCount, 
+          ),
+        ],
+      ),
       body: SingleChildScrollView(
         scrollDirection: Axis.vertical,
         child: Column(
@@ -781,3 +813,32 @@ void initState() {
   }
 }
 
+class Notification {
+  final String apiUrl = 'https://www.edueliteroom.com/connect/notification_assingment.php';
+
+  Future<List<NotificationData>> fetchNotifications(String username) async {
+    try {
+      // ส่งข้อมูล username ไปยัง API
+      final response = await http.post(
+        Uri.parse(apiUrl),
+        body: {'username': username},
+      );
+
+
+      if (response.statusCode == 200) {
+
+        var data = json.decode(response.body);
+
+
+        List<dynamic> notifications = data['notifications'];
+
+        return notifications.map((item) => NotificationData.fromMap(item)).toList();
+      } else {
+        throw Exception('Failed to load notifications: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error fetching notifications: $e');
+      return [];
+    }
+  }
+}

@@ -1,7 +1,5 @@
-
-// comment----------------------------------------
 import 'dart:typed_data';
-
+import 'package:intl/intl.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 
@@ -259,6 +257,8 @@ class Classroom {
       classroomNumRoom: json['classroom_numroom'],
     );
   }
+
+  static fromMap(item) {}
 }
 
 //-----------------------------------------------------------------------------
@@ -284,5 +284,61 @@ class Even_teacher {
     required this.ClassID,
   });
 }
+
+//-------notification-------------------
+
+class NotificationData {
+  final int id;
+  final String title;
+  final String classId;
+  final String time;
+  final String dueDate;
+  final String user;
+  final bool readStatus;
+  final String classroomName;
+  final String classroomMajor;
+  final String classroomYear;
+  final String classroomNumRoom;
+
+  NotificationData({
+    required this.id,
+    required this.title,
+    required this.classId,
+    required this.time,
+    required this.dueDate,
+    required this.user,
+    required this.readStatus,
+    required this.classroomName,
+    required this.classroomMajor,
+    required this.classroomYear,
+    required this.classroomNumRoom,
+  });
+
+  factory NotificationData.fromMap(Map<String, dynamic> map) {
+    return NotificationData(
+      id: int.parse(map['notification_assingment_auto']),
+      title: map['notification_assingment_title'],
+      classId: map['notification_assingment_classID'],
+      time: map['notification_assingment_time'],
+      dueDate: map['notification_assingment_duedate'],
+      user: map['notification_assingment_usert'],
+      readStatus: map['notification_assingment_readstatus'] == 'Alreadyread',
+      classroomName: map['classroom_name'] ?? '',
+      classroomMajor: map['classroom_major'] ?? '',
+      classroomYear: map['classroom_year'] ?? '',
+      classroomNumRoom: map['classroom_numroom'] ?? '',
+    );
+  }
+}
+
+
+
+
+
+//----------------------
+
+
+
+
 
 

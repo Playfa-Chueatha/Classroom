@@ -95,13 +95,19 @@ class _DoauswerstudentsState extends State<Doauswerstudents> {
 
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: const Color.fromARGB(255, 152, 186, 218),
-        title: const Text('แบบทดสอบแบบถามตอบ'),
-        actions: [
-          appbarstudents(context, widget.thfname, widget.thlname, widget.username),
-        ],
-      ),
+      // appBar: AppBar(
+      //   backgroundColor: const Color.fromARGB(255, 152, 186, 218),
+      //   title: Text(
+      //     'ตอบคำถาม',
+      //   ),
+      //   actions: [
+      //     appbarstudents(
+      //       thfname: widget.thfname,
+      //       thlname: widget.thlname,
+      //       username: widget.username,
+      //     ),
+      //   ],
+      // ),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(20.0),

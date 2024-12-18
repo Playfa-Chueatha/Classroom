@@ -123,7 +123,6 @@ class _CalendarHomeState extends State<CalendarHome_T> {
                     DateTime checkDay = DateTime(day.year, day.month, day.day); // ตรวจสอบเฉพาะวันที่
                     return _events[checkDay]?.map((event) => '●').toList() ?? [];
                   },
-                  headerVisible: false,
                   calendarStyle: CalendarStyle(
                     markersAutoAligned: true,
                     markerDecoration: BoxDecoration(

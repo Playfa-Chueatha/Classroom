@@ -161,9 +161,16 @@ void sortStudentsremove() {
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 195, 238, 250),
       appBar: AppBar(
-        backgroundColor: const Color.fromARGB(255, 30, 141, 172),
+        backgroundColor: const Color.fromARGB(255, 152, 186, 218),
+        title: Text(
+          'ตั้งค่าห้องเรียน ${widget.classroomName} ${widget.classroomYear}/${widget.classroomNumRoom} (${widget.classroomMajor})',
+        ),
         actions: [
-          appbarteacher(context, widget.thfname, widget.thlname, widget.username),
+          appbarteacher(
+            thfname: widget.thfname,
+            thlname: widget.thlname,
+            username: widget.username,
+          ),
         ],
       ),
       body: SingleChildScrollView(
