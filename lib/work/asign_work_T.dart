@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_esclass_2/Classroom/setting_calss.dart';
 import 'package:flutter_esclass_2/Data/Data.dart';
-import 'package:flutter_esclass_2/Home/Even.dart';
 import 'package:flutter_esclass_2/Home/homeT.dart';
 import 'package:flutter_esclass_2/Login/login.dart';
 import 'package:flutter_esclass_2/Model/Chat.dart';
@@ -46,7 +45,6 @@ class AssignWork_class_T extends StatefulWidget {
 }
 
 class _AssignWork_class_TState extends State<AssignWork_class_T> {
-  late final Map<DateTime, List<Map<String, String>>> _events = {};
   List<Even_teacher> dataevent = [];
   List<Examset> examsets = [];
   List<Examset> futurexamsets = [];
@@ -60,6 +58,7 @@ class _AssignWork_class_TState extends State<AssignWork_class_T> {
   bool isExpandedFuture = false;
   bool isExpandedPast = false;
   bool isExapandedcomplete = false;
+  bool hasTodayEvent = false;
   
 
   Future<List<Examset>> fetchExamsets(String classroomName, String classroomMajor, String classroomYear, String classroomNumRoom, String username) async {
@@ -83,46 +82,45 @@ class _AssignWork_class_TState extends State<AssignWork_class_T> {
 }
 
   Future<void> fetchEvents() async {
-    final url = Uri.parse('https://www.edueliteroom.com/connect/event_teacher.php?usert_username=${widget.username}');
-    
+    final url = Uri.parse('https://www.edueliteroom.com/connect/event_assignment.php?usert_username=${widget.username}');
     try {
       final response = await http.get(url);
       if (response.statusCode == 200) {
         final responseData = jsonDecode(response.body);
-        
+
         if (responseData['status'] == 'success') {
           setState(() {
-            _events.clear();
             dataevent.clear();
             isLoading = false;
+            hasTodayEvent = false;
 
-            List<Even_teacher> todayEvents = []; 
-            List<Even_teacher> futureEvents = []; 
+            for (var event in responseData['data_assignment']) {
+              dataevent.add(Even_teacher(
+                Title: event['event_assignment_title'] ?? '',
+                Date: event['event_assignment_duedate'] ?? '',
+                Time: event['event_assignment_time'] ?? '',
+                Class: event['classroom_name'] ?? '',
+                Major: event['classroom_major'] ?? '',
+                Year: event['classroom_year'] ?? '',
+                Room: event['classroom_numroom'] ?? '',
+                ClassID: event['event_assignment_classID'] ?? '',
+              ));
+            }
 
-            for (var event in responseData['data']) {
-              DateTime eventDate = DateTime.parse(event['event_usert_date']);
-              DateTime today = DateTime.now();
-              
-              if (eventDate.year == today.year && eventDate.month == today.month && eventDate.day == today.day) {
-                todayEvents.add(Even_teacher(
-                  Title: event['event_usert_title'],
-                  Date: event['event_usert_date'],
-                  Time: event['event_usert_time'],
-                ));
-              } else if (eventDate.isAfter(today)) {
-                futureEvents.add(Even_teacher(
-                  Title: event['event_usert_title'],
-                  Date: event['event_usert_date'],
-                  Time: event['event_usert_time'],
-                ));
+            // Sort events: Today first, then future events
+            dataevent.sort((a, b) {
+              final dateA = DateTime.parse(a.Date);
+              final dateB = DateTime.parse(b.Date);
+              return dateA.compareTo(dateB);
+            });
+
+            // Check if today has any events
+            for (var event in dataevent) {
+              if (isToday(event.Date)) {
+                hasTodayEvent = true;
+                break;
               }
             }
-            
-            todayEvents.sort((a, b) => DateTime.parse(a.Date).compareTo(DateTime.parse(b.Date)));
-            futureEvents.sort((a, b) => DateTime.parse(a.Date).compareTo(DateTime.parse(b.Date)));
-
-
-            dataevent = todayEvents + futureEvents;
           });
         } else {
           setState(() {
@@ -131,15 +129,26 @@ class _AssignWork_class_TState extends State<AssignWork_class_T> {
           print('Error: ${responseData['message']}');
         }
       } else {
-        print('Error: ${response.statusCode}'); 
-        print('Response body: ${response.body}');
+        setState(() {
+          isLoading = false;
+        });
+        print('Error: ${response.statusCode}');
       }
     } catch (e) {
-      print('Network error: $e');
       setState(() {
         isLoading = false;
       });
+      print('Network error: $e');
     }
+  }
+  
+
+  bool isToday(String eventDate) {
+    final today = DateTime.now();
+    final eventDateTime = DateTime.parse(eventDate); // Assuming the date is in ISO 8601 format (yyyy-MM-dd)
+    return today.year == eventDateTime.year &&
+           today.month == eventDateTime.month &&
+           today.day == eventDateTime.day;
   }
 
   Future<void> loadExamsets() async {
@@ -265,6 +274,7 @@ void initState() {
   super.initState();
   loadExamsets();
   successChecks = List<bool>.filled(futurexamsets.length, false);
+  fetchEvents();
 }
 
   @override
@@ -309,7 +319,7 @@ void initState() {
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
                             Container(
-                              height: 590,
+                              height: 550,
                               width: 350,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(20),
@@ -345,7 +355,7 @@ void initState() {
                             SizedBox(height: 20),
                           
                             Container(
-                              height: 300,
+                              height: 420,
                               width: 350,
                               decoration: BoxDecoration(
                                 color: Colors.white,
@@ -358,26 +368,47 @@ void initState() {
                                 children: [
                                   SizedBox(height: 20),
                                   Text(
-                                    'กิจกรรมที่กำลังมาถึง',
+                                    'งานที่มอบหมาย',
                                     style: TextStyle(fontSize: 20),
                                   ),
-                                  Expanded(
+
+                                  if (!hasTodayEvent) 
+                                  Container(
+                                    margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                                    decoration: BoxDecoration(
+                                      color: Colors.blue,
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                    child: const ListTile(
+                                      title: Text('- ไม่มีงานที่ต้องส่งในวันนี้ -'),
+                                    ),
+                                  ),
+                                   Expanded(
                                     child: ListView.builder(
                                       itemCount: dataevent.length,
                                       itemBuilder: (context, index) {
+                                        final event = dataevent[index];
+                                        final isEventToday = isToday(event.Date); // Check if it's today
+
                                         return Container(
-                                          margin: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                                          margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
                                           decoration: BoxDecoration(
-                                            color: Color.fromARGB(255, 195, 238, 250),
+                                            color: isEventToday
+                                                ? Colors.blue // Blue for today
+                                                : const Color.fromARGB(255, 195, 238, 250), // Light color for other days
                                             borderRadius: BorderRadius.circular(20),
                                           ),
                                           child: ListTile(
-                                            title: Text(dataevent[index].Title),
-                                            subtitle: Text(
-                                              'วันที่: ${dataevent[index].Date} เวลา: ${dataevent[index].Time} น.',
-                                            ),
+                                            title: Text(event.Title),
+                                            subtitle: Column(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                Text('วันที่สุดท้ายของการส่งงาน: ${event.Date}'),
+                                                Text('วิชา: ${event.Class} (${event.Year}/${event.Room})'),
+                                              ],
+                                            ) 
                                           ),
-                                        ); 
+                                        );
                                       },
                                     ),
                                   ),

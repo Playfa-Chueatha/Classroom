@@ -1,8 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_esclass_2/Classroom/setting_calss.dart';
-import 'package:flutter_esclass_2/Home/Even.dart';
-import 'package:flutter_esclass_2/Model/Menu_listclassroom_T.dart';
+import 'package:flutter_esclass_2/Data/Data.dart';
 import 'package:flutter_esclass_2/Model/Menu_listclassroom_T_inclass.dart';
 import 'package:http/http.dart' as http;
 
@@ -18,53 +17,51 @@ class Menuu_class extends StatefulWidget {
 }
 
 class _MenuState extends State<Menuu_class> {
-  late final Map<DateTime, List<Map<String, String>>> _events = {};
-  List<Even_teacher> dataevent = [];
-  bool isLoading = true; // Loading state
+  List<Even_teacher> dataevent = []; // เก็บข้อมูล Even_teacher
+  bool isLoading = true; // สถานะโหลดข้อมูล
+  bool hasTodayEvent = false; // เช็คว่ามีงานวันนี้หรือไม่
 
+  // ฟังก์ชันดึงข้อมูลจาก API
   Future<void> fetchEvents() async {
-    final url = Uri.parse('https://www.edueliteroom.com/connect/event_teacher.php?usert_username=${widget.username}');
-    
+    final url = Uri.parse('https://www.edueliteroom.com/connect/event_assignment.php?usert_username=${widget.username}');
     try {
       final response = await http.get(url);
       if (response.statusCode == 200) {
         final responseData = jsonDecode(response.body);
-        
+
         if (responseData['status'] == 'success') {
           setState(() {
-            _events.clear();
             dataevent.clear();
             isLoading = false;
+            hasTodayEvent = false;
 
-            List<Even_teacher> todayEvents = []; // Current day's events
-            List<Even_teacher> futureEvents = []; // Future events
+            for (var event in responseData['data_assignment']) {
+              dataevent.add(Even_teacher(
+                Title: event['event_assignment_title'] ?? '',
+                Date: event['event_assignment_duedate'] ?? '',
+                Time: event['event_assignment_time'] ?? '',
+                Class: event['classroom_name'] ?? '',
+                Major: event['classroom_major'] ?? '',
+                Year: event['classroom_year'] ?? '',
+                Room: event['classroom_numroom'] ?? '',
+                ClassID: event['event_assignment_classID'] ?? '',
+              ));
+            }
 
-            for (var event in responseData['data']) {
-              DateTime eventDate = DateTime.parse(event['event_usert_date']);
-              DateTime today = DateTime.now();
-              
-              // Check if the event date is today (ignoring the time)
-              if (eventDate.year == today.year && eventDate.month == today.month && eventDate.day == today.day) {
-                todayEvents.add(Even_teacher(
-                  Title: event['event_usert_title'],
-                  Date: event['event_usert_date'],
-                  Time: event['event_usert_time'],
-                ));
-              } else if (eventDate.isAfter(today)) {
-                futureEvents.add(Even_teacher(
-                  Title: event['event_usert_title'],
-                  Date: event['event_usert_date'],
-                  Time: event['event_usert_time'],
-                ));
+            // Sort events: Today first, then future events
+            dataevent.sort((a, b) {
+              final dateA = DateTime.parse(a.Date);
+              final dateB = DateTime.parse(b.Date);
+              return dateA.compareTo(dateB);
+            });
+
+            // Check if today has any events
+            for (var event in dataevent) {
+              if (isToday(event.Date)) {
+                hasTodayEvent = true;
+                break;
               }
             }
-            
-            // Sort today’s and future events by date
-            todayEvents.sort((a, b) => DateTime.parse(a.Date).compareTo(DateTime.parse(b.Date)));
-            futureEvents.sort((a, b) => DateTime.parse(a.Date).compareTo(DateTime.parse(b.Date)));
-
-            // Combine today’s and future events
-            dataevent = todayEvents + futureEvents;
           });
         } else {
           setState(() {
@@ -73,15 +70,26 @@ class _MenuState extends State<Menuu_class> {
           print('Error: ${responseData['message']}');
         }
       } else {
-        print('Error: ${response.statusCode}'); 
-        print('Response body: ${response.body}');
+        setState(() {
+          isLoading = false;
+        });
+        print('Error: ${response.statusCode}');
       }
     } catch (e) {
-      print('Network error: $e');
       setState(() {
         isLoading = false;
       });
+      print('Network error: $e');
     }
+  }
+
+  // ฟังก์ชันสำหรับตรวจสอบว่าเป็นวันนี้หรือไม่
+  bool isToday(String eventDate) {
+    final today = DateTime.now();
+    final eventDateTime = DateTime.parse(eventDate); // Assuming the date is in ISO 8601 format (yyyy-MM-dd)
+    return today.year == eventDateTime.year &&
+           today.month == eventDateTime.month &&
+           today.day == eventDateTime.day;
   }
 
   @override
@@ -93,113 +101,127 @@ class _MenuState extends State<Menuu_class> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color.fromARGB(255, 195, 238, 250),
+      backgroundColor: const Color.fromARGB(255, 195, 238, 250),
       body: isLoading
-        ? Center(child: CircularProgressIndicator()) // Loading indicator
-        : Column(
-          children: [
-            Container(
-              height: 350,
-              width: 350,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.only(
-                  topRight: Radius.circular(20),
-                  bottomRight: Radius.circular(20),
-                ),
-              ),
-              child: Column(
-                children: [
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(300, 10, 10, 0),
-                    child: IconButton(
-                      tooltip: 'ตั้งค่าห้องเรียน',
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => SettingCalss(thfname: widget.thfname, thlname: widget.thlname, username: widget.username,classroomMajor: '',classroomName: '',classroomNumRoom: '',classroomYear: '',),
-                          ),
-                        );
-                      },
-                      icon: Icon(Icons.settings),
+          ? const Center(child: CircularProgressIndicator()) // แสดง Loading
+          : Column(
+              children: [
+                
+                Container(
+                  height: 450,
+                  width: 350,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: const BorderRadius.only(
+                      topRight: Radius.circular(20),
+                      bottomRight: Radius.circular(20),
                     ),
                   ),
-                  SizedBox(
-                    height: 250,
-                    width: 300,
-                    child: List_classroom_inclass(thfname: widget.thfname, thlname: widget.thlname, username: widget.username,), // Menu_listclassroom.dart
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(300, 10, 10, 0),
+                        child: IconButton(
+                          tooltip: 'ตั้งค่าห้องเรียน',
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => SettingCalss(
+                                  thfname: widget.thfname,
+                                  thlname: widget.thlname,
+                                  username: widget.username,
+                                  classroomMajor: '',
+                                  classroomName: '',
+                                  classroomNumRoom: '',
+                                  classroomYear: '',
+                                ),
+                              ),
+                            );
+                          },
+                          icon: const Icon(Icons.settings),
+                        ),
+                      ),
+                      SizedBox(
+                        height: 350,
+                        width: 300,
+                        child: List_classroom_inclass(
+                          thfname: widget.thfname,
+                          thlname: widget.thlname,
+                          username: widget.username,
+                        ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
-            ),
-            SizedBox(height: 20),
-
-            
-            Container(
-              height: 300,
-              width: 350,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.only(
-                  topRight: Radius.circular(20),
-                  bottomRight: Radius.circular(20),
                 ),
-              ),
-              child: Column(
-                children: const [
-                  SizedBox(height: 20),
-                  Text(
-                    'งานที่มอบหมาย',
-                    style: TextStyle(fontSize: 20),
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(height: 20),
+                const SizedBox(height: 20),
 
-            Container(
-              height: 300,
-              width: 350,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.only(
-                  topRight: Radius.circular(20),
-                  bottomRight: Radius.circular(20),
-                ),
-              ),
-              child: Column(
-                children: [
-                  SizedBox(height: 20),
-                  Text(
-                    'กิจกรรมที่กำลังมาถึง',
-                    style: TextStyle(fontSize: 20),
+                // ส่วนแสดงรายการกิจกรรมที่กำลังมาถึง
+                Container(
+                  height: 530,
+                  width: 350,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: const BorderRadius.only(
+                      topRight: Radius.circular(20),
+                      bottomRight: Radius.circular(20),
+                    ),
                   ),
-                  Expanded(
-                    child: ListView.builder(
-                      itemCount: dataevent.length,
-                      itemBuilder: (context, index) {
-                        return Container(
-                          margin: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                  child: Column(
+                    children: [
+                      const SizedBox(height: 20),
+                      const Text(
+                        'งานที่มอบหมาย',
+                        style: TextStyle(fontSize: 20),
+                      ),
+
+                      // If there is no event today, show the message
+                      if (!hasTodayEvent) 
+                        Container(
+                          margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
                           decoration: BoxDecoration(
-                            color: Color.fromARGB(255, 195, 238, 250),
+                            color: Colors.blue,
                             borderRadius: BorderRadius.circular(20),
                           ),
-                          child: ListTile(
-                            title: Text(dataevent[index].Title),
-                            subtitle: Text(
-                              'วันที่: ${dataevent[index].Date} เวลา: ${dataevent[index].Time} น.',
-                            ),
+                          child: const ListTile(
+                            title: Text('- ไม่มีงานที่ต้องส่งในวันนี้ -'),
                           ),
-                        ); 
-                      },
-                    ),
+                        ),
+
+                      Expanded(
+                        child: ListView.builder(
+                          itemCount: dataevent.length,
+                          itemBuilder: (context, index) {
+                            final event = dataevent[index];
+                            final isEventToday = isToday(event.Date); // Check if it's today
+
+                            return Container(
+                              margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                              decoration: BoxDecoration(
+                                color: isEventToday
+                                    ? Colors.blue // Blue for today
+                                    : const Color.fromARGB(255, 195, 238, 250), // Light color for other days
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: ListTile(
+                                title: Text(event.Title),
+                                subtitle: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text('วันที่สุดท้ายของการส่งงาน: ${event.Date}'),
+                                    Text('วิชา: ${event.Class} (${event.Year}/${event.Room})'),
+                                  ],
+                                ) 
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-          ],
-        ),
     );
   }
 }

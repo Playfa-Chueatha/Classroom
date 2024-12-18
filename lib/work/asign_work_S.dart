@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_esclass_2/Data/Data.dart';
-import 'package:flutter_esclass_2/Home/Even.dart';
 import 'package:flutter_esclass_2/Model/appbar_students.dart';
 import 'package:flutter_esclass_2/Model/menu_t.dart';
 import 'package:flutter_esclass_2/Model/menu_s.dart';
@@ -37,18 +36,25 @@ class _work_body_SState extends State<work_body_S> {
   late final Map<DateTime, List<Map<String, String>>> _events = {};
   List<Examset> examsets = [];   
   bool isLoadingExamset = true;
+  List<Even_teacher> dataevent = [];
   List<Examset> futurexamsets = [];
   List<Examset> pastDeadlines = [];
+  List<Examset> completeexamsets = [];
   bool isLoading = true; 
   Examset? selectedExam;
+  List<bool> successChecks =[];
+  bool isExpandedFuture = false;
+  bool isExpandedPast = false;
+  bool isExapandedcomplete = false;
+  bool hasTodayEvent = false; // เช็คว่ามีงานวันนี้หรือไม่
 
 
 
 
-
-  Future<List<Examset>> fetchExamsets(String classroomName, String classroomMajor, String classroomYear, String classroomNumRoom, String username) async {
+  Future<List<Examset>> fetchExamsets(String classroomName, String classroomMajor,
+    String classroomYear, String classroomNumRoom, String username) async {
   final response = await http.post(
-    Uri.parse('https://www.edueliteroom.com/connect/%20fetch_examsets_students.php'),
+    Uri.parse('https://www.edueliteroom.com/connect/fetch_examsets_students.php'),
     body: {
       'classroomName': classroomName,
       'classroomMajor': classroomMajor,
@@ -58,13 +64,41 @@ class _work_body_SState extends State<work_body_S> {
     },
   );
 
+print("classroomName: $classroomName");
+print("classroomMajor: $classroomMajor");
+print("classroomYear: $classroomYear");
+print("classroomNumRoom: $classroomNumRoom");
+print("username: $username");
+// print("Response Status Code: ${response.statusCode}");
+// print("Response Body: ${response.body}");
+
+
+
+
   if (response.statusCode == 200) {
-    List jsonResponse = json.decode(response.body);
-    return jsonResponse.map((data) => Examset.fromJson(data)).toList();
+    // ตรวจสอบ JSON Response
+    final decodedResponse = json.decode(response.body);
+    
+    if (decodedResponse is Map<String, dynamic>) {
+      // กรณีเป็น Object และมี error
+      if (decodedResponse.containsKey('error')) {
+        throw Exception("ข้อผิดพลาดจากเซิร์ฟเวอร์: ${decodedResponse['error']}");
+      } else {
+        throw Exception("รูปแบบข้อมูลไม่ถูกต้อง: ได้รับ Object แทนที่จะเป็น List");
+      }
+    } else if (decodedResponse is List) {
+      // กรณีเป็น List ให้แปลงเป็น Examset
+      return decodedResponse.map((data) => Examset.fromJson(data)).toList();
+    } else {
+      throw Exception("รูปแบบข้อมูลไม่ถูกต้อง");
+    }
   } else {
-    throw Exception('ไม่สามารถโหลดงานที่มอบหมายได้');
+    throw Exception('ไม่สามารถโหลดข้อมูลจากเซิร์ฟเวอร์ได้');
   }
 }
+
+
+
 
 Future<void> loadExamsets() async {
   setState(() {
@@ -96,87 +130,140 @@ Future<void> filterExamsets(List<Examset> examsets) async {
 
   List<Examset> futureExamsetsTemp = [];
   List<Examset> pastDeadlinesTemp = [];
+  List<Examset> completeExamsetsTemp = []; // เปลี่ยนชื่อจาก completeexamsets
 
   for (var examset in examsets) {
-    DateTime deadlineDate = DateTime.parse(examset.deadline);
-
-    if (deadlineDate.isAfter(currentDate) || deadlineDate.isAtSameMomentAs(currentDate)) {
-      futureExamsetsTemp.add(examset);
-    } else if (deadlineDate.isBefore(yesterdayDate)) {
-      pastDeadlinesTemp.add(examset);
+    DateTime deadlineDate = DateTime.tryParse(examset.deadline) ?? DateTime.now();
+    
+    if (examset.inspectionStatus == 'complete') {
+      completeExamsetsTemp.add(examset); // ใช้ชื่อใหม่
+    } else {
+      if (deadlineDate.isAfter(currentDate) || 
+          (deadlineDate.year == currentDate.year &&
+           deadlineDate.month == currentDate.month &&
+           deadlineDate.day == currentDate.day)) {
+        futureExamsetsTemp.add(examset);
+      } else if (deadlineDate.isBefore(yesterdayDate)) {
+        pastDeadlinesTemp.add(examset);
+      }
     }
   }
-
 
   setState(() {
     futurexamsets = futureExamsetsTemp;
     pastDeadlines = pastDeadlinesTemp;
+    completeexamsets = completeExamsetsTemp;
   });
-
 }
 
 
-Future<void> fetchEvents() async {
-  final url = Uri.parse('https://www.edueliteroom.com/connect/event_students.php?users_username=${widget.username}');
-  
+
+
+void fetchEvents() async {
+  final url = Uri.parse(
+      'https://www.edueliteroom.com/connect/event_assignment_students.php?usert_username=${widget.username}');
   try {
-      final response = await http.get(url);
-      if (response.statusCode == 200) {
-        final responseData = jsonDecode(response.body);
-        
-        if (responseData['status'] == 'success') {
-          setState(() {
-            _events.clear();
-            dataevent.clear();
-            isLoading = false;
+    final response = await http.get(url);
+    
 
-            List<Even_teacher> todayEvents = []; // รายการสำหรับกิจกรรมในวันปัจจุบัน
-            List<Even_teacher> futureEvents = []; // รายการสำหรับกิจกรรมในอนาคต
+    if (response.statusCode == 200) {
+      final responseData = jsonDecode(response.body);
+    
+      if (responseData['status'] == 'success') {
+        setState(() {
+          _events.clear();
+          dataevent.clear();
 
-            for (var event in responseData['data']) {
-              DateTime eventDate = DateTime.parse(event['event_users_date']);
-              
-              // ตรวจสอบกิจกรรมในวันปัจจุบัน
-              if (eventDate.isAtSameMomentAs(DateTime.now())) {
-                todayEvents.add(Even_teacher(
-                  Title: event['event_users_title'],
-                  Date: event['event_users_date'],
-                  Time: event['event_users_time'],
-                ));
-              } 
-              // ตรวจสอบกิจกรรมในอนาคต
-              else if (eventDate.isAfter(DateTime.now())) {
-                futureEvents.add(Even_teacher(
-                  Title: event['event_users_title'],
-                  Date: event['event_users_date'],
-                  Time: event['event_users_time'],
-                ));
+          for (var event in responseData['data_assignment']) {
+            try {
+              // แปลงวันที่กำหนดส่งให้เป็น DateTime object
+              DateTime eventDate = DateTime.parse(event['event_assignment_duedate']);
+              final eventDateKey = DateTime(eventDate.year, eventDate.month, eventDate.day);
+
+              // เพิ่มข้อมูลเหตุการณ์ทั้งหมดไปยัง dataevent
+              dataevent.add(Even_teacher(
+                Title: event['event_assignment_title'] ?? '',
+                Date: event['event_assignment_duedate'] ?? '',
+                Time: event['event_assignment_time'] ?? '',
+                Class: event['classroom_name'] ?? '',
+                Major: event['classroom_major'] ?? '',
+                Year: event['classroom_year'] ?? '',
+                Room: event['classroom_numroom'] ?? '',
+                ClassID: event['event_assignment_classID'] ?? '',
+              ));
+
+              // จัดเก็บข้อมูลทั้งหมดสำหรับ UI
+              if (_events[eventDateKey] == null) {
+                _events[eventDateKey] = [];
               }
+              _events[eventDateKey]!.add({
+                'event': event['event_assignment_title'] ?? '',
+                'date': event['event_assignment_duedate'] ?? '',
+                'time': event['event_assignment_time'] ?? '',
+                'classroom_name': event['classroom_name'] ?? '',
+                'classroom_major': event['classroom_major'] ?? '',
+                'classroom_year': event['classroom_year'] ?? '',
+                'classroom_numroom': event['classroom_numroom'] ?? '',
+                'classID': event['event_assignment_classID'] ?? '',
+              });
+            } catch (e) {
+              print('Error parsing event date: $e');
             }
-            
-            // รวมกิจกรรมในวันปัจจุบันและกิจกรรมในอนาคต
-            dataevent = todayEvents + futureEvents;
-            
-            // เรียงลำดับกิจกรรมในอนาคต
-            futureEvents.sort((a, b) => DateTime.parse(a.Date).compareTo(DateTime.parse(b.Date)));
-          });
-        } else {
-          setState(() {
-            isLoading = false;
-          });
-          print('Error: ${responseData['message']}');
-        }
+          }
+
+          // อัปเดตเหตุการณ์ที่เลือกไว้สำหรับ UI
+        });
       } else {
-        print('Error: ${response.statusCode}'); 
-        print('Response body: ${response.body}');
+        // ใช้ Snackbar เพื่อแจ้งข้อผิดพลาดให้ผู้ใช้
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('Error: ${responseData['message']}'),
+        ));
       }
-    } catch (e) {
-      print('Network error: $e');
-      setState(() {
-        isLoading = false;
-      });
+    } else {
+      // แสดงข้อผิดพลาดเมื่อ HTTP status code ไม่ใช่ 200
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Failed to fetch data: ${response.statusCode}'),
+      ));
     }
+  } catch (e) {
+    print('Network error: $e');
+    // แจ้งข้อผิดพลาดหากเกิดข้อผิดพลาดในการเชื่อมต่อ
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text('Network error: $e'),
+    ));
   }
+}
+bool isToday(String eventDate) {
+    final today = DateTime.now();
+    final eventDateTime = DateTime.parse(eventDate); // Assuming the date is in ISO 8601 format (yyyy-MM-dd)
+    return today.year == eventDateTime.year &&
+           today.month == eventDateTime.month &&
+           today.day == eventDateTime.day;
+  }
+
+  void showStatusConfirmationDialog(BuildContext context, String title, String message, 
+    VoidCallback onConfirm) {
+  showDialog(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: Text(title),
+      content: Text(message),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(), // ปิด Dialog
+          child: Text('ยกเลิก'),
+        ),
+        TextButton(
+          onPressed: () {
+            Navigator.of(context).pop(); // ปิด Dialog
+            onConfirm(); // เรียกฟังก์ชันเมื่อยืนยัน
+          },
+          child: Text('ยืนยัน'),
+        ),
+      ],
+    ),
+  );
+}
 
 
 
@@ -198,7 +285,7 @@ void initState() {
       backgroundColor: Color.fromARGB(255, 195, 238, 250),
       appBar: AppBar(
         backgroundColor: Color.fromARGB(255, 152, 186, 218),
-        title: Text('Edueliteroom'),
+        title: Text('งานที่ได้รับ วิชา ${widget.classroomName} ${widget.classroomYear}/${widget.classroomNumRoom} (${widget.classroomMajor})'),
         actions: [
           appbarstudents(context, widget.thfname, widget.thlname, widget.username),
         ],
@@ -234,7 +321,7 @@ void initState() {
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
                             Container(
-                              height: 590,
+                              height: 550,
                               width: 350,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(20),
@@ -256,45 +343,72 @@ void initState() {
                             SizedBox(height: 20),
                           
                             Container(
-                              height: 300,
-                              width: 350,
+                  height: 420,
+                  width: 350,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: const BorderRadius.only(
+                      topRight: Radius.circular(20),
+                      bottomRight: Radius.circular(20),
+                    ),
+                  ),
+                  child: Column(
+                    children: [
+                      const SizedBox(height: 20),
+                      const Text(
+                        'งานที่มอบหมาย',
+                        style: TextStyle(fontSize: 20),
+                      ),
+
+                      // If there is no event today, show the message
+                      if (!hasTodayEvent) 
+                        Container(
+                          margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                          decoration: BoxDecoration(
+                            color: Colors.blue,
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: const ListTile(
+                            title: Text('- ไม่มีงานที่ต้องส่งในวันนี้ -'),
+                          ),
+                        ),
+
+                      Expanded(
+                        child: ListView.builder(
+                          itemCount: dataevent.length,
+                          itemBuilder: (context, index) {
+                            final event = dataevent[index];
+                            final isEventToday = isToday(event.Date); // Check if it's today
+
+                            return Container(
+                              margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
                               decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.only(
-                                  topRight: Radius.circular(20),
-                                  bottomRight: Radius.circular(20),
-                                ),
+                                color: isEventToday
+                                    ? Colors.blue // Blue for today
+                                    : const Color.fromARGB(255, 195, 238, 250), // Light color for other days
+                                borderRadius: BorderRadius.circular(20),
                               ),
-                              child: Column(
-                                children: [
-                                  SizedBox(height: 20),
-                                  Text(
-                                    'กิจกรรมที่กำลังมาถึง',
-                                    style: TextStyle(fontSize: 20),
-                                  ),
-                                  Expanded(
-                                    child: ListView.builder(
-                                      itemCount: dataevent.length,
-                                      itemBuilder: (context, index) {
-                                        return Container(
-                                          margin: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-                                          decoration: BoxDecoration(
-                                            color: Color.fromARGB(255, 195, 238, 250),
-                                            borderRadius: BorderRadius.circular(20),
-                                          ),
-                                          child: ListTile(
-                                            title: Text(dataevent[index].Title),
-                                            subtitle: Text(
-                                              'วันที่: ${dataevent[index].Date} เวลา: ${dataevent[index].Time} น.',
-                                            ),
-                                          ),
-                                        ); 
-                                      },
-                                    ),
-                                  ),
-                                ],
+                              child: ListTile(
+                                title: Text(event.Title),
+                                subtitle: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text('วันที่สุดท้ายของการส่งงาน: ${event.Date}'),
+                                    Text('วิชา: ${event.Class} (${event.Year}/${event.Room})'),
+                                  ],
+                                ) 
                               ),
-                            ),
+                            );
+                          },
+                        ),
+                      ),
+                  
+                
+                
+              
+            ],
+          ), 
+        ),
 
                           ],
                         ),
@@ -319,10 +433,9 @@ void initState() {
                           
                             //งานที่มอบหมาย
                             Container(
-                              height: 400,
                               width: 500,
                               padding: EdgeInsets.all(20),
-                              margin: EdgeInsets.fromLTRB(0, 0, 0, 50),
+                              margin: EdgeInsets.fromLTRB(0, 0, 0, 20),
                               decoration: BoxDecoration(
                                 color: Color.fromARGB(255, 147, 185, 221),
                                 borderRadius: BorderRadius.circular(20),
@@ -330,78 +443,94 @@ void initState() {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(
-                                    "งานที่มอบหมายทั้งหมด (${futurexamsets.length} งาน)",
-                                    style: TextStyle(fontSize: 20),
+                                  // Title and Toggle Button
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        "งานที่มอบหมายทั้งหมด (${futurexamsets.length} งาน)",
+                                        style: TextStyle(fontSize: 20),
+                                      ),
+                                      IconButton(
+                                        icon: Icon(
+                                          isExpandedFuture ? Icons.expand_less : Icons.expand_more,
+                                        ),
+                                        onPressed: () {
+                                          setState(() {
+                                            isExpandedFuture = !isExpandedFuture;
+                                          });
+                                        },
+                                      ),
+                                    ],
                                   ),
                                   const SizedBox(height: 10),
-                                  isLoadingExamset
-                                      ? Center(
-                                          child: CircularProgressIndicator(),
-                                        )
-                                      : futurexamsets.isEmpty
-                                          ? Center(
-                                              child: Text("ไม่มีงานที่มอบหมาย"),
-                                            )
-                                          : Expanded(
-                                              child: ListView.builder(
-                                                itemCount: futurexamsets.length,
-                                                itemBuilder: (context, index) {
-                                                  final exam = futurexamsets[index];
-                                                  return Card(
-                                                    color: Colors.white,
-                                                    margin: const EdgeInsets.symmetric(vertical: 8),
-                                                    shape: RoundedRectangleBorder(
-                                                      borderRadius: BorderRadius.circular(15),
-                                                    ),
-                                                    elevation: 4,
-                                                    child: Padding(
-                                                      padding: const EdgeInsets.all(16.0),
-                                                      child: Column(
-                                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                                        children: [
-                                                          Text(
-                                                            " ${exam.direction}",
-                                                            style: TextStyle(
-                                                              fontSize: 18,
-                                                              fontWeight: FontWeight.bold,
-                                                            ),
-                                                          ),
-                                                          Row(
-                                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                            children: [
-                                                              Text("คะแนนเต็ม: ${exam.fullMark}"),
-                                                              IconButton(
-                                                              onPressed: () {
-                                                                setState(() {
-                                                                  selectedExam = exam;
-                                                                });
-                                                              }, 
-                                                              icon: Icon(Icons.search),
-                                                            )
 
-
-                                                            ],
-                                                          )
-                                                        ],
+                                 
+                                  if (isExpandedFuture)
+                                    isLoadingExamset
+                                        ? Center(child: CircularProgressIndicator())
+                                        : futurexamsets.isEmpty
+                                            ? Center(child: Text("ไม่มีงานที่มอบหมาย"))
+                                            : SizedBox(
+                                                height: 500, 
+                                                child: ListView.builder(
+                                                  shrinkWrap: true,
+                                                  itemCount: futurexamsets.length,
+                                                  itemBuilder: (context, index) {
+                                                    final exam = futurexamsets[index];
+                                                    return Card(
+                                                      color: Colors.white,
+                                                      margin: const EdgeInsets.symmetric(vertical: 8),
+                                                      shape: RoundedRectangleBorder(
+                                                        borderRadius: BorderRadius.circular(15),
                                                       ),
-                                                    ),
-                                                  );
-                                                },
+                                                      elevation: 4,
+                                                      child: Padding(
+                                                        padding: const EdgeInsets.all(16.0),
+                                                        child: Column(
+                                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                                          children: [
+                                                            Text(' ${exam.time}'),
+                                                            
+                                                            Text(
+                                                              " ${exam.direction}",
+                                                              style: TextStyle(
+                                                                fontSize: 18,
+                                                                fontWeight: FontWeight.bold,
+                                                              ),
+                                                            ),
+                                                            Row(
+                                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                              children: [
+                                                                Text("คะแนนเต็ม: ${exam.fullMark}"),
+                                                                IconButton(
+                                                                  onPressed: () {
+                                                                    setState(() {
+                                                                      selectedExam = exam;
+                                                                    });
+                                                                  },
+                                                                  icon: Icon(Icons.search),
+                                                                )
+                                                              ],
+                                                            )
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    );
+                                                  },
+                                                ),
                                               ),
-                                            ),
-                                ],
-                              ),
-                            ),
+                                            ],
+                                          ),
+                                        ),
 
 
 
                             //งานที่เลยกำหนด
                             Container(
-                              height: 400,
                               width: 500,
                               padding: EdgeInsets.all(20),
-                              margin: EdgeInsets.fromLTRB(0, 0, 0, 50),
+                              margin: EdgeInsets.fromLTRB(0, 0, 0, 20),
                               decoration: BoxDecoration(
                                 color: Color.fromARGB(255, 147, 185, 221),
                                 borderRadius: BorderRadius.circular(20),
@@ -409,36 +538,61 @@ void initState() {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(
-                                    "งานที่เลยกำหนดแล้วทั้งหมด (${pastDeadlines.length} งาน)",
-                                    style: TextStyle(fontSize: 20),
+                                  
+                                  
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        "งานที่เลยกำหนดแล้วทั้งหมด (${pastDeadlines.length} งาน)",
+                                        style: TextStyle(fontSize: 20),
+                                      ),
+                                      IconButton(
+                                        icon: Icon(
+                                          isExpandedPast ? Icons.expand_less : Icons.expand_more,
+                                        ),
+                                        onPressed: () {
+                                          setState(() {
+                                            isExpandedPast = !isExpandedPast;
+                                          });
+                                        },
+                                      ),
+                                    ],
                                   ),
                                   const SizedBox(height: 10),
-                                  isLoadingExamset
-                                      ? Center(
-                                          child: CircularProgressIndicator(),
-                                        )
-                                      : pastDeadlines.isEmpty
-                                          ? Center(
-                                              child: Text("ไม่มีงานที่มอบหมาย"),
-                                            )
-                                          : Expanded(
+
+                                  // Content
+                                  if (isExpandedPast)
+                                    isLoadingExamset
+                                        ? Center(child: CircularProgressIndicator())
+                                        : pastDeadlines.isEmpty
+                                            ? Center(child: Text("ไม่มีงานที่มอบหมาย"))
+                                            : SizedBox( 
+                                              height: 500, 
                                               child: ListView.builder(
+                                                shrinkWrap: true,                                              
                                                 itemCount: pastDeadlines.length,
                                                 itemBuilder: (context, index) {
                                                   final exam = pastDeadlines[index];
-                                                  return Card(
-                                                    color: Colors.white,
-                                                    margin: const EdgeInsets.symmetric(vertical: 8),
-                                                    shape: RoundedRectangleBorder(
-                                                      borderRadius: BorderRadius.circular(15),
-                                                    ),
-                                                    elevation: 4,
-                                                    child: Padding(
-                                                      padding: const EdgeInsets.all(16.0),
-                                                      child: Column(
-                                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                                        children: [
+                                                  if (successChecks.length < pastDeadlines.length) {
+                                                    successChecks = List<bool>.filled(pastDeadlines.length, false);
+                                                  }
+                                                  return Card(  
+                                                    color: Colors.white,  
+                                                    margin: const EdgeInsets.symmetric(vertical: 8),  
+                                                    shape: RoundedRectangleBorder(  
+                                                      borderRadius: BorderRadius.circular(15),  
+                                                    ),  
+                                                    elevation: 4, 
+                                                    child: Padding( 
+                                                      padding: const EdgeInsets.all(16.0),  
+                                                      child: Column(  
+                                                        crossAxisAlignment: 
+                                                            CrossAxisAlignment.start, 
+                                                        children: [ 
+                                                        
+                                                          Text(' ${exam.time}'),
+                                                          
                                                           Text(
                                                             " ${exam.direction} ",
                                                             style: TextStyle(
@@ -446,32 +600,126 @@ void initState() {
                                                               fontWeight: FontWeight.bold,
                                                             ),
                                                           ),
-
                                                           Row(
-                                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment.spaceBetween,
                                                             children: [
                                                               Text("คะแนนเต็ม: ${exam.fullMark}"),
-                                                              IconButton(onPressed: (){
-                                                                setState(() {
-                                                                  selectedExam = exam;
-                                                                });
-
-                                                              }, 
-                                                              icon: Icon(Icons.search))
-
+                                                              IconButton(
+                                                                  onPressed: () {
+                                                                    setState(() {
+                                                                      selectedExam = exam;
+                                                                    });
+                                                                  },
+                                                                  icon: Icon(Icons.search))
                                                             ],
                                                           )
-                                                          
                                                         ],
                                                       ),
                                                     ),
                                                   );
                                                 },
+                                              ),)
+                                            ],
+                                          ),
+                                        ),
+
+                                        Container(
+                                          width: 500,
+                                          padding: EdgeInsets.all(20),
+                                          margin: EdgeInsets.fromLTRB(0, 0, 0, 20),
+                                          decoration: BoxDecoration(
+                                            color: Color.fromARGB(255, 147, 185, 221),
+                                            borderRadius: BorderRadius.circular(20),
+                                          ),
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Row(
+                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                children: [
+                                                  Text(
+                                                    "งานที่ตรวจสอบแล้วทั้งหมด (${completeexamsets.length} งาน)",
+                                                    style: TextStyle(fontSize: 20),
+                                                  ),
+                                                  IconButton(
+                                                    icon: Icon(
+                                                      isExapandedcomplete ? Icons.expand_less : Icons.expand_more,
+                                                    ),
+                                                    onPressed: () {
+                                                      setState(() {
+                                                        isExapandedcomplete = !isExapandedcomplete;
+                                                      });
+                                                    },
+                                                  ),
+                                                ],
                                               ),
-                                            ),
-                                ],
-                              ),
-                            ),
+                                              const SizedBox(height: 10),
+
+                                              // Content
+                                              if (isExapandedcomplete)
+                                                isLoadingExamset
+                                                    ? Center(child: CircularProgressIndicator())
+                                                    : completeexamsets.isEmpty
+                                                        ? Center(child: Text("ไม่มีงานที่ตรวจสอบแล้ว"))
+                                                        : SizedBox(
+                                                            height: 500,
+                                                            child: ListView.builder(
+                                                              shrinkWrap: true,
+                                                              itemCount: completeexamsets.length,
+                                                              itemBuilder: (context, index) {
+                                                                final exam = completeexamsets[index];
+                                                                if (successChecks.length < completeexamsets.length) {
+                                                                  successChecks = List<bool>.filled(
+                                                                      completeexamsets.length, false);
+                                                                }
+                                                                return Card(
+                                                                  color: Colors.white,
+                                                                  margin: const EdgeInsets.symmetric(vertical: 8),
+                                                                  shape: RoundedRectangleBorder(
+                                                                    borderRadius: BorderRadius.circular(15),
+                                                                  ),
+                                                                  elevation: 4,
+                                                                  child: Padding(
+                                                                    padding: const EdgeInsets.all(16.0),
+                                                                    child: Column(
+                                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                                      children: [
+                                                                        Text(' ${exam.time}'),
+                                                                        
+                                                                        Text(
+                                                                          " ${exam.direction} ",
+                                                                          style: TextStyle(
+                                                                            fontSize: 18,
+                                                                            fontWeight: FontWeight.bold,
+                                                                          ),
+                                                                        ),
+                                                                        Row(
+                                                                          mainAxisAlignment:
+                                                                              MainAxisAlignment.spaceBetween,
+                                                                          children: [
+                                                                            Text("คะแนนเต็ม: ${exam.fullMark}"),
+                                                                            IconButton(
+                                                                              onPressed: () {
+                                                                                setState(() {
+                                                                                  selectedExam = exam;
+                                                                                });
+                                                                              },
+                                                                              icon: Icon(Icons.search),
+                                                                            ),
+                                                                          ],
+                                                                        ),
+                                                                      ],
+                                                                    ),
+                                                                  ),
+                                                                );
+                                                              },
+                                                            ),
+                                                          ),
+                                            ],
+                                          ),
+                                        )                      
+                                     
 
                             
 

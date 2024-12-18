@@ -255,3 +255,26 @@ class _Detail_workState extends State<Detail_work_S> {
 
 //-------------------------------------------------
 
+class Assignment {
+  final String title;
+  final String time;
+  final String duedate;
+  final String classID;
+
+  Assignment({
+    required this.title,
+    required this.time,
+    required this.duedate,
+    required this.classID,
+  });
+
+  // ฟังก์ชันสำหรับแปลงข้อมูลจาก JSON
+  factory Assignment.fromJson(Map<String, dynamic> json) {
+    return Assignment(
+      title: json['event_assignment_title'],
+      time: json['event_assignment_time'],
+      duedate: json['event_assignment_duedate'],
+      classID: json['event_assignment_classID'],
+    );
+  }
+}

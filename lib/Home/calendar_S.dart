@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_esclass_2/Home/Even.dart';
+import 'package:flutter_esclass_2/Data/Data.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -18,117 +18,84 @@ class _CalendarHomeState extends State<CalendarHome_S> {
   late DateTime _selectedDay;
   List<Even_teacher> dataevent = [];
 
-  final TextEditingController _eventController = TextEditingController();
-  final TextEditingController _timeController = TextEditingController();
 
-  Future<void> addEventToDatabase(String event, String time, String formattedDate, String username) async {
-  final url = Uri.parse('https://www.edueliteroom.com/connect/event_students.php');
-    if (event.isEmpty || time.isEmpty || username.isEmpty || formattedDate.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('กรุณากรอกข้อมูลให้ครบถ้วน'), backgroundColor: Colors.red),
-      );
-      return;
-    }
+void fetchEvents() async {
+  final url = Uri.parse(
+      'https://www.edueliteroom.com/connect/event_assignment_students.php?usert_username=${widget.username}');
+  try {
+    final response = await http.get(url);
+    
 
-    try {
-      final response = await http.post(
-        url,
-        headers: {"Content-Type": "application/x-www-form-urlencoded"},
-        body: {
-          'event_users_title': event,
-          'event_users_date': formattedDate,
-          'event_users_time': time,
-          'users_username': widget.username, 
-        },
-      );
+    if (response.statusCode == 200) {
+      final responseData = jsonDecode(response.body);
+    
+      if (responseData['status'] == 'success') {
+        setState(() {
+          _events.clear();
+          dataevent.clear();
 
-      if (response.statusCode == 200) {
-        final responseData = jsonDecode(response.body);
-        if (responseData['status'] == 'success') {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('เพิ่มกิจกรรมสำเร็จ'), backgroundColor: Colors.green),
-          );
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('เพิ่มกิจกรรมไม่สำเร็จ: ${responseData['message']}'), backgroundColor: Colors.red),
-          );
-        }
-        // Clear fields if success
-        _eventController.clear();
-        _timeController.clear();
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('เกิดข้อผิดพลาดจากเซิร์ฟเวอร์: ${response.statusCode}'), backgroundColor: Colors.red),
-        );
-      }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('เกิดข้อผิดพลาดจากเครือข่าย: ${e.toString()}'), backgroundColor: Colors.red),
-      );
-    }
-  }
-
-
-  void _addEvent(String event, String time, DateTime eventDate) {
-    setState(() {
-      final eventDateKey = DateTime(eventDate.year, eventDate.month, eventDate.day);
-      _events[eventDateKey] ??= [];
-      _events[eventDateKey]!.add({'event': event, 'time': time});
-      _selectedEvents = _events[eventDateKey]!;
-
-      String formattedDate = "${eventDate.year}-${eventDate.month.toString().padLeft(2, '0')}-${eventDate.day.toString().padLeft(2, '0')}";
-      
-      
-      addEventToDatabase(event, time, formattedDate, widget.username).then((_) {
-        
-        fetchEvents();
-      });
-
-      
-      _eventController.clear();
-      _timeController.clear();
-    });
-  }
-
-
-  void fetchEvents() async {
-    final url = Uri.parse('https://www.edueliteroom.com/connect/event_students.php?users_username=${widget.username}');
-    try {
-      final response = await http.get(url);
-      // print("API Response: ${response.body}");
-      if (response.statusCode == 200) {
-        final responseData = jsonDecode(response.body);
-        if (responseData['status'] == 'success') {
-          // print("Data fetched successfully: ${responseData['data']}");
-          setState(() {
-            _events.clear();
-            dataevent.clear();
-            for (var event in responseData['data']) {
-              DateTime eventDate = DateTime.parse(event['event_users_date']);
+          for (var event in responseData['data_assignment']) {
+            try {
+              // แปลงวันที่กำหนดส่งให้เป็น DateTime object
+              DateTime eventDate = DateTime.parse(event['event_assignment_duedate']);
               final eventDateKey = DateTime(eventDate.year, eventDate.month, eventDate.day);
+
+              // เพิ่มข้อมูลเหตุการณ์ทั้งหมดไปยัง dataevent
               dataevent.add(Even_teacher(
-                Title: event['event_users_title'],
-                Date: event['event_users_date'],
-                Time: event['event_users_time'],
+                Title: event['event_assignment_title'] ?? '',
+                Date: event['event_assignment_duedate'] ?? '',
+                Time: event['event_assignment_time'] ?? '',
+                Class: event['classroom_name'] ?? '',
+                Major: event['classroom_major'] ?? '',
+                Year: event['classroom_year'] ?? '',
+                Room: event['classroom_numroom'] ?? '',
+                ClassID: event['event_assignment_classID'] ?? '',
               ));
+
+              // จัดเก็บข้อมูลทั้งหมดสำหรับ UI
               if (_events[eventDateKey] == null) {
                 _events[eventDateKey] = [];
-                
               }
               _events[eventDateKey]!.add({
-                'event': event['event_users_title'],
-                'date': event['event_users_date'],
-                'time': event['event_users_time'],
+                'event': event['event_assignment_title'] ?? '',
+                'date': event['event_assignment_duedate'] ?? '',
+                'time': event['event_assignment_time'] ?? '',
+                'classroom_name': event['classroom_name'] ?? '',
+                'classroom_major': event['classroom_major'] ?? '',
+                'classroom_year': event['classroom_year'] ?? '',
+                'classroom_numroom': event['classroom_numroom'] ?? '',
+                'classID': event['event_assignment_classID'] ?? '',
               });
+            } catch (e) {
+              print('Error parsing event date: $e');
             }
-            _selectedEvents = _events[_selectedDay] ?? [];
-          });
-        }
+          }
+
+          // อัปเดตเหตุการณ์ที่เลือกไว้สำหรับ UI
+          _selectedEvents = _events[_selectedDay] ?? [];
+        });
+      } else {
+        // ใช้ Snackbar เพื่อแจ้งข้อผิดพลาดให้ผู้ใช้
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('Error: ${responseData['message']}'),
+        ));
       }
-    } catch (e) {
-      print('Network error: $e');
+    } else {
+      // แสดงข้อผิดพลาดเมื่อ HTTP status code ไม่ใช่ 200
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Failed to fetch data: ${response.statusCode}'),
+      ));
     }
+  } catch (e) {
+    print('Network error: $e');
+    // แจ้งข้อผิดพลาดหากเกิดข้อผิดพลาดในการเชื่อมต่อ
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text('Network error: $e'),
+    ));
   }
+}
+
+
 
   @override
   void initState() {
@@ -137,80 +104,11 @@ class _CalendarHomeState extends State<CalendarHome_S> {
     _selectedEvents = [];
     _selectedDay = DateTime.now();
     fetchEvents();
+   
   }
 
-  Future<void> _selectTime(BuildContext context) async {
-    TimeOfDay? selectedTime = await showTimePicker(
-      context: context,
-      initialTime: TimeOfDay.now(),
-    );
-    if (selectedTime != null) {
-      final formattedTime = '${selectedTime.hour.toString().padLeft(2, '0')}:${selectedTime.minute.toString().padLeft(2, '0')}';
-      _timeController.text = formattedTime;
-    }
-  }
 
-  void _showAddEventDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('เพิ่มกิจกรรมของคุณ'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: _eventController,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: 'กิจกรรม',
-                ),
-              ),
-              SizedBox(height: 10),
-              TextField(
-                controller: _timeController,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: 'เวลา (HH:mm)',
-                ),
-                readOnly: true,
-                onTap: () {
-                  _selectTime(context);
-                },
-              ),
-            ],
-          ),
-          actions: [
-            OutlinedButton(
-              onPressed: () {
-                final eventText = _eventController.text;
-                final timeText = _timeController.text;
-                final eventDate = _selectedDay;
-
-                if (eventText.isNotEmpty && timeText.isNotEmpty) {
-                  _addEvent(eventText, timeText, eventDate);
-                  Navigator.of(context).pop();
-                } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('กรุณากรอกข้อมูลให้ครบถ้วน!')),
-                  );
-                }
-              },
-              child: Text('ตกลง'),
-            ),
-            OutlinedButton(
-              onPressed: () {
-                _eventController.clear();
-                _timeController.clear();
-                Navigator.of(context).pop();
-              },
-              child: Text('ยกเลิก'),
-            ),
-          ],
-        );
-      },
-    );
-  }
+  
 
   @override
   Widget build(BuildContext context) {
@@ -218,18 +116,11 @@ class _CalendarHomeState extends State<CalendarHome_S> {
       backgroundColor: const Color.fromARGB(255, 255, 255, 255),
       body: Column(
         children: [
-          Padding(
-            padding: EdgeInsets.fromLTRB(400, 10, 0, 5),
-            child: ElevatedButton(
-              onPressed: () {
-                _showAddEventDialog(context);
-              },
-              child: Text('เพิ่มกิจกรรม'),
-            ),
-          ),
+          
           Row(
             children: [
               Container(
+                padding: EdgeInsets.fromLTRB(10,30,30,10),
                 height: 400,
                 width: 1000,
                 margin: EdgeInsets.all(5),
@@ -239,6 +130,7 @@ class _CalendarHomeState extends State<CalendarHome_S> {
                   lastDay: DateTime.utc(2030, 12, 31),
                   focusedDay: _selectedDay,
                   selectedDayPredicate: (day) => isSameDay(day, _selectedDay),
+                  availableGestures: AvailableGestures.none,
                   onDaySelected: (selectedDay, focusedDay) {
                     setState(() {
                       _selectedDay = selectedDay;
@@ -246,17 +138,18 @@ class _CalendarHomeState extends State<CalendarHome_S> {
                     });
                   },
                   eventLoader: (day) {
-                    DateTime checkDay = DateTime(day.year, day.month, day.day); // ตรวจสอบเฉพาะวันที่
+                    DateTime checkDay = DateTime(day.year, day.month, day.day); 
                     return _events[checkDay]?.map((event) => '●').toList() ?? [];
                     
                   },
                   calendarStyle: CalendarStyle(
                     markersAutoAligned: true,
                     markerDecoration: BoxDecoration(
-                      color: const Color.fromARGB(255, 18, 153, 177),
+                      color: const Color.fromARGB(255, 221, 100, 100),
                       shape: BoxShape.circle,
                     ),
                   ),
+                  
                 ),
               ),
               Container(
@@ -277,8 +170,8 @@ class _CalendarHomeState extends State<CalendarHome_S> {
                             subtitle: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text('วันที่: ${event['date'] ?? ''}'),
-                                Text('เวลา: ${event['time'] ?? ''} น.'),
+                                Text('วันที่สุดท้ายที่รับงาน: ${event['date'] ?? ''} น.'),
+                                Text('วิชา: ${event['classroom_name']} (${event['classroom_year']}/${event['classroom_numroom']})'),
                               ],
                             ),
                           );

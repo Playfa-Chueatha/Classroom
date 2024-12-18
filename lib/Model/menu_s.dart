@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_esclass_2/Classroom/add_classroom.dart';
 import 'package:flutter_esclass_2/Classroom/setting_calss.dart';
-import 'package:flutter_esclass_2/Home/Even.dart';
+import 'package:flutter_esclass_2/Data/Data.dart';
 import 'package:flutter_esclass_2/Model/Menu_listclassroom_S.dart';
 import 'package:flutter_esclass_2/Model/Menu_todolist.dart';
 import 'package:http/http.dart' as http;
@@ -23,69 +23,90 @@ class Menuu_class_s extends StatefulWidget {
 class _MenuState extends State<Menuu_class_s> {
   late final Map<DateTime, List<Map<String, String>>> _events = {};
   List<Even_teacher> dataevent = [];
-  bool isLoading = true; // Loading state
+  bool isLoading = true; 
+  bool hasTodayEvent = false; // เช็คว่ามีงานวันนี้หรือไม่
 
 
-  Future<void> fetchEvents() async {
-  final url = Uri.parse('https://www.edueliteroom.com/connect/event_students.php?users_username=${widget.username}');
-  
+  void fetchEvents() async {
+  final url = Uri.parse(
+      'https://www.edueliteroom.com/connect/event_assignment_students.php?usert_username=${widget.username}');
   try {
-      final response = await http.get(url);
-      if (response.statusCode == 200) {
-        final responseData = jsonDecode(response.body);
-        
-        if (responseData['status'] == 'success') {
-          setState(() {
-            _events.clear();
-            dataevent.clear();
-            isLoading = false;
+    final response = await http.get(url);
+    
 
-            List<Even_teacher> todayEvents = []; // รายการสำหรับกิจกรรมในวันปัจจุบัน
-            List<Even_teacher> futureEvents = []; // รายการสำหรับกิจกรรมในอนาคต
+    if (response.statusCode == 200) {
+      final responseData = jsonDecode(response.body);
+    
+      if (responseData['status'] == 'success') {
+        setState(() {
+          _events.clear();
+          dataevent.clear();
 
-            for (var event in responseData['data']) {
-              DateTime eventDate = DateTime.parse(event['event_users_date']);
-              
-              // ตรวจสอบกิจกรรมในวันปัจจุบัน
-              if (eventDate.isAtSameMomentAs(DateTime.now())) {
-                todayEvents.add(Even_teacher(
-                  Title: event['event_users_title'],
-                  Date: event['event_users_date'],
-                  Time: event['event_users_time'],
-                ));
-              } 
-              // ตรวจสอบกิจกรรมในอนาคต
-              else if (eventDate.isAfter(DateTime.now())) {
-                futureEvents.add(Even_teacher(
-                  Title: event['event_users_title'],
-                  Date: event['event_users_date'],
-                  Time: event['event_users_time'],
-                ));
+          for (var event in responseData['data_assignment']) {
+            try {
+              // แปลงวันที่กำหนดส่งให้เป็น DateTime object
+              DateTime eventDate = DateTime.parse(event['event_assignment_duedate']);
+              final eventDateKey = DateTime(eventDate.year, eventDate.month, eventDate.day);
+
+              // เพิ่มข้อมูลเหตุการณ์ทั้งหมดไปยัง dataevent
+              dataevent.add(Even_teacher(
+                Title: event['event_assignment_title'] ?? '',
+                Date: event['event_assignment_duedate'] ?? '',
+                Time: event['event_assignment_time'] ?? '',
+                Class: event['classroom_name'] ?? '',
+                Major: event['classroom_major'] ?? '',
+                Year: event['classroom_year'] ?? '',
+                Room: event['classroom_numroom'] ?? '',
+                ClassID: event['event_assignment_classID'] ?? '',
+              ));
+
+              // จัดเก็บข้อมูลทั้งหมดสำหรับ UI
+              if (_events[eventDateKey] == null) {
+                _events[eventDateKey] = [];
               }
+              _events[eventDateKey]!.add({
+                'event': event['event_assignment_title'] ?? '',
+                'date': event['event_assignment_duedate'] ?? '',
+                'time': event['event_assignment_time'] ?? '',
+                'classroom_name': event['classroom_name'] ?? '',
+                'classroom_major': event['classroom_major'] ?? '',
+                'classroom_year': event['classroom_year'] ?? '',
+                'classroom_numroom': event['classroom_numroom'] ?? '',
+                'classID': event['event_assignment_classID'] ?? '',
+              });
+            } catch (e) {
+              print('Error parsing event date: $e');
             }
-            
-            // รวมกิจกรรมในวันปัจจุบันและกิจกรรมในอนาคต
-            dataevent = todayEvents + futureEvents;
-            
-            // เรียงลำดับกิจกรรมในอนาคต
-            futureEvents.sort((a, b) => DateTime.parse(a.Date).compareTo(DateTime.parse(b.Date)));
-          });
-        } else {
-          setState(() {
-            isLoading = false;
-          });
-          print('Error: ${responseData['message']}');
-        }
+          }
+
+          // อัปเดตเหตุการณ์ที่เลือกไว้สำหรับ UI
+        });
       } else {
-        print('Error: ${response.statusCode}'); 
-        print('Response body: ${response.body}');
+        // ใช้ Snackbar เพื่อแจ้งข้อผิดพลาดให้ผู้ใช้
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('Error: ${responseData['message']}'),
+        ));
       }
-    } catch (e) {
-      print('Network error: $e');
-      setState(() {
-        isLoading = false;
-      });
+    } else {
+      // แสดงข้อผิดพลาดเมื่อ HTTP status code ไม่ใช่ 200
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Failed to fetch data: ${response.statusCode}'),
+      ));
     }
+  } catch (e) {
+    print('Network error: $e');
+    // แจ้งข้อผิดพลาดหากเกิดข้อผิดพลาดในการเชื่อมต่อ
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text('Network error: $e'),
+    ));
+  }
+}
+bool isToday(String eventDate) {
+    final today = DateTime.now();
+    final eventDateTime = DateTime.parse(eventDate); // Assuming the date is in ISO 8601 format (yyyy-MM-dd)
+    return today.year == eventDateTime.year &&
+           today.month == eventDateTime.month &&
+           today.day == eventDateTime.day;
   }
 
 
@@ -143,63 +164,68 @@ class _MenuState extends State<Menuu_class_s> {
 
         //todolist
         Container(
-          height: 300,
-          width: 350,
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.only(
-              topRight: Radius.circular(20),
-              bottomRight: Radius.circular(20),
-            )
-          ), 
-          child: Column(
-            children: const [
-              SizedBox(height: 20),
-              Text('งานที่มอบหมาย',style: TextStyle(fontSize: 20),),
-              // MenuTodolist()
-            ],
-          ),  
-        ),
-        SizedBox(height: 20),
+                  height: 530,
+                  width: 350,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: const BorderRadius.only(
+                      topRight: Radius.circular(20),
+                      bottomRight: Radius.circular(20),
+                    ),
+                  ),
+                  child: Column(
+                    children: [
+                      const SizedBox(height: 20),
+                      const Text(
+                        'งานที่มอบหมาย',
+                        style: TextStyle(fontSize: 20),
+                      ),
 
-
-
-        //useronline
-        Container(
-          height: 300,
-          width: 350,
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.only(
-              topRight: Radius.circular(20),
-              bottomRight: Radius.circular(20),
-            )
-          ), 
-          child: Column(
-            children: [
-              SizedBox(height: 20),
-              Text('กิจกรรมที่กำลังมาถึง',style: TextStyle(fontSize: 20),),
-              Expanded(
-                  child: ListView.builder(
-                    itemCount: dataevent.length,
-                    itemBuilder: (context, index) {
-                      return Container(
-                        margin: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-                        decoration: BoxDecoration(
-                          color: Color.fromARGB(255, 195, 238, 250),
-                          borderRadius: BorderRadius.circular(20)
-                        ),
-                        child: ListTile(
-                          title: Text(dataevent[index].Title),
-                          subtitle: Text(
-                            'วันที่: ${dataevent[index].Date} เวลา: ${dataevent[index].Time} น.',
+                      // If there is no event today, show the message
+                      if (!hasTodayEvent) 
+                        Container(
+                          margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                          decoration: BoxDecoration(
+                            color: Colors.blue,
+                            borderRadius: BorderRadius.circular(20),
                           ),
-                          
-                        )
-                      ); 
-                    },
-                  )
-                ),
+                          child: const ListTile(
+                            title: Text('- ไม่มีงานที่ต้องส่งในวันนี้ -'),
+                          ),
+                        ),
+
+                      Expanded(
+                        child: ListView.builder(
+                          itemCount: dataevent.length,
+                          itemBuilder: (context, index) {
+                            final event = dataevent[index];
+                            final isEventToday = isToday(event.Date); // Check if it's today
+
+                            return Container(
+                              margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                              decoration: BoxDecoration(
+                                color: isEventToday
+                                    ? Colors.blue // Blue for today
+                                    : const Color.fromARGB(255, 195, 238, 250), // Light color for other days
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: ListTile(
+                                title: Text(event.Title),
+                                subtitle: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text('วันที่สุดท้ายของการส่งงาน: ${event.Date}'),
+                                    Text('วิชา: ${event.Class} (${event.Year}/${event.Room})'),
+                                  ],
+                                ) 
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                  
+                
+                
               
             ],
           ), 

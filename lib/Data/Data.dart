@@ -162,19 +162,20 @@ class Examset {
 
   factory Examset.fromJson(Map<String, dynamic> json) {
     return Examset(
-      autoId: int.parse(json['examsets_auto']),
-      direction: json['examsets_direction'],
-      fullMark: int.parse(json['examsets_fullmark']),
-      deadline: json['examsets_deadline'],
-      time: json['examsets_time'],
-      type: json['examsets_type'],
-      closed: json['examsets_closed'],
-      inspectionStatus: json['examsets_Inspection_status'],
-      classroomId: int.parse(json['classroom_id']),
-      usertUsername: json['usert_username'],
+      autoId: int.tryParse(json['examsets_auto']?.toString() ?? '') ?? 0, 
+      direction: json['examsets_direction'] ?? 'N/A',
+      fullMark: int.tryParse(json['examsets_fullmark']?.toString() ?? '') ?? 0,
+      deadline: json['examsets_deadline'] ?? 'N/A',
+      time: json['examsets_time'] ?? 'N/A',
+      type: json['examsets_type'] ?? 'N/A',
+      closed: json['examsets_closed'] ?? 'N/A',
+      inspectionStatus: json['examsets_Inspection_status'] ?? 'N/A',
+      classroomId: int.tryParse(json['classroom_id']?.toString() ?? '') ?? 0,
+      usertUsername: json['usert_username'] ?? 'N/A',
     );
   }
 }
+
 
 
 //---------------------------------------------
@@ -262,5 +263,26 @@ class Classroom {
 
 //-----------------------------------------------------------------------------
 
+class Even_teacher {
+  String Title;        // ชื่อการมอบหมายงาน
+  String Date;         // วันที่กำหนดส่ง
+  String Time;         // เวลาที่กำหนด
+  String Class;        // ชื่อห้องเรียน (classroom_name)
+  String Major;        // สาขาวิชา (classroom_major)
+  String Year;         // ชั้นปี (classroom_year)
+  String Room;         // หมายเลขห้อง (classroom_numroom)
+  String ClassID;      // ID ห้องเรียน (event_assignment_classID)
+
+  Even_teacher({
+    required this.Title,
+    required this.Date,
+    required this.Time,
+    required this.Class,
+    required this.Major,
+    required this.Year,
+    required this.Room,
+    required this.ClassID,
+  });
+}
 
 
