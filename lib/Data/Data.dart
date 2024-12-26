@@ -195,17 +195,24 @@ class Upfile {
   });
 
   factory Upfile.fromJson(Map<String, dynamic> json) {
-  return Upfile(
-    upfileAuto: int.tryParse(json['upfile_auto'] ?? '0') ?? 0, // ใช้ tryParse เพื่อจัดการค่าที่ไม่ใช่ตัวเลข
-    examsetsId: int.tryParse(json['examsets_id'] ?? '0') ?? 0,
-    upfileName: json['upfile_name'] ?? '',
-    upfileSize: int.tryParse(json['upfile_size'] ?? '0') ?? 0,
-    upfileType: json['upfile_type'] ?? '',
-    upfileUrl: json['upfile_url'] ?? '',
-  );
+    return Upfile(
+      upfileAuto: _parseInt(json['upfile_auto']),
+      examsetsId: _parseInt(json['examsets_id']),
+      upfileName: json['upfile_name'] ?? '',
+      upfileSize: _parseInt(json['upfile_size']),
+      upfileType: json['upfile_type'] ?? '',
+      upfileUrl: json['upfile_url'] ?? '',
+    );
+  }
 
+  // Helper function เพื่อใช้ซ้ำ
+  static int _parseInt(dynamic value) {
+    if (value is int) return value;
+    if (value is String) return int.tryParse(value) ?? 0;
+    return 0; // ค่าดีฟอลต์เมื่อไม่สามารถแปลงได้
   }
 }
+
 
 //------------------------------------------------------------
 
@@ -692,3 +699,4 @@ class Submission {
 
 
 
+//-----------------------------------------------------------------------------

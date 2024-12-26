@@ -52,7 +52,8 @@ class _work_body_SState extends State<work_body_S> {
 
 
 
-  Future<List<Examset>> fetchExamsets(String classroomName, String classroomMajor,
+  // ฟังก์ชันเพื่อแปลง JSON จาก PHP เป็น List<Examset>
+Future<Map<String, List<Examset>>> fetchExamsets(String classroomName, String classroomMajor,
     String classroomYear, String classroomNumRoom, String username) async {
   final response = await http.post(
     Uri.parse('https://www.edueliteroom.com/connect/fetch_examsets_students.php'),
@@ -65,31 +66,45 @@ class _work_body_SState extends State<work_body_S> {
     },
   );
 
+  print(response.body);
 
   if (response.statusCode == 200) {
-    // ตรวจสอบ JSON Response
     final decodedResponse = json.decode(response.body);
-    
+    print("Response from server: ${response.body}"); 
+
     if (decodedResponse is Map<String, dynamic>) {
-      // กรณีเป็น Object และมี error
       if (decodedResponse.containsKey('error')) {
         throw Exception("ข้อผิดพลาดจากเซิร์ฟเวอร์: ${decodedResponse['error']}");
-      } else {
-        throw Exception("รูปแบบข้อมูลไม่ถูกต้อง: ได้รับ Object แทนที่จะเป็น List");
       }
-    } else if (decodedResponse is List) {
-      // กรณีเป็น List ให้แปลงเป็น Examset
-      return decodedResponse.map((data) => Examset.fromJson(data)).toList();
+
+      // แปลงข้อมูล completed_examsets และ future_examsets
+      List<Examset> completedExamsets = [];
+      List<Examset> futureExamsets = [];
+
+      if (decodedResponse['completed_examsets'] != null) {
+        completedExamsets = List<Examset>.from(
+          decodedResponse['completed_examsets'].map((examset) => Examset.fromJson(examset))
+        );
+      }
+
+      if (decodedResponse['future_examsets'] != null) {
+        futureExamsets = List<Examset>.from(
+          decodedResponse['future_examsets'].map((examset) => Examset.fromJson(examset))
+        );
+      }
+
+      // ส่งค่ากลับ
+      return {
+        'completed_examsets': completedExamsets,
+        'future_examsets': futureExamsets,
+      };
     } else {
-      throw Exception("รูปแบบข้อมูลไม่ถูกต้อง");
+      throw Exception("รูปแบบข้อมูลที่ได้รับไม่ถูกต้อง");
     }
   } else {
     throw Exception('ไม่สามารถโหลดข้อมูลจากเซิร์ฟเวอร์ได้');
   }
 }
-
-
-
 
 Future<void> loadExamsets() async {
   setState(() {
@@ -97,15 +112,43 @@ Future<void> loadExamsets() async {
   });
 
   try {
-    examsets = await fetchExamsets(
-      widget.classroomName,
-      widget.classroomMajor,
-      widget.classroomYear,
-      widget.classroomNumRoom,
-      widget.username,
+    final response = await http.post(
+      Uri.parse('https://www.edueliteroom.com/connect/fetch_examsets_students.php'),
+      body: {
+        'classroomName': widget.classroomName,
+        'classroomMajor': widget.classroomMajor,
+        'classroomYear': widget.classroomYear,
+        'classroomNumRoom': widget.classroomNumRoom,
+        'username': widget.username,
+      },
     );
-    await filterExamsets(examsets);
 
+    // ตรวจสอบ status code และเนื้อหาของ response
+    if (response.statusCode == 200) {
+      try {
+        final decodedResponse = json.decode(response.body);
+
+        if (decodedResponse['error'] != null) {
+          throw Exception("Error from server: ${decodedResponse['error']}");
+        }
+
+        List<Examset> completedExamsets = List<Examset>.from(
+          decodedResponse['completed_examsets'].map((examset) => Examset.fromJson(examset))
+        );
+
+        List<Examset> futureExamsets = List<Examset>.from(
+          decodedResponse['future_examsets'].map((examset) => Examset.fromJson(examset))
+        );
+
+        await filterExamsets(futureExamsets, completedExamsets);
+
+      } catch (e) {
+        throw Exception("Error parsing JSON: $e");
+      }
+    } else {
+      print("Failed to load data. Status code: ${response.statusCode}");
+      print("Response body: ${response.body}");
+    }
   } catch (e) {
     print("Error fetching examsets: $e");
   } finally {
@@ -115,21 +158,20 @@ Future<void> loadExamsets() async {
   }
 }
 
-Future<void> filterExamsets(List<Examset> examsets) async {
+
+Future<void> filterExamsets(List<Examset> futureExamsets, List<Examset> completedExamsets) async {
   DateTime currentDate = DateTime.now();
   DateTime yesterdayDate = currentDate.subtract(Duration(days: 1));
-   
 
+  // ตัวแปรที่จะเก็บข้อมูลที่กรองแล้ว
   List<Examset> futureExamsetsTemp = [];
   List<Examset> pastDeadlinesTemp = [];
-  List<Examset> completeExamsetsTemp = []; 
 
-  for (var examset in examsets) {
+  // ลูปผ่าน futureExamsets เพื่อกรองข้อมูลตามเงื่อนไข
+  for (var examset in futureExamsets) {
     DateTime deadlineDate = DateTime.tryParse(examset.deadline) ?? DateTime.now();
-    
-    if (examset.inspectionStatus == 'complete') {
-      completeExamsetsTemp.add(examset); 
-    } else {
+
+    if (examset.inspectionStatus != 'complete') {
       if (deadlineDate.isAfter(currentDate) || 
           (deadlineDate.year == currentDate.year &&
            deadlineDate.month == currentDate.month &&
@@ -141,12 +183,15 @@ Future<void> filterExamsets(List<Examset> examsets) async {
     }
   }
 
+  // อัปเดตตัวแปรที่เก็บค่าหลังจากกรองแล้ว
   setState(() {
     futurexamsets = futureExamsetsTemp;
     pastDeadlines = pastDeadlinesTemp;
-    completeexamsets = completeExamsetsTemp;
+    completeexamsets = completedExamsets;  // ใช้ค่าจาก completedExamsets ที่ได้รับจากฟังก์ชัน fetchExamsets
   });
 }
+
+
 
 
 
@@ -365,73 +410,68 @@ void initState() {
                             SizedBox(height: 20),
                           
                             Container(
-                  height: 420,
-                  width: 350,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: const BorderRadius.only(
-                      topRight: Radius.circular(20),
-                      bottomRight: Radius.circular(20),
-                    ),
-                  ),
-                  child: Column(
-                    children: [
-                      const SizedBox(height: 20),
-                      const Text(
-                        'งานที่ได้รับ',
-                        style: TextStyle(fontSize: 20),
-                      ),
-
-                      // If there is no event today, show the message
-                      if (!hasTodayEvent) 
-                        Container(
-                          margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-                          decoration: BoxDecoration(
-                            color: Colors.blue,
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: const ListTile(
-                            title: Text('- ไม่มีงานที่ต้องส่งในวันนี้ -'),
-                          ),
-                        ),
-
-                      Expanded(
-                        child: ListView.builder(
-                          itemCount: dataevent.length,
-                          itemBuilder: (context, index) {
-                            final event = dataevent[index];
-                            final isEventToday = isToday(event.Date); // Check if it's today
-
-                            return Container(
-                              margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-                              decoration: BoxDecoration(
-                                color: isEventToday
-                                    ? Colors.blue // Blue for today
-                                    : const Color.fromARGB(255, 195, 238, 250), // Light color for other days
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              child: ListTile(
-                                title: Text(event.Title),
-                                subtitle: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                height: 420,
+                                width: 350,
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: const BorderRadius.only(
+                                    topRight: Radius.circular(20),
+                                    bottomRight: Radius.circular(20),
+                                  ),
+                                ),
+                                child: Column(
                                   children: [
-                                    Text('วันที่สุดท้ายของการส่งงาน: ${event.Date}'),
-                                    Text('วิชา: ${event.Class} (${event.Year}/${event.Room})'),
-                                  ],
-                                ) 
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                  
-                
-                
-              
-            ],
-          ), 
-        ),
+                                    const SizedBox(height: 20),
+                                    const Text(
+                                      'งานที่ได้รับ',
+                                      style: TextStyle(fontSize: 20),
+                                    ),
 
+                                    // If there is no event today, show the message
+                                    if (!hasTodayEvent) 
+                                      Container(
+                                        margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                                        decoration: BoxDecoration(
+                                          color: Colors.blue,
+                                          borderRadius: BorderRadius.circular(20),
+                                        ),
+                                        child: const ListTile(
+                                          title: Text('- ไม่มีงานที่ต้องส่งในวันนี้ -'),
+                                        ),
+                                      ),
+
+                                    Expanded(
+                                      child: ListView.builder(
+                                        itemCount: dataevent.length,
+                                        itemBuilder: (context, index) {
+                                          final event = dataevent[index];
+                                          final isEventToday = isToday(event.Date); // Check if it's today
+
+                                          return Container(
+                                            margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                                            decoration: BoxDecoration(
+                                              color: isEventToday
+                                                  ? Colors.blue // Blue for today
+                                                  : const Color.fromARGB(255, 195, 238, 250), // Light color for other days
+                                              borderRadius: BorderRadius.circular(20),
+                                            ),
+                                            child: ListTile(
+                                              title: Text(event.Title),
+                                              subtitle: Column(
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                children: [
+                                                  Text('วันที่สุดท้ายของการส่งงาน: ${event.Date}'),
+                                                  Text('วิชา: ${event.Class} (${event.Year}/${event.Room})'),
+                                                ],
+                                              ) 
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                    ),        
+                                  ],
+                                ), 
+                              ),
                           ],
                         ),
 
@@ -448,7 +488,9 @@ void initState() {
                         borderRadius: BorderRadius.circular(20)
                         ),
                         
-                        child: Column(
+                        child: SingleChildScrollView(
+                          child: 
+                        Column(
                           children: [
                            
 
@@ -499,6 +541,8 @@ void initState() {
                                                   shrinkWrap: true,
                                                   itemCount: futurexamsets.length,
                                                   itemBuilder: (context, index) {
+
+                                                    futurexamsets.sort((a, b) => DateTime.parse(b.time).compareTo(DateTime.parse(a.time)));
                                                     final exam = futurexamsets[index];
                                                     return Card(
                                                       color: Colors.white,
@@ -595,6 +639,8 @@ void initState() {
                                                 shrinkWrap: true,                                              
                                                 itemCount: pastDeadlines.length,
                                                 itemBuilder: (context, index) {
+
+                                                  pastDeadlines.sort((a, b) => DateTime.parse(b.time).compareTo(DateTime.parse(a.time)));
                                                   final exam = pastDeadlines[index];
                                                   if (successChecks.length < pastDeadlines.length) {
                                                     successChecks = List<bool>.filled(pastDeadlines.length, false);
@@ -690,6 +736,8 @@ void initState() {
                                                               shrinkWrap: true,
                                                               itemCount: completeexamsets.length,
                                                               itemBuilder: (context, index) {
+
+                                                                completeexamsets.sort((a, b) => DateTime.parse(b.time).compareTo(DateTime.parse(a.time)));
                                                                 final exam = completeexamsets[index];
                                                                 if (successChecks.length < completeexamsets.length) {
                                                                   successChecks = List<bool>.filled(
@@ -750,7 +798,7 @@ void initState() {
 
 
                           ]
-                        ),
+                        ),)
                       ),
                       SizedBox(width: 50,),
 

@@ -75,6 +75,7 @@ class _AssignWork_class_TState extends State<AssignWork_class_T> {
       'username': username,
     },
   );
+  
 
   if (response.statusCode == 200) {
     List jsonResponse = json.decode(response.body);
@@ -465,7 +466,9 @@ void initState() {
                         borderRadius: BorderRadius.circular(20)
                         ),
                         
-                        child: Column(
+                        child: SingleChildScrollView(
+                          child: 
+                          Column(
                           children: [
                             Padding(
                               padding: EdgeInsets.fromLTRB(550,5,5,5),
@@ -900,7 +903,7 @@ void initState() {
                                           ),
                                         )                      
                                       ]
-                                    ),
+                                    ),)
                                   ),
                                   SizedBox(width: 20,),
 

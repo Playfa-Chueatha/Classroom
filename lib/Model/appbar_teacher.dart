@@ -90,7 +90,7 @@ class _appbarteacherState extends State<appbarteacher> {
 }
 
 Future<void> markAllNotificationsAsRead() async {
-  const String url = 'https://www.edueliteroom.com/connect/update_notification_status.php';
+  const String url = 'https://www.edueliteroom.com/connect/update_notificationassubmit_status.php';
   
   // สร้างรายการของ notification_ids ที่ต้องการอัพเดต
   List<int> notificationIdsToUpdate = notifications
