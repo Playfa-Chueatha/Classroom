@@ -42,11 +42,13 @@ class ClassT extends StatefulWidget {
 
 class ClassTState extends State<ClassT> {
   late Future<List<dynamic>> futurePosts;
+  int unreadCount = 0;
 
   @override
   void initState() {
     super.initState();
     futurePosts = fetchPosts();
+    _getUnreadNotifications();
   }
 
   Future<List<dynamic>> fetchPosts() async {
@@ -80,7 +82,29 @@ class ClassTState extends State<ClassT> {
   }
 }
 
+  Future<void> _getUnreadNotifications() async {
+    Notification notificationService = Notification();
+    try {
+      // ส่ง username ที่ได้รับมาจาก widget
+      List<NotificationData_sumit> fetchedNotifications =
+          await notificationService.fetchNotifications(widget.username);
 
+      if (fetchedNotifications.isNotEmpty) {
+        // นับจำนวนการแจ้งเตือนที่ยังไม่ได้อ่าน
+        int count = fetchedNotifications
+            .where((notification) => notification.user == 'notread')
+            .length;
+        setState(() {
+          unreadCount = count;
+        });
+      } else {
+        print("ไม่มีข้อมูลการแจ้งเตือน");
+      }
+    } catch (e) {
+      print("เกิดข้อผิดพลาดในการดึงข้อมูลการแจ้งเตือน: $e");
+    }
+  }
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -363,5 +387,36 @@ class ClassTState extends State<ClassT> {
         ),
       ),
     );
+  }
+}
+
+
+class Notification {
+  final String apiUrl = 'https://www.edueliteroom.com/connect/notification_submit.php';
+
+  Future<List<NotificationData_sumit>> fetchNotifications(String username) async {
+    try {
+      // ส่งข้อมูล username ไปยัง API
+      final response = await http.post(
+        Uri.parse(apiUrl),
+        body: {'username': username},
+      );
+
+
+      if (response.statusCode == 200) {
+
+        var data = json.decode(response.body);
+
+
+        List<dynamic> notifications = data['notifications'];
+
+        return notifications.map((item) => NotificationData_sumit.fromMap(item)).toList();
+      } else {
+        throw Exception('Failed to load notifications: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error fetching notifications: $e');
+      return [];
+    }
   }
 }

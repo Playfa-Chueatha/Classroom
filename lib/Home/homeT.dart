@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_esclass_2/Classroom/classT.dart';
+import 'package:flutter_esclass_2/Data/Data.dart';
 import 'package:flutter_esclass_2/Home/calendar_T.dart';
 import 'package:flutter_esclass_2/Home/todolist_T.dart';
 import 'package:flutter_esclass_2/Model/appbar_teacher.dart';
@@ -19,6 +20,31 @@ class main_home_T extends StatefulWidget {
 }
 
 class _main_home_TState extends State<main_home_T> {
+  int unreadCount = 0;
+
+  Future<void> _getUnreadNotifications() async {
+    Notification notificationService = Notification();
+    try {
+      // ส่ง username ที่ได้รับมาจาก widget
+      List<NotificationData_sumit> fetchedNotifications =
+          await notificationService.fetchNotifications(widget.username);
+
+      if (fetchedNotifications.isNotEmpty) {
+        // นับจำนวนการแจ้งเตือนที่ยังไม่ได้อ่าน
+        int count = fetchedNotifications
+            .where((notification) => notification.user == 'notread')
+            .length;
+        setState(() {
+          unreadCount = count;
+        });
+      } else {
+        print("ไม่มีข้อมูลการแจ้งเตือน");
+      }
+    } catch (e) {
+      print("เกิดข้อผิดพลาดในการดึงข้อมูลการแจ้งเตือน: $e");
+    }
+  }
+
   Future<Map<String, String>> fetchTeacherInfo() async {
     final response = await http.get(Uri.parse('https://www.edueliteroom.com/connect/get_user_teacher.php'));
 
@@ -31,6 +57,13 @@ class _main_home_TState extends State<main_home_T> {
     } else {
       throw Exception('ล้มเหลวในการโหลดข้อมูล');
     }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    _getUnreadNotifications();
   }
 
   @override
@@ -136,5 +169,36 @@ class _main_home_TState extends State<main_home_T> {
         },
       ),
     );
+  }
+}
+
+
+class Notification {
+  final String apiUrl = 'https://www.edueliteroom.com/connect/notification_submit.php';
+
+  Future<List<NotificationData_sumit>> fetchNotifications(String username) async {
+    try {
+      // ส่งข้อมูล username ไปยัง API
+      final response = await http.post(
+        Uri.parse(apiUrl),
+        body: {'username': username},
+      );
+
+
+      if (response.statusCode == 200) {
+
+        var data = json.decode(response.body);
+
+
+        List<dynamic> notifications = data['notifications'];
+
+        return notifications.map((item) => NotificationData_sumit.fromMap(item)).toList();
+      } else {
+        throw Exception('Failed to load notifications: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error fetching notifications: $e');
+      return [];
+    }
   }
 }

@@ -107,4 +107,44 @@ class Notification {
   }
 }
 
+//------------------------------------------------------
+
+class Studentdetailwork {
+  String usersUsername;
+  String usersNumber;
+  String usersPrefix;
+  String usersThfname;
+  String usersThlname;
+
+  Studentdetailwork({
+    required this.usersUsername,
+    required this.usersNumber,
+    required this.usersPrefix,
+    required this.usersThfname,
+    required this.usersThlname,
+  });
+
+  // สร้าง factory constructor เพื่อแปลงจาก Map (ข้อมูลที่ได้จาก API)
+  factory Studentdetailwork.fromJson(Map<String, dynamic> json) {
+    return Studentdetailwork(
+      usersUsername: json['users_username'],
+      usersNumber: json['users_number'].toString(),
+      usersPrefix: json['users_prefix'] ?? '',
+      usersThfname: json['users_thfname'] ?? '',
+      usersThlname: json['users_thlname'] ?? '',
+    );
+  }
+
+  // แปลงเป็น Map เพื่อใช้ในการแสดงผลหรือติดต่อกับ API
+  Map<String, dynamic> toJson() {
+    return {
+      'users_username': usersUsername,
+      'users_number': usersNumber,
+      'users_prefix': usersPrefix,
+      'users_thfname': usersThfname,
+      'users_thlname': usersThlname,
+    };
+  }
+}
+
 

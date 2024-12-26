@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_esclass_2/Classroom/setting_calss.dart';
 import 'package:flutter_esclass_2/Data/Data.dart';
@@ -59,6 +61,7 @@ class _AssignWork_class_TState extends State<AssignWork_class_T> {
   bool isExpandedPast = false;
   bool isExapandedcomplete = false;
   bool hasTodayEvent = false;
+  int unreadCount = 0;
   
 
   Future<List<Examset>> fetchExamsets(String classroomName, String classroomMajor, String classroomYear, String classroomNumRoom, String username) async {
@@ -205,7 +208,7 @@ Future<void> filterExamsets(List<Examset> examsets) async {
     }
   }
 
-  print('Complete Examsets: ${completeexamsets.length}');
+  // print('Complete Examsets: ${completeexamsets.length}');
   
   setState(() {
     futurexamsets = futureExamsetsTemp;
@@ -268,6 +271,29 @@ Future<void> updateInspectionStatus(String autoId, bool isChecked) async {
   }
 }
 
+Future<void> _getUnreadNotifications() async {
+    Notification notificationService = Notification();
+    try {
+      // ส่ง username ที่ได้รับมาจาก widget
+      List<NotificationData_sumit> fetchedNotifications =
+          await notificationService.fetchNotifications(widget.username);
+
+      if (fetchedNotifications.isNotEmpty) {
+        // นับจำนวนการแจ้งเตือนที่ยังไม่ได้อ่าน
+        int count = fetchedNotifications
+            .where((notification) => notification.user == 'notread')
+            .length;
+        setState(() {
+          unreadCount = count;
+        });
+      } else {
+        print("ไม่มีข้อมูลการแจ้งเตือน");
+      }
+    } catch (e) {
+      print("เกิดข้อผิดพลาดในการดึงข้อมูลการแจ้งเตือน: $e");
+    }
+  }
+
 
 @override
 void initState() {
@@ -275,6 +301,7 @@ void initState() {
   loadExamsets();
   successChecks = List<bool>.filled(futurexamsets.length, false);
   fetchEvents();
+  _getUnreadNotifications();
 }
 
   @override
@@ -514,8 +541,12 @@ void initState() {
                                                 height: 500, 
                                                 child: ListView.builder(
                                                   shrinkWrap: true,
+                                                  
                                                   itemCount: futurexamsets.length,
                                                   itemBuilder: (context, index) {
+                                                    
+                                                    futurexamsets.sort((a, b) => DateTime.parse(b.time).compareTo(DateTime.parse(a.time)));
+
                                                     final exam = futurexamsets[index];
                                                     return Card(
                                                       color: Colors.white,
@@ -532,7 +563,10 @@ void initState() {
                                                             Row(
                                                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                               children: [
-                                                                Text(' ${exam.time}'),
+                                                                Text(
+                                                                  DateFormat('dd/MM/yyyy (HH.mm น.)').format(DateTime.parse(exam.time)),
+                                                                  style: TextStyle(fontSize: 16),
+                                                                ),
                                                                 ElevatedButton(
                                                                   onPressed: () {
                                                                     const String title = 'ยืนยันการเปลี่ยนสถานะ';
@@ -558,11 +592,10 @@ void initState() {
                                                                   style: ElevatedButton.styleFrom(
                                                                     backgroundColor: Colors.green,
                                                                   ),
-                                                                  child: Text('ตรวจงานครบแล้ว',style: TextStyle(color: Colors.black),),
+                                                                  child: Text('ตรวจงานครบแล้ว', style: TextStyle(color: Colors.black)),
                                                                 ),
                                                               ],
                                                             ),
-                                                            Text(' ${exam.autoId} Status: ${exam.inspectionStatus} '),
                                                             Text(
                                                               " ${exam.direction}",
                                                               style: TextStyle(
@@ -581,7 +614,7 @@ void initState() {
                                                                     });
                                                                   },
                                                                   icon: Icon(Icons.search),
-                                                                )
+                                                                ),
                                                               ],
                                                             )
                                                           ],
@@ -591,6 +624,7 @@ void initState() {
                                                   },
                                                 ),
                                               ),
+
                                             ],
                                           ),
                                         ),
@@ -646,6 +680,7 @@ void initState() {
                                                 shrinkWrap: true,                                              
                                                 itemCount: pastDeadlines.length,
                                                 itemBuilder: (context, index) {
+                                                  pastDeadlines.sort((a, b) => DateTime.parse(b.time).compareTo(DateTime.parse(a.time)));
                                                   final exam = pastDeadlines[index];
                                                   if (successChecks.length < pastDeadlines.length) {
                                                     successChecks = List<bool>.filled(pastDeadlines.length, false);
@@ -666,7 +701,10 @@ void initState() {
                                                           Row(
                                                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                             children: [
-                                                              Text(' ${exam.time}'),
+                                                              Text(
+                                                                DateFormat('dd/MM/yyyy (HH.mm น.)').format(DateTime.parse(exam.time)),
+                                                                style: TextStyle(fontSize: 16),
+                                                              ),
                                                               ElevatedButton(
                                                               onPressed: () {
                                                                 const String title = 'ยืนยันการเปลี่ยนสถานะ';
@@ -696,7 +734,7 @@ void initState() {
                                                             ),
                                                             ]),
 
-                                                          Text(' ${exam.autoId} Status: ${exam.inspectionStatus} '),
+                                                          
                                                           Text(
                                                             " ${exam.direction} ",
                                                             style: TextStyle(
@@ -773,6 +811,7 @@ void initState() {
                                                               shrinkWrap: true,
                                                               itemCount: completeexamsets.length,
                                                               itemBuilder: (context, index) {
+                                                                completeexamsets.sort((a, b) => DateTime.parse(b.time).compareTo(DateTime.parse(a.time)));
                                                                 final exam = completeexamsets[index];
                                                                 if (successChecks.length < completeexamsets.length) {
                                                                   successChecks = List<bool>.filled(
@@ -793,7 +832,11 @@ void initState() {
                                                                         Row(
                                                                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                                           children: [
-                                                                            Text(' ${exam.time}'),
+                                                                            Text(
+                                                                              DateFormat('dd/MM/yyyy (HH.mm น.)').format(DateTime.parse(exam.time)),
+                                                                              style: TextStyle(fontSize: 16),
+                                                                            ),
+                                                              
                                                                            ElevatedButton(
                                                                               onPressed: () {
                                                                                 const String title = 'ยืนยันการเปลี่ยนสถานะ';
@@ -824,7 +867,6 @@ void initState() {
 
                                                                           ],
                                                                         ),
-                                                                        Text(' ${exam.autoId} Status: ${exam.inspectionStatus} '),
                                                                         Text(
                                                                           " ${exam.direction} ",
                                                                           style: TextStyle(
@@ -916,4 +958,32 @@ void initState() {
 }
 
 
+class Notification {
+  final String apiUrl = 'https://www.edueliteroom.com/connect/notification_submit.php';
 
+  Future<List<NotificationData_sumit>> fetchNotifications(String username) async {
+    try {
+      // ส่งข้อมูล username ไปยัง API
+      final response = await http.post(
+        Uri.parse(apiUrl),
+        body: {'username': username},
+      );
+
+
+      if (response.statusCode == 200) {
+
+        var data = json.decode(response.body);
+
+
+        List<dynamic> notifications = data['notifications'];
+
+        return notifications.map((item) => NotificationData_sumit.fromMap(item)).toList();
+      } else {
+        throw Exception('Failed to load notifications: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error fetching notifications: $e');
+      return [];
+    }
+  }
+}

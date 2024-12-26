@@ -46,7 +46,7 @@ class _work_body_SState extends State<work_body_S> {
   bool isExpandedFuture = false;
   bool isExpandedPast = false;
   bool isExapandedcomplete = false;
-  bool hasTodayEvent = false; // เช็คว่ามีงานวันนี้หรือไม่
+  bool hasTodayEvent = false; 
   int unreadCount = 0;
 
 
@@ -64,16 +64,6 @@ class _work_body_SState extends State<work_body_S> {
       'username': username,
     },
   );
-
-print("classroomName: $classroomName");
-print("classroomMajor: $classroomMajor");
-print("classroomYear: $classroomYear");
-print("classroomNumRoom: $classroomNumRoom");
-print("username: $username");
-// print("Response Status Code: ${response.statusCode}");
-// print("Response Body: ${response.body}");
-
-
 
 
   if (response.statusCode == 200) {
@@ -132,13 +122,13 @@ Future<void> filterExamsets(List<Examset> examsets) async {
 
   List<Examset> futureExamsetsTemp = [];
   List<Examset> pastDeadlinesTemp = [];
-  List<Examset> completeExamsetsTemp = []; // เปลี่ยนชื่อจาก completeexamsets
+  List<Examset> completeExamsetsTemp = []; 
 
   for (var examset in examsets) {
     DateTime deadlineDate = DateTime.tryParse(examset.deadline) ?? DateTime.now();
     
     if (examset.inspectionStatus == 'complete') {
-      completeExamsetsTemp.add(examset); // ใช้ชื่อใหม่
+      completeExamsetsTemp.add(examset); 
     } else {
       if (deadlineDate.isAfter(currentDate) || 
           (deadlineDate.year == currentDate.year &&
@@ -388,7 +378,7 @@ void initState() {
                     children: [
                       const SizedBox(height: 20),
                       const Text(
-                        'งานที่มอบหมาย',
+                        'งานที่ได้รับ',
                         style: TextStyle(fontSize: 20),
                       ),
 
@@ -480,7 +470,7 @@ void initState() {
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text(
-                                        "งานที่มอบหมายทั้งหมด (${futurexamsets.length} งาน)",
+                                        "งานที่ได้รับทั้งหมด (${futurexamsets.length} งาน)",
                                         style: TextStyle(fontSize: 20),
                                       ),
                                       IconButton(
@@ -502,7 +492,7 @@ void initState() {
                                     isLoadingExamset
                                         ? Center(child: CircularProgressIndicator())
                                         : futurexamsets.isEmpty
-                                            ? Center(child: Text("ไม่มีงานที่มอบหมาย"))
+                                            ? Center(child: Text("ไม่มีงานทีได้รับ"))
                                             : SizedBox(
                                                 height: 500, 
                                                 child: ListView.builder(
@@ -576,7 +566,7 @@ void initState() {
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text(
-                                        "งานที่เลยกำหนดแล้วทั้งหมด (${pastDeadlines.length} งาน)",
+                                        "งานที่เลยกำหนดส่งแล้วทั้งหมด (${pastDeadlines.length} งาน)",
                                         style: TextStyle(fontSize: 20),
                                       ),
                                       IconButton(
@@ -598,7 +588,7 @@ void initState() {
                                     isLoadingExamset
                                         ? Center(child: CircularProgressIndicator())
                                         : pastDeadlines.isEmpty
-                                            ? Center(child: Text("ไม่มีงานที่มอบหมาย"))
+                                            ? Center(child: Text("ไม่มีงานที่เลยกำหนดส่ง"))
                                             : SizedBox( 
                                               height: 500, 
                                               child: ListView.builder(
@@ -671,7 +661,7 @@ void initState() {
                                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                 children: [
                                                   Text(
-                                                    "งานที่ตรวจสอบแล้วทั้งหมด (${completeexamsets.length} งาน)",
+                                                    "งานที่ส่งแล้วแล้วทั้งหมด (${completeexamsets.length} งาน)",
                                                     style: TextStyle(fontSize: 20),
                                                   ),
                                                   IconButton(
@@ -693,7 +683,7 @@ void initState() {
                                                 isLoadingExamset
                                                     ? Center(child: CircularProgressIndicator())
                                                     : completeexamsets.isEmpty
-                                                        ? Center(child: Text("ไม่มีงานที่ตรวจสอบแล้ว"))
+                                                        ? Center(child: Text("ยังไม่มีงานที่คุณส่งแล้ว"))
                                                         : SizedBox(
                                                             height: 500,
                                                             child: ListView.builder(

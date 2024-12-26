@@ -34,6 +34,15 @@ class _DoauswerstudentsState extends State<Doauswerstudents> {
   const url = "https://www.edueliteroom.com/connect/submit_auswer.php";
   final answers = <Map<String, dynamic>>[];
 
+  // ตรวจสอบว่า widget.questions ไม่ว่าง
+  if (widget.questions.isEmpty) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('ไม่มีคำถามที่จะส่ง')),
+    );
+    return;
+  }
+
+  // เตรียมข้อมูลคำตอบ
   for (int i = 0; i < widget.questions.length; i++) {
     answers.add({
       'question_id': widget.questions[i].questionAuto,
@@ -47,29 +56,38 @@ class _DoauswerstudentsState extends State<Doauswerstudents> {
     'answers': answers,
   };
 
-  final response = await http.post(
-    Uri.parse(url),
-    headers: {"Content-Type": "application/json"},
-    body: jsonEncode(data),
-  );
+  print("Data being sent: $data");
 
-  if (response.statusCode == 200) {
-    final result = jsonDecode(response.body);
-    if (result['success']) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('ส่งคำตอบสำเร็จ')),
-      );
+  try {
+    final response = await http.post(
+      Uri.parse(url),
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode(data),
+    ).timeout(const Duration(seconds: 30)); 
+    if (response.statusCode == 200) {
+      final result = jsonDecode(response.body);
+      if (result['success']) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('ส่งคำตอบสำเร็จ')),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('เกิดข้อผิดพลาดในการส่งคำตอบ')),
+        );
+      }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('เกิดข้อผิดพลาดในการส่งคำตอบ')),
+        const SnackBar(content: Text('ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้')),
       );
     }
-  } else {
+  } catch (e) {
+    // จัดการข้อผิดพลาดเมื่อเกิดปัญหาการเชื่อมต่อ
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้')),
+      SnackBar(content: Text('เกิดข้อผิดพลาด: $e')),
     );
   }
 }
+
 
 
   @override

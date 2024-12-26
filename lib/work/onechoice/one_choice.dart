@@ -883,18 +883,11 @@ void _deleteQuestion(int index) {
                 
                 
                 Expanded(
-                  child: Text(
-                    question.questionController.text,
+                  child: Text(' ${question.questionController.text} (${question.fullMarkinchoiceController.text} คะแนน)',
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
-                ),
+                  ),),
+            
 
-                Expanded(child: Text(
-                  question.fullMarkinchoiceController.text,
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-
-                )
-                ),
 
                 IconButton(
                   onPressed: () => _editQuestion(questionIndex), 
