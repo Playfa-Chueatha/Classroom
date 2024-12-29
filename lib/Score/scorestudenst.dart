@@ -1,9 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_esclass_2/Data/Data_students.dart';
+import 'package:flutter_esclass_2/Data/Data.dart';
+
+List<liststudents> dataliststudents = [];
 
 class Scorestudenst extends StatefulWidget {
-  const Scorestudenst({super.key});
+  final String username;
+  final String thfname;
+  final String thlname;
+  final String classroomName;
+  final String classroomMajor;
+  final String classroomYear;
+  final String classroomNumRoom;
+
+  const Scorestudenst({
+    super.key,
+    required this.username, 
+    required this.thfname, 
+    required this.thlname, 
+    required this.classroomName, 
+    required this.classroomMajor, 
+    required this.classroomYear, 
+    required this.classroomNumRoom, 
+  });
 
   @override
   State<Scorestudenst> createState() => _ScorestudentsState();
@@ -183,18 +202,17 @@ class _ScorestudentsState extends State<Scorestudenst> {
                         ),
                       ),
                     );
-                  // ignore: unnecessary_to_list_in_spreads
-                  }).toList(),
+                  }),
                 ],
                 rows: dataliststudents.asMap().entries.map((entry) {
                   var student = entry.value;
                   var controllers = scoreControllers[entry.key];
                   return DataRow(
                     cells: [
-                      DataCell(Text(student.numroom.toString())),
-                      DataCell(Text(student.IDstudents.toString())),
-                      DataCell(Text(student.firstnamestudents)),
-                      DataCell(Text(student.lastnamestudents)),
+                      DataCell(Text(student.studentNumber)),
+                      DataCell(Text(student.studentId)),
+                      DataCell(Text(student.firstName)),
+                      DataCell(Text(student.lastName)),
                       // Add cells for scores dynamically
                       ...controllers.map((controller) => DataCell(
                         Center(child: 
@@ -222,3 +240,5 @@ class _ScorestudentsState extends State<Scorestudenst> {
     );
   }
 }
+
+

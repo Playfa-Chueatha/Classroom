@@ -1,20 +1,4 @@
-class liststudents {
-  final String firstnamestudents;
-  final String lastnamestudents;
-  final int numroom;
-  final int IDstudents;
-  final String email;
 
-  liststudents({
-    required this.firstnamestudents,
-    required this.lastnamestudents,
-    required this.numroom,
-    required this.IDstudents,
-    required this.email,
-  });
-}
-
-List<liststudents> dataliststudents = [];
 
 
 //------------------------------------------------------------------------------------------------------------>>>>>

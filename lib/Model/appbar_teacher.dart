@@ -254,7 +254,7 @@ Future<void> fetchUnreadNotifications() async {
                     style: IconButton.styleFrom(
                       highlightColor: const Color.fromARGB(255, 170, 205, 238),
                     ),
-                    onPressed: () => navigateTo(Score_T_body(thfname: widget.thfname, thlname: widget.thlname, username: widget.username)), 
+                    onPressed: () => navigateTo(Score_T_body(thfname: widget.thfname, thlname: widget.thlname, username: widget.username, classroomMajor: '', classroomName: '', classroomYear: '', classroomNumRoom: '')), 
                     icon: const Icon(Icons.list_alt),
                     tooltip: 'รายชื่อนักเรียน',
                   ),

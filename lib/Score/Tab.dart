@@ -3,14 +3,30 @@ import 'package:flutter_esclass_2/Score/checkinclassroom.dart';
 import 'package:flutter_esclass_2/Score/scorestudenst.dart';
 
 class TabScore extends StatefulWidget {
-  const TabScore({super.key});
+  final String username;
+  final String thfname;
+  final String thlname;
+  final String classroomName;
+  final String classroomMajor;
+  final String classroomYear;
+  final String classroomNumRoom;
+  const TabScore({
+    super.key,
+    required this.username, 
+    required this.thfname, 
+    required this.thlname, 
+    required this.classroomName, 
+    required this.classroomMajor, 
+    required this.classroomYear, 
+    required this.classroomNumRoom, 
+  });
 
   @override
   State<TabScore> createState() => _TabScoreState();
 }
 
 class _TabScoreState extends State<TabScore> {
-  List<String> tabData = ['', '', '', '']; // ใช้เก็บข้อมูลจากแต่ละแท็บ
+  List<String> tabData = ['', '', '', ''];
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +42,11 @@ class _TabScoreState extends State<TabScore> {
         child: DefaultTabController(
           length: 2, // จำนวนแท็บที่ต้องการแสดง
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              Text('ห้องเรียน ${widget.classroomName} ${widget.classroomYear}/${widget.classroomNumRoom} (${widget.classroomMajor})', style: TextStyle(
+                fontSize: 20,
+              ),),
               TabBar(
                 tabs: [
                   Tab(
@@ -44,8 +64,24 @@ class _TabScoreState extends State<TabScore> {
               Expanded(
                 child: TabBarView(
                   children: [
-                    Center(child: Checkinclassroom()),
-                    Center(child: Scorestudenst()),
+                    Center(child: Checkinclassroom(
+                          classroomMajor: widget.classroomMajor,
+                          classroomName: widget.classroomName,
+                          classroomNumRoom: widget.classroomNumRoom,
+                          classroomYear: widget.classroomYear,
+                          thfname: widget.thfname,
+                          thlname: widget.thlname,
+                          username: widget.username,
+                    )),
+                    Center(child: Scorestudenst(
+                          classroomMajor: widget.classroomMajor,
+                          classroomName: widget.classroomName,
+                          classroomNumRoom: widget.classroomNumRoom,
+                          classroomYear: widget.classroomYear,
+                          thfname: widget.thfname,
+                          thlname: widget.thlname,
+                          username: widget.username,
+                    )),
                   ],
                 ),
               ),

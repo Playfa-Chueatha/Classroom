@@ -2,10 +2,16 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_esclass_2/Data/Data.dart';
 import 'package:flutter_esclass_2/work/auswer/QuestionListDialog.dart';
+import 'package:flutter_esclass_2/work/auswer/chcekworkaftersubmitscoreauswer.dart';
 import 'package:flutter_esclass_2/work/auswer/doAuswerStudents.dart';
+import 'package:flutter_esclass_2/work/auswer/getsubmitauswer.dart';
 import 'package:flutter_esclass_2/work/manychoice/DoManychoiceStudents.dart';
+import 'package:flutter_esclass_2/work/manychoice/chcekscoremanychoice.dart';
 import 'package:flutter_esclass_2/work/manychoice/manychoice_dialog.dart';
 import 'package:flutter_esclass_2/work/onechoice/DoonechoiceStudents.dart';
+import 'package:flutter_esclass_2/work/onechoice/chcekscoreonechoice.dart';
+import 'package:flutter_esclass_2/work/upfile/chcekworkaftersubmitscoreupfile.dart';
+import 'package:flutter_esclass_2/work/upfile/getsubmitscoreupfile.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:url_launcher/url_launcher.dart';
@@ -35,6 +41,7 @@ class _Detail_workState extends State<Detail_work_S> {
   bool hasSubmitted = false;
   bool isLoading = true;
   bool status = false;
+  String submitTime = '';
 
   Future<void> _fetchData() async {
     final exam = widget.exam;
@@ -79,19 +86,22 @@ class _Detail_workState extends State<Detail_work_S> {
       final data = jsonDecode(response.body);
       print('Decoded Data: $data');
       
-      // เก็บค่าจาก response ในตัวแปร hasSubmitted และ status
+      // เก็บค่าจาก response
       hasSubmitted = data['exists'] == true;
-      status = data['status'] ?? false;  // กำหนดค่าเริ่มต้นเป็น false หากไม่มีค่า status
+      status = data['status'] ?? false;
+      submitTime = data['submitTime'];
+     
 
-      return hasSubmitted;  // คืนค่าจาก hasSubmitted
+      return hasSubmitted;
     } else {
       throw Exception('Server Error: ${response.statusCode}');
     }
   } catch (e) {
     debugPrint('Error in _checkSubmit: $e');
-    return false; // Return false if there's an error
+    return false;
   }
 }
+
 
 
 
@@ -293,10 +303,41 @@ void didUpdateWidget(covariant Detail_work_S oldWidget) {
                             Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
+                                  if (submitTime.isNotEmpty && widget.exam.deadline.isNotEmpty) 
+                                  Builder(builder: (context){
+                                    final submitDate = DateTime.parse(submitTime);
+                                    final deadlineDate = DateTime.parse(widget.exam.deadline);
+
+                                    // เปรียบเทียบเฉพาะวัน (ไม่สนใจเวลา)
+                                    if (submitDate.year == deadlineDate.year &&
+                                        submitDate.month == deadlineDate.month &&
+                                        submitDate.day == deadlineDate.day) {
+                                      // กรณีส่งในวันเดียวกัน
+                                      return Text(
+                                        'คุณได้ส่งไฟล์เรียบร้อยแล้ว ',
+                                        style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold),
+                                      );
+                                    } else if (!submitDate.isAfter(deadlineDate)) {
+                                      // กรณีส่งตรงเวลา หรือก่อนเวลา
+                                      return Text(
+                                        'คุณได้ส่งไฟล์เรียบร้อยแล้ว ',
+                                        style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold),
+                                      );
+                                    } else {
+                                      // กรณีส่งช้ากว่ากำหนด
+                                      final overdueDays = submitDate.difference(deadlineDate).inDays;
+                                      return Text(
+                                        'คุณได้ส่งไฟล์ช้ากว่ากำหนด $overdueDays วัน',
+                                        style: TextStyle(color: const Color.fromARGB(255, 177, 136, 2), fontWeight: FontWeight.bold),
+                                      );
+                                    }
+                                  },
+                                  )else
                                   Text(
-                                    'คุณได้ส่งไฟล์เรียบร้อยแล้ว',
-                                    style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold),
+                                    'ข้อมูลเวลาไม่ถูกต้อง',
+                                    style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
                                   ),
+                                  
                                   SizedBox(width: 8),
                                   // แสดง TextButton พร้อม Icon ข้างหน้า
                                   status
@@ -306,12 +347,19 @@ void didUpdateWidget(covariant Detail_work_S oldWidget) {
                                             color: Colors.green,
                                           ),
                                           label: Text(
-                                            'เสร็จสิ้น',
+                                            'งานได้รับการตรวจแล้ว',
                                             style: TextStyle(color: Colors.green, fontSize: 16),
                                           ),
                                           onPressed: () {
-                                            // ฟังก์ชันเมื่อกด TextButton
-                                            print('TextButton with check icon clicked');
+                                            showDialog(
+                                              context: context,
+                                              builder: (BuildContext context) {
+                                                return Chcekworkaftersubmitscoreupfile(
+                                                  exam: widget.exam,
+                                                  username: widget.username,
+                                                ); 
+                                              },
+                                            );
                                           },
                                         )
                                       : TextButton.icon(
@@ -320,12 +368,21 @@ void didUpdateWidget(covariant Detail_work_S oldWidget) {
                                             color: Colors.orange,
                                           ),
                                           label: Text(
-                                            'กำลังดำเนินการ',
+                                            'กำลังรอตรวจงาน',
                                             style: TextStyle(color: Colors.orange, fontSize: 16),
                                           ),
                                           onPressed: () {
-                                            // ฟังก์ชันเมื่อกด TextButton
-                                            print('TextButton with hourglass icon clicked');
+                                            showDialog(
+                                              context: context,
+                                              builder: (BuildContext context) {
+                                                return Getsubmitscoreupfile(
+                                                  exam: widget.exam,
+                                                  username: widget.username,
+                                                ); 
+                                              },
+                                            );
+                                            
+
                                           },
                                         ),
                                 ],
@@ -335,10 +392,14 @@ void didUpdateWidget(covariant Detail_work_S oldWidget) {
                                         DateTime currentDate = DateTime.now();
                                         DateTime deadlineDate = DateTime.parse(exam.deadline);
 
+                                        // ทำให้เวลาเป็น 00:00:00 ของวันเพื่อเปรียบเทียบเฉพาะวัน
+                                        DateTime currentDateOnly = DateTime(currentDate.year, currentDate.month, currentDate.day);
+                                        DateTime deadlineDateOnly = DateTime(deadlineDate.year, deadlineDate.month, deadlineDate.day);
 
-                                        Duration difference = currentDate.difference(deadlineDate);
-                                        // หากวันที่ปัจจุบันเลยวันครบกำหนดแล้ว
-                                        if (currentDate.isAfter(deadlineDate)) {
+                                        Duration difference = currentDateOnly.difference(deadlineDateOnly);
+
+                                        if (currentDateOnly.isAfter(deadlineDateOnly)) {
+                                          // หากวันที่ปัจจุบันเลยวันครบกำหนดแล้ว
                                           return Text(
                                             'คุณไม่สามารถส่งงานได้เนื่องจากเลยวันครบกำหนดมา ${difference.inDays} วันแล้ว',
                                             style: TextStyle(color: Colors.red, fontSize: 16),
@@ -350,20 +411,20 @@ void didUpdateWidget(covariant Detail_work_S oldWidget) {
                                             children: [
                                               Text('คุณยังไม่ได้ส่งงาน'),
                                               IconButton(
-                                              onPressed: () async {
-                                                FilePickerResult? result = await FilePicker.platform.pickFiles(
-                                                  allowMultiple: true,
-                                                );
-                                                if (result != null) {
-                                                  setState(() {
-                                                    selectedFiles = result.files;
-                                                  });
-                                                }
-                                              },
-                                              icon: Icon(Icons.upload, size: 30),
-                                            )
+                                                onPressed: () async {
+                                                  FilePickerResult? result = await FilePicker.platform.pickFiles(
+                                                    allowMultiple: true,
+                                                  );
+                                                  if (result != null) {
+                                                    setState(() {
+                                                      selectedFiles = result.files;
+                                                    });
+                                                  }
+                                                },
+                                                icon: Icon(Icons.upload, size: 30),
+                                              ),
                                             ],
-                                          ); 
+                                          );
                                         }
                                       } else {
                                         // หาก exam.closed == 'No' แสดงปุ่มส่งงาน
@@ -392,11 +453,32 @@ void didUpdateWidget(covariant Detail_work_S oldWidget) {
                                             )
 
                                           ],);
+                                        } else if (difference.inDays == 0){
+                                          return Row(
+                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Text('กำหนดส่งวันนี้วันสุดท้ายกรุณาส่งงานโดยเร็ว!', style: TextStyle(color: Colors.orange, fontSize: 14),),
+                                              IconButton(
+                                              onPressed: () async {
+                                                FilePickerResult? result = await FilePicker.platform.pickFiles(
+                                                  allowMultiple: true,
+                                                );
+                                                if (result != null) {
+                                                  setState(() {
+                                                    selectedFiles = result.files;
+                                                  });
+                                                }
+                                              },
+                                              icon: Icon(Icons.upload, size: 30),
+                                            ),
+                                            ],
+                                          );
+
                                         } else {
                                           return Row(
                                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                           children: [
-                                            Text('เลยวันครบกำหนดมา ${difference.inDays} วันแล้วรีบส่งงานโดยเร็ว', style: TextStyle(color: Colors.orange, fontSize: 14),),
+                                            Text('เลยวันครบกำหนดมา ${difference.inDays} วันแล้วรีบส่งงานโดยเร็ว!', style: TextStyle(color: Colors.orange, fontSize: 14),),
                                             IconButton(
                                               onPressed: () async {
                                                 FilePickerResult? result = await FilePicker.platform.pickFiles(
@@ -452,9 +534,39 @@ void didUpdateWidget(covariant Detail_work_S oldWidget) {
                   ? Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
+                                  if (submitTime.isNotEmpty && widget.exam.deadline.isNotEmpty) 
+                                  Builder(builder: (context){
+                                    final submitDate = DateTime.parse(submitTime);
+                                    final deadlineDate = DateTime.parse(widget.exam.deadline);
+
+                                    // เปรียบเทียบเฉพาะวัน (ไม่สนใจเวลา)
+                                    if (submitDate.year == deadlineDate.year &&
+                                        submitDate.month == deadlineDate.month &&
+                                        submitDate.day == deadlineDate.day) {
+                                      // กรณีส่งในวันเดียวกัน
+                                      return Text(
+                                        'คุณได้ตอบคำถามเรียบร้อยแล้ว ',
+                                        style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold),
+                                      );
+                                    } else if (!submitDate.isAfter(deadlineDate)) {
+                                      // กรณีส่งตรงเวลา หรือก่อนเวลา
+                                      return Text(
+                                        'คุณได้ตอบคำถามเรียบร้อยแล้ว ',
+                                        style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold),
+                                      );
+                                    } else {
+                                      // กรณีส่งช้ากว่ากำหนด
+                                      final overdueDays = submitDate.difference(deadlineDate).inDays;
+                                      return Text(
+                                        'คุณได้ตอบคำถามช้ากว่ากำหนด $overdueDays วัน',
+                                        style: TextStyle(color: const Color.fromARGB(255, 177, 136, 2), fontWeight: FontWeight.bold),
+                                      );
+                                    }
+                                  },
+                                  )else
                                   Text(
-                                    'คุณได้ส่งไฟล์เรียบร้อยแล้ว',
-                                    style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold),
+                                    'ข้อมูลเวลาไม่ถูกต้อง',
+                                    style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
                                   ),
                                   SizedBox(width: 8),
                                   // แสดง TextButton พร้อม Icon ข้างหน้า
@@ -465,11 +577,17 @@ void didUpdateWidget(covariant Detail_work_S oldWidget) {
                                             color: Colors.green,
                                           ),
                                           label: Text(
-                                            'เสร็จสิ้น',
+                                            'งานได้รับการตรวจแล้ว',
                                             style: TextStyle(color: Colors.green, fontSize: 16),
                                           ),
                                           onPressed: () {
-                                            // ฟังก์ชันเมื่อกด TextButton
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(builder: (context) => Chcekworkaftersubmitscoreauswer(
+                                                exam: widget.exam,
+                                                username: widget.username,
+                                              ))
+                                            );
                                             print('TextButton with check icon clicked');
                                           },
                                         )
@@ -479,133 +597,197 @@ void didUpdateWidget(covariant Detail_work_S oldWidget) {
                                             color: Colors.orange,
                                           ),
                                           label: Text(
-                                            'กำลังดำเนินการ',
+                                            'กำลังรอตรวจงาน',
                                             style: TextStyle(color: Colors.orange, fontSize: 16),
                                           ),
                                           onPressed: () {
-                                            // ฟังก์ชันเมื่อกด TextButton
-                                            print('TextButton with hourglass icon clicked');
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(builder: (context) => Getsubmitauswer(
+                                                exam: widget.exam,
+                                                username: widget.username,
+                                              ))
+                                            );
                                           },
                                         ),])
-                                
-                  : Builder(
-                      builder: (context) {
-                        DateTime currentDate = DateTime.now();
-                        DateTime deadlineDate = DateTime.parse(exam.deadline);
+                                                
+                                  : Builder(
+                                      builder: (context) {
+                                        DateTime currentDate = DateTime.now();
+                                        DateTime deadlineDate = DateTime.parse(exam.deadline);
 
-                        Duration difference = currentDate.difference(deadlineDate);
+                                        Duration difference = currentDate.difference(deadlineDate);
 
-                        if (exam.closed == 'Yes') {
-                          // งานปิดรับ
-                          if (currentDate.isAfter(deadlineDate)) {
-                            // เลยวันครบกำหนด
-                            return Text(
-                              'คุณไม่สามารถส่งงานได้เนื่องจากเลยวันครบกำหนดมาแล้ว ${difference.inDays} วัน',
-                              style: TextStyle(color: Colors.red, fontSize: 16),
-                            );
-                          } else {
-                            // ยังไม่ถึงวันครบกำหนด
-                            return Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text('คุณยังไม่ได้ส่งงาน'),
-                                OutlinedButton(
-                                  onPressed: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => Doauswerstudents(
-                                          thfname: widget.thfname,
-                                          thlname: widget.thlname,
-                                          username: widget.username,
-                                          exam: widget.exam,
-                                          questions: questionData,
-                                        ),
-                                      ),
-                                    );
+                                        if (exam.closed == 'Yes') {
+                                        DateTime currentDate = DateTime.now();
+                                        DateTime deadlineDate = DateTime.parse(exam.deadline);
+
+                                        // ทำให้เวลาเป็น 00:00:00 ของวันเพื่อเปรียบเทียบเฉพาะวัน
+                                        DateTime currentDateOnly = DateTime(currentDate.year, currentDate.month, currentDate.day);
+                                        DateTime deadlineDateOnly = DateTime(deadlineDate.year, deadlineDate.month, deadlineDate.day);
+
+                                        Duration difference = currentDateOnly.difference(deadlineDateOnly);
+
+                                        if (currentDateOnly.isAfter(deadlineDateOnly)) {
+                                          // หากวันที่ปัจจุบันเลยวันครบกำหนดแล้ว
+                                          return Text(
+                                            'คุณไม่สามารถส่งงานได้เนื่องจากเลยวันครบกำหนดมา ${difference.inDays} วันแล้ว',
+                                            style: TextStyle(color: Colors.red, fontSize: 16),
+                                          );
+                                        } else {
+                                          // หากยังไม่ถึงวันครบกำหนดให้แสดงปุ่ม
+                                          return Row(
+                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Text('คุณยังไม่ได้ส่งงาน'),
+                                              IconButton(
+                                                onPressed: () async {
+                                                  Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                        builder: (context) => Doauswerstudents(
+                                                          thfname: widget.thfname,
+                                                          thlname: widget.thlname,
+                                                          username: widget.username,
+                                                          exam: widget.exam,
+                                                          questions: questionData,
+                                                        ),
+                                                      ),
+                                                    );
+                                                  
+                                                },
+                                                icon: Icon(Icons.upload, size: 30),
+                                              ),
+                                            ],
+                                          );
+                                        }
+                                        } else {
+                                          // งานยังเปิดรับ
+                                          if (difference.isNegative) {
+                                            // ยังไม่ถึงวันครบกำหนด
+                                            return Row(
+                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                              children: [
+                                                Text('คุณยังไม่ได้ส่งงาน'),
+                                                OutlinedButton(
+                                                  onPressed: () {
+                                                    Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                        builder: (context) => Doauswerstudents(
+                                                          thfname: widget.thfname,
+                                                          thlname: widget.thlname,
+                                                          username: widget.username,
+                                                          exam: widget.exam,
+                                                          questions: questionData,
+                                                        ),
+                                                      ),
+                                                    );
+                                                  },
+                                                  child: Text('ไปตอบคำถาม'),
+                                                ),
+                                              ],
+                                            );
+                                          } else if (difference.inDays == 0){
+                                          return Row(
+                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Text('กำหนดส่งวันนี้วันสุดท้ายกรุณาส่งงานโดยเร็ว!', style: TextStyle(color: Colors.orange, fontSize: 14),),
+                                              IconButton(
+                                              onPressed: () async {
+                                                FilePickerResult? result = await FilePicker.platform.pickFiles(
+                                                  allowMultiple: true,
+                                                );
+                                                if (result != null) {
+                                                  setState(() {
+                                                    selectedFiles = result.files;
+                                                  });
+                                                }
+                                              },
+                                              icon: Icon(Icons.upload, size: 30),
+                                            ),
+                                            ],
+                                          );
+                                          } else {
+                                            // เลยวันครบกำหนดมาแล้ว
+                                            return Row(
+                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                              children: [
+                                                Text(
+                                                  'เลยวันครบกำหนดมา ${difference.inDays} วันแล้วรีบส่งงานโดยเร็ว',
+                                                  style: TextStyle(color: Colors.orange, fontSize: 14),
+                                                ),
+                                                OutlinedButton(
+                                                  onPressed: () {
+                                                    Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                        builder: (context) => Doauswerstudents(
+                                                          thfname: widget.thfname,
+                                                          thlname: widget.thlname,
+                                                          username: widget.username,
+                                                          exam: widget.exam,
+                                                          questions: questionData,
+                                                        ),
+                                                      ),
+                                                    );
+                                                  },
+                                                  child: Text('ไปตอบคำถาม'),
+                                                ),
+                                              ],
+                                            );
+                                          }
+                                        }
+                                      },
+                                    ),
+                            ],
+
+
+
+                            //onechoice
+                            if (exam.type == 'onechoice') ...[
+                              SizedBox(height: 16),
+                              Text('สถานะการส่งงาาน:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+                              SizedBox(height: 8),
+                                hasSubmitted
+                                    ? Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        if (submitTime.isNotEmpty && widget.exam.deadline.isNotEmpty) 
+                                  Builder(builder: (context){
+                                    final submitDate = DateTime.parse(submitTime);
+                                    final deadlineDate = DateTime.parse(widget.exam.deadline);
+
+                                    // เปรียบเทียบเฉพาะวัน (ไม่สนใจเวลา)
+                                    if (submitDate.year == deadlineDate.year &&
+                                        submitDate.month == deadlineDate.month &&
+                                        submitDate.day == deadlineDate.day) {
+                                      // กรณีส่งในวันเดียวกัน
+                                      return Text(
+                                        'คุณได้ทำข้อสอบเรียบร้อยแล้ว ',
+                                        style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold),
+                                      );
+                                    } else if (!submitDate.isAfter(deadlineDate)) {
+                                      // กรณีส่งตรงเวลา หรือก่อนเวลา
+                                      return Text(
+                                        'คุณได้ทำข้อสอบเรียบร้อยแล้ว ',
+                                        style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold),
+                                      );
+                                    } else {
+                                      // กรณีส่งช้ากว่ากำหนด
+                                      final overdueDays = submitDate.difference(deadlineDate).inDays;
+                                      return Text(
+                                        'คุณได้ทำข้อสอบช้ากว่ากำหนด $overdueDays วัน',
+                                        style: TextStyle(color: const Color.fromARGB(255, 177, 136, 2), fontWeight: FontWeight.bold),
+                                      );
+                                    }
                                   },
-                                  child: Text('ไปตอบคำถาม'),
-                                ),
-                              ],
-                            );
-                          }
-                        } else {
-                          // งานยังเปิดรับ
-                          if (difference.isNegative) {
-                            // ยังไม่ถึงวันครบกำหนด
-                            return Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text('คุณยังไม่ได้ส่งงาน'),
-                                OutlinedButton(
-                                  onPressed: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => Doauswerstudents(
-                                          thfname: widget.thfname,
-                                          thlname: widget.thlname,
-                                          username: widget.username,
-                                          exam: widget.exam,
-                                          questions: questionData,
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                  child: Text('ไปตอบคำถาม'),
-                                ),
-                              ],
-                            );
-                          } else {
-                            // เลยวันครบกำหนดมาแล้ว
-                            return Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  'เลยวันครบกำหนดมา ${difference.inDays} วันแล้วรีบส่งงานโดยเร็ว',
-                                  style: TextStyle(color: Colors.orange, fontSize: 14),
-                                ),
-                                OutlinedButton(
-                                  onPressed: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => Doauswerstudents(
-                                          thfname: widget.thfname,
-                                          thlname: widget.thlname,
-                                          username: widget.username,
-                                          exam: widget.exam,
-                                          questions: questionData,
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                  child: Text('ไปตอบคำถาม'),
-                                ),
-                              ],
-                            );
-                          }
-                        }
-                      },
-                    ),
-            ],
-
-
-
-            //onechoice
-            if (exam.type == 'onechoice') ...[
-              SizedBox(height: 16),
-              Text('สถานะการส่งงาาน:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-              SizedBox(height: 8),
-                hasSubmitted
-                    ? Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                        'คุณได้ทำข้อสอบเรียบร้อยแล้ว',
-                        style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold),
-                      ),
-                      TextButton.icon(
+                                  )else
+                                  Text(
+                                    'ข้อมูลเวลาไม่ถูกต้อง',
+                                    style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+                                  ),
+                                      TextButton.icon(
                                           icon: Icon(
                                             Icons.search,
                                             color: const Color.fromARGB(255, 0, 0, 0),
@@ -615,128 +797,188 @@ void didUpdateWidget(covariant Detail_work_S oldWidget) {
                                             style: TextStyle(color: const Color.fromARGB(255, 0, 0, 0), fontSize: 16),
                                           ),
                                           onPressed: () {
-                                            // ฟังก์ชันเมื่อกด TextButton
-                                            print('TextButton with check icon clicked');
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(builder: (context) => Chcekscoreonechoice(
+                                                exam: widget.exam,
+                                                username: widget.username,
+                                              ))
+                                            );
                                           },
                                         )
 
-                      ],
-                    )              
-                    : Builder(builder: (context){
-                        if (exam.closed == 'Yes') {
-                          DateTime currentDate = DateTime.now();
-                          DateTime deadlineDate = DateTime.parse(exam.deadline);
+                                    ],
+                                  )              
+                                  : Builder(builder: (context){
+                                      if (exam.closed == 'Yes') {
+                                        DateTime currentDate = DateTime.now();
+                                        DateTime deadlineDate = DateTime.parse(exam.deadline);
 
-                          Duration difference = currentDate.difference(deadlineDate);
-                          if (currentDate.isAfter(deadlineDate)) {
-                            return Text(
-                              'คุณไม่สามารถส่งงานได้เนื่องจากเลยวันครบกำหนดมา ${difference.inDays} วันแล้ว',
-                              style: TextStyle(color: Colors.red, fontSize: 16),
-                            );
-                          } else {
-                            return Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text('คุณยังไม่ได้ส่งงาน'),
-                                OutlinedButton(
-                                onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => Doonechoicestudents(
-                                        exam: widget.exam,
-                                        username: widget.username,
-                                        thfname: widget.thfname,
-                                        thlname: widget.thlname,
-                                      ),
-                                    ),
-                                  );
-                                },
-                                child: Text('ไปทำข้อสอบ'),
-                              )
+                                        // ทำให้เวลาเป็น 00:00:00 ของวันเพื่อเปรียบเทียบเฉพาะวัน
+                                        DateTime currentDateOnly = DateTime(currentDate.year, currentDate.month, currentDate.day);
+                                        DateTime deadlineDateOnly = DateTime(deadlineDate.year, deadlineDate.month, deadlineDate.day);
 
-                              ],
-                            ); 
-                          }
+                                        Duration difference = currentDateOnly.difference(deadlineDateOnly);
 
-                        } else {
-                          DateTime currentDate = DateTime.now();
-                          DateTime deadlineDate = DateTime.parse(exam.deadline);
+                                        if (currentDateOnly.isAfter(deadlineDateOnly)) {
+                                          // หากวันที่ปัจจุบันเลยวันครบกำหนดแล้ว
+                                          return Text(
+                                            'คุณไม่สามารถทำข้อสอบได้เนื่องจากเลยวันครบกำหนดมา ${difference.inDays} วันแล้ว',
+                                            style: TextStyle(color: Colors.red, fontSize: 16),
+                                          );
+                                        } else {
+                                          // หากยังไม่ถึงวันครบกำหนดให้แสดงปุ่ม
+                                          return Row(
+                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Text('คุณยังไม่ได้ทำข้อสอบ'),
+                                              OutlinedButton(
+                                              onPressed: () {
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) => Doonechoicestudents(
+                                                      exam: widget.exam,
+                                                      username: widget.username,
+                                                      thfname: widget.thfname,
+                                                      thlname: widget.thlname,
+                                                    ),
+                                                  ),
+                                                );
+                                              },
+                                              child: Text('ไปทำข้อสอบ'),
+                                            ),
+                                            ],
+                                          );
+                                        }
+                                      } else {
+                                        DateTime currentDate = DateTime.now();
+                                        DateTime deadlineDate = DateTime.parse(exam.deadline);
 
-                          Duration difference = currentDate.difference(deadlineDate);
-                          if (difference.isNegative) {
-                            return Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text('คุณยังไม่ได้ส่งงาน'),
-                            OutlinedButton(
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => Doonechoicestudents(
-                                      exam: widget.exam,
-                                      username: widget.username,
-                                      thfname: widget.thfname,
-                                      thlname: widget.thlname,
-                                    ),
+                                        Duration difference = currentDate.difference(deadlineDate);
+                                        if (difference.isNegative) {
+                                          return Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text('คุณยังไม่ได้ทำข้อสอบ'),
+                                          OutlinedButton(
+                                            onPressed: () {
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) => Doonechoicestudents(
+                                                    exam: widget.exam,
+                                                    username: widget.username,
+                                                    thfname: widget.thfname,
+                                                    thlname: widget.thlname,
+                                                  ),
+                                                ),
+                                              );
+                                            },
+                                            child: Text('ไปทำข้อสอบ'),
+                                          ),
+                                          
+                                        ]);
+
+                                        } else if (difference.inDays == 0){
+                                          return Row(
+                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Text('กำหนดส่งวันนี้วันสุดท้ายกรุณาทำข้อสอบโดยเร็ว!', style: TextStyle(color: Colors.orange, fontSize: 14),),
+                                              IconButton(
+                                              onPressed: () async {
+                                                FilePickerResult? result = await FilePicker.platform.pickFiles(
+                                                  allowMultiple: true,
+                                                );
+                                                if (result != null) {
+                                                  setState(() {
+                                                    selectedFiles = result.files;
+                                                  });
+                                                }
+                                              },
+                                              icon: Icon(Icons.upload, size: 30),
+                                            ),
+                                            ],
+                                          );
+
+                                        } else {
+                                          return Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text('เลยวันครบกำหนดมา ${difference.inDays} วันแล้วรีบทำข้อสอบโดยเร็ว',style: TextStyle(color: Colors.orange, fontSize: 14),),
+                                          OutlinedButton(
+                                            onPressed: () {
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) => Doonechoicestudents(
+                                                    exam: widget.exam,
+                                                    username: widget.username,
+                                                    thfname: widget.thfname,
+                                                    thlname: widget.thlname,
+                                                  ),
+                                                ),
+                                              );
+                                            },
+                                            child: Text('ไปทำข้อสอบ'),
+                                          ),
+                                          
+                                          
+                                        ]);
+
+                                        }
+                                        
+                                      }
+                                      }) 
+                                      
+                            ],
+
+
+
+
+                            //manychoice
+                            if (exam.type == 'manychoice') ...[
+                              SizedBox(height: 16),
+                              Text('สถานะการส่งงาาน:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+                              SizedBox(height: 8),
+                                  hasSubmitted
+                                      ? Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        if (submitTime.isNotEmpty && widget.exam.deadline.isNotEmpty) 
+                                  Builder(builder: (context){
+                                    final submitDate = DateTime.parse(submitTime);
+                                    final deadlineDate = DateTime.parse(widget.exam.deadline);
+
+                                    // เปรียบเทียบเฉพาะวัน (ไม่สนใจเวลา)
+                                    if (submitDate.year == deadlineDate.year &&
+                                        submitDate.month == deadlineDate.month &&
+                                        submitDate.day == deadlineDate.day) {
+                                      // กรณีส่งในวันเดียวกัน
+                                      return Text(
+                                        'คุณได้ทำข้อสอบเรียบร้อยแล้ว ',
+                                        style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold),
+                                      );
+                                    } else if (!submitDate.isAfter(deadlineDate)) {
+                                      // กรณีส่งตรงเวลา หรือก่อนเวลา
+                                      return Text(
+                                        'คุณได้ทำข้อสอบเรียบร้อยแล้ว ',
+                                        style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold),
+                                      );
+                                    } else {
+                                      // กรณีส่งช้ากว่ากำหนด
+                                      final overdueDays = submitDate.difference(deadlineDate).inDays;
+                                      return Text(
+                                        'คุณได้ทำข้อสอบกว่ากำหนด $overdueDays วัน',
+                                        style: TextStyle(color: const Color.fromARGB(255, 177, 136, 2), fontWeight: FontWeight.bold),
+                                      );
+                                    }}
+                                  ) else
+                                  Text(
+                                    'ข้อมูลเวลาไม่ถูกต้อง',
+                                    style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
                                   ),
-                                );
-                              },
-                              child: Text('ไปทำข้อสอบ'),
-                            ),
-                            
-                          ]);
-
-                          } else {
-                            return Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text('เลยวันครบกำหนดมา ${difference.inDays} วันแล้วรีบทำข้อสอบโดยเร็ว',style: TextStyle(color: Colors.orange, fontSize: 14),),
-                            OutlinedButton(
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => Doonechoicestudents(
-                                      exam: widget.exam,
-                                      username: widget.username,
-                                      thfname: widget.thfname,
-                                      thlname: widget.thlname,
-                                    ),
-                                  ),
-                                );
-                              },
-                              child: Text('ไปทำข้อสอบ'),
-                            ),
-                            
-                            
-                          ]);
-
-                          }
-                          
-                        }
-                        }) 
-                        
-              ],
-
-
-
-
-            //manychoice
-            if (exam.type == 'manychoice') ...[
-              SizedBox(height: 16),
-              Text('สถานะการส่งงาาน:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-              SizedBox(height: 8),
-                  hasSubmitted
-                      ? Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                        'คุณได้ทำข้อสอบเรียบร้อยแล้ว',
-                        style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold),
-                      ),
-                      TextButton.icon(
+                                      TextButton.icon(
                                           icon: Icon(
                                             Icons.search,
                                             color: const Color.fromARGB(255, 0, 0, 0),
@@ -746,101 +988,137 @@ void didUpdateWidget(covariant Detail_work_S oldWidget) {
                                             style: TextStyle(color: const Color.fromARGB(255, 0, 0, 0), fontSize: 16),
                                           ),
                                           onPressed: () {
-                                            // ฟังก์ชันเมื่อกด TextButton
-                                            print('TextButton with check icon clicked');
+                                            Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                        builder: (context) => Chcekscoremanychoice(
+                                                          exam: widget.exam,
+                                                          username: widget.username,
+                                                        ),
+                                                      ),
+                                                    );
+                                            
                                           },
                                         )
 
-                      ],
-                    )
-                      : Builder(builder: (context){
-                        if (exam.closed == 'Yes') {
-                          DateTime currentDate = DateTime.now();
-                          DateTime deadlineDate = DateTime.parse(exam.deadline);
+                                    ],
+                                  )
+                                    : Builder(builder: (context){
+                                      if (exam.closed == 'Yes') {
+                                        DateTime currentDate = DateTime.now();
+                                        DateTime deadlineDate = DateTime.parse(exam.deadline);
 
-                          Duration difference = currentDate.difference(deadlineDate);
-                          if (currentDate.isAfter(deadlineDate)) {
-                            return Text(
-                              'คุณไม่สามารถส่งงานได้เนื่องจากเลยวันครบกำหนดมา ${difference.inDays} วันแล้ว',
-                              style: TextStyle(color: Colors.red, fontSize: 16),
-                            );
-                          } else {
-                            return Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text('คุณยังไม่ได้ส่งงาน'),
-                                 OutlinedButton(
-                                  onPressed: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => Domanychoicestudents(
-                                          exam: widget.exam,
-                                          username: widget.username,
-                                          thfname: widget.thfname,
-                                          thlname: widget.thlname,
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                  child: Text('ไปทำข้อสอบ'),
-                                )
+                                        // ทำให้เวลาเป็น 00:00:00 ของวันเพื่อเปรียบเทียบเฉพาะวัน
+                                        DateTime currentDateOnly = DateTime(currentDate.year, currentDate.month, currentDate.day);
+                                        DateTime deadlineDateOnly = DateTime(deadlineDate.year, deadlineDate.month, deadlineDate.day);
 
-                              ],
-                            );
-                          }
+                                        Duration difference = currentDateOnly.difference(deadlineDateOnly);
 
-                        } else {
-                          DateTime currentDate = DateTime.now();
-                          DateTime deadlineDate = DateTime.parse(exam.deadline);
+                                        if (currentDateOnly.isAfter(deadlineDateOnly)) {
+                                          // หากวันที่ปัจจุบันเลยวันครบกำหนดแล้ว
+                                          return Text(
+                                            'คุณไม่สามารถทำข้อสอบได้เนื่องจากเลยวันครบกำหนดมา ${difference.inDays} วันแล้ว',
+                                            style: TextStyle(color: Colors.red, fontSize: 16),
+                                          );
+                                        } else {
+                                          // หากยังไม่ถึงวันครบกำหนดให้แสดงปุ่ม
+                                          return Row(
+                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Text('คุณยังไม่ได้ทำข้อสอบ'),
+                                              IconButton(
+                                                onPressed: () async {
+                                                  Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                        builder: (context) => Domanychoicestudents(
+                                                          exam: widget.exam,
+                                                          username: widget.username,
+                                                          thfname: widget.thfname,
+                                                          thlname: widget.thlname,
+                                                        ),
+                                                      ),
+                                                    );
+                                                  
+                                                },
+                                                icon: Icon(Icons.upload, size: 30),
+                                              ),
+                                            ],
+                                          );
+                                        }
 
-                          Duration difference = currentDate.difference(deadlineDate);
-                          if (difference.isNegative) {
-                            return Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text('คุณยังไม่ได้ส่งงาน'),
-                                OutlinedButton(
-                                  onPressed: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => Domanychoicestudents(
-                                          exam: widget.exam,
-                                          username: widget.username,
-                                          thfname: widget.thfname,
-                                          thlname: widget.thlname,
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                  child: Text('ไปทำข้อสอบ'),
-                                )
-                              ],
-                            ); 
-                          } else {
-                            return Row(
-                              children: [
-                                OutlinedButton(
-                                  onPressed: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => Domanychoicestudents(
-                                          exam: widget.exam,
-                                          username: widget.username,
-                                          thfname: widget.thfname,
-                                          thlname: widget.thlname,
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                  child: Text('ไปทำข้อสอบ'),
-                                ),
-                                Text('เลยวันครบกำหนดมา ${difference.inDays} วันแล้วรีบทำข้อสอบโดยเร็ว', style: TextStyle(color: Colors.orange, fontSize: 14),),
+                                        } else {
+                                          DateTime currentDate = DateTime.now();
+                                          DateTime deadlineDate = DateTime.parse(exam.deadline);
 
-                              ],
-                            );
+                                          Duration difference = currentDate.difference(deadlineDate);
+                                          if (difference.isNegative) {
+                                            return Row(
+                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                              children: [
+                                                Text('คุณยังไม่ได้ทำข้อสอบ'),
+                                                OutlinedButton(
+                                                  onPressed: () {
+                                                    Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                        builder: (context) => Domanychoicestudents(
+                                                          exam: widget.exam,
+                                                          username: widget.username,
+                                                          thfname: widget.thfname,
+                                                          thlname: widget.thlname,
+                                                        ),
+                                                      ),
+                                                    );
+                                                  },
+                                                  child: Text('ไปทำข้อสอบ'),
+                                                )
+                                              ],
+                                            ); 
+                                          } else if (difference.inDays == 0){
+                                          return Row(
+                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Text('กำหนดส่งวันนี้วันสุดท้ายกรุณาทำข้อสอบโดยเร็ว!', style: TextStyle(color: Colors.orange, fontSize: 14),),
+                                              IconButton(
+                                              onPressed: () async {
+                                                FilePickerResult? result = await FilePicker.platform.pickFiles(
+                                                  allowMultiple: true,
+                                                );
+                                                if (result != null) {
+                                                  setState(() {
+                                                    selectedFiles = result.files;
+                                                  });
+                                                }
+                                              },
+                                              icon: Icon(Icons.upload, size: 30),
+                                            ),
+                                            ],
+                                          );
+
+                                        } else {
+                                            return Row(
+                                              children: [
+                                                OutlinedButton(
+                                                  onPressed: () {
+                                                    Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                        builder: (context) => Domanychoicestudents(
+                                                          exam: widget.exam,
+                                                          username: widget.username,
+                                                          thfname: widget.thfname,
+                                                          thlname: widget.thlname,
+                                                        ),
+                                                      ),
+                                                    );
+                                                  },
+                                                  child: Text('ไปทำข้อสอบ'),
+                                                ),
+                                                Text('เลยวันครบกำหนดมา ${difference.inDays} วันแล้วรีบทำข้อสอบโดยเร็ว', style: TextStyle(color: Colors.orange, fontSize: 14),),
+
+                                              ],
+                                            );
 
 
                           }

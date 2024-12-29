@@ -651,6 +651,40 @@ class Upfile_submit {
 
 //-------------------------------------------------------
 
+class CheckworkUpfile {
+  final int checkworkUpfileAuto;
+  final int examsetsId;
+  final String questionDetail;
+  final int checkworkUpfileScore;
+  final String usersUsername;
+  final String checkworkUpfileTime;
+  final String checkworkUpfileComments;
+
+  CheckworkUpfile({
+    required this.checkworkUpfileAuto,
+    required this.examsetsId,
+    required this.questionDetail,
+    required this.checkworkUpfileScore,
+    required this.usersUsername,
+    required this.checkworkUpfileTime,
+    required this.checkworkUpfileComments,
+  });
+
+  factory CheckworkUpfile.fromJson(Map<String, dynamic> json) {
+    return CheckworkUpfile(
+      checkworkUpfileAuto: int.parse(json['checkwork_upfile_auto']),
+      examsetsId: int.parse(json['examsets_id']),
+      questionDetail: json['question_detail'],
+      checkworkUpfileScore: int.parse(json['checkwork_upfile_score']),
+      usersUsername: json['users_username'],
+      checkworkUpfileTime: json['checkwork_upfile_time'],
+      checkworkUpfileComments: json['checkwork_upfile_comments'],
+    );
+  }
+}
+
+//-------------------------------------------------------------------------
+
 class UserSubmission {
   final String usersUsername;
   final List<Submission> submissions;
@@ -700,3 +734,351 @@ class Submission {
 
 
 //-----------------------------------------------------------------------------
+
+class AnswerData {
+  final int questionId;
+  final String questionDetail;
+  final int checkworkAuswerScore;
+  final String submitAuswerReply;
+  final String submitAuswerTime;
+  final int? auswerQuestionScore;  
+
+  AnswerData({
+    required this.questionId,
+    required this.questionDetail,
+    required this.checkworkAuswerScore,
+    required this.submitAuswerReply,
+    required this.submitAuswerTime,
+    this.auswerQuestionScore,
+  });
+
+  factory AnswerData.fromJson(Map<String, dynamic> json) {
+    return AnswerData(
+      questionId: json['question_id'] != null ? int.parse(json['question_id']) : 0, // ตรวจสอบค่า null
+      questionDetail: json['question_detail'] ?? '', // หาก null ให้เป็นค่าว่าง
+      checkworkAuswerScore: json['checkwork_auswer_score'] != null
+          ? int.parse(json['checkwork_auswer_score'])
+          : 0, // ตรวจสอบค่า null และแปลงเป็น int
+      submitAuswerReply: json['submit_auswer_reply'] ?? '', // หาก null ให้เป็นค่าว่าง
+      submitAuswerTime: json['submit_auswer_time'] ?? '', // หาก null ให้เป็นค่าว่าง
+      auswerQuestionScore: json['auswer_question_score'] != null
+          ? int.parse(json['auswer_question_score'])
+          : null, // ใช้ null เมื่อไม่มีคะแนน
+    );
+  }
+}//---------------------------------------------------------------------
+
+class GetsubmitauswerData {
+  final int questionId;
+  final String submitAuswerReply;
+  final String submitAuswerTime;
+  final double auswerQuestionScore;
+  final String questionDetail;
+
+  GetsubmitauswerData({
+    required this.questionId,
+    required this.submitAuswerReply,
+    required this.submitAuswerTime,
+    required this.auswerQuestionScore,
+    required this.questionDetail,
+  });
+
+  // ฟังก์ชันในการแปลง JSON เป็น GetsubmitauswerData
+  factory GetsubmitauswerData.fromJson(Map<String, dynamic> json) {
+    return GetsubmitauswerData(
+      questionId: int.tryParse(json['question_id'].toString()) ?? 0, // แปลง String เป็น int หรือใช้ค่า 0 ถ้าไม่สามารถแปลงได้
+      submitAuswerReply: json['submit_auswer_reply'] ?? '',  // ใช้ค่าเริ่มต้นเป็นค่าว่าง ถ้าไม่มีข้อมูล
+      submitAuswerTime: json['submit_auswer_time'] ?? '',  // ใช้ค่าเริ่มต้นเป็นค่าว่าง ถ้าไม่มีข้อมูล
+      auswerQuestionScore: double.tryParse(json['auswer_question_score'].toString()) ?? 0.0, // แปลง String เป็น double หรือใช้ 0.0 ถ้าไม่สามารถแปลงได้
+      questionDetail: json['question_detail'] ?? '',  // ใช้ค่าเริ่มต้นเป็นค่าว่าง ถ้าไม่มีข้อมูล
+    );
+  }
+
+  // ฟังก์ชันในการแปลง GetsubmitauswerData เป็น JSON
+  Map<String, dynamic> toJson() {
+    return {
+      'question_id': questionId,
+      'submit_auswer_reply': submitAuswerReply,
+      'submit_auswer_time': submitAuswerTime,
+      'auswer_question_score': auswerQuestionScore,
+      'question_detail': questionDetail,
+    };
+  }
+}
+
+//--------------------------------------------------
+
+class Chcekscoreonechoicedata {
+  final List<OnechoiceData> onechoiceData;
+  final List<SubmitOnechoiceData> submitOnechoiceData;
+
+  Chcekscoreonechoicedata({required this.onechoiceData, required this.submitOnechoiceData});
+
+  factory Chcekscoreonechoicedata.fromJson(Map<String, dynamic> json) {
+    return Chcekscoreonechoicedata(
+      onechoiceData: List<OnechoiceData>.from(json['onechoice_data'].map((x) => OnechoiceData.fromJson(x))),
+      submitOnechoiceData: List<SubmitOnechoiceData>.from(json['submit_onechoice_data'].map((x) => SubmitOnechoiceData.fromJson(x))),
+    );
+  }
+}
+
+class OnechoiceData {
+  final int onechoiceAuto;
+  final int examsetsId;
+  final String onechoiceQuestion;
+  final String onechoiceA;
+  final String onechoiceB;
+  final String onechoiceC;
+  final String onechoiceD;
+  final String onechoiceAnswer;
+  final int onechoiceQuestionScore;
+
+  OnechoiceData({
+    required this.onechoiceAuto,
+    required this.examsetsId,
+    required this.onechoiceQuestion,
+    required this.onechoiceA,
+    required this.onechoiceB,
+    required this.onechoiceC,
+    required this.onechoiceD,
+    required this.onechoiceAnswer,
+    required this.onechoiceQuestionScore,
+  });
+
+  factory OnechoiceData.fromJson(Map<String, dynamic> json) {
+    return OnechoiceData(
+      onechoiceAuto: int.tryParse(json['onechoice_auto'].toString()) ?? 0,
+      examsetsId: int.tryParse(json['examsets_id'].toString()) ?? 0,
+      onechoiceQuestion: json['onechoice_question'] ?? 'N/A',
+      onechoiceA: json['onechoice_a'] ?? 'N/A',
+      onechoiceB: json['onechoice_b'] ?? 'N/A',
+      onechoiceC: json['onechoice_c'] ?? 'N/A',
+      onechoiceD: json['onechoice_d'] ?? 'N/A',
+      onechoiceAnswer: json['onechoice_answer'] ?? 'N/A',
+      onechoiceQuestionScore: int.tryParse(json['onechoice_question_score'].toString()) ?? 0,
+    );
+  }
+}
+
+class SubmitOnechoiceData {
+  final int submitOnechoiceAuto;
+  final int examsetsId;
+  final int questionId;
+  final String submitOnechoiceReply;
+  final int submitOnechoiceScore;
+  final String submitOnechoiceTime;
+  final String usersUsername;
+
+  SubmitOnechoiceData({
+    required this.submitOnechoiceAuto,
+    required this.examsetsId,
+    required this.questionId,
+    required this.submitOnechoiceReply,
+    required this.submitOnechoiceScore,
+    required this.submitOnechoiceTime,
+    required this.usersUsername,
+  });
+
+  factory SubmitOnechoiceData.fromJson(Map<String, dynamic> json) {
+    return SubmitOnechoiceData(
+      submitOnechoiceAuto: int.tryParse(json['submit_onechoice_auto'].toString()) ?? 0,
+      examsetsId: int.tryParse(json['examsets_id'].toString()) ?? 0,
+      questionId: int.tryParse(json['question_id'].toString()) ?? 0,
+      submitOnechoiceReply: json['submit_onechoice_reply'] ?? 'N/A',
+      submitOnechoiceScore: int.tryParse(json['submit_onechoice_score'].toString()) ?? 0,
+      submitOnechoiceTime: json['submit_onechoice_time'] ?? 'N/A',
+      usersUsername: json['users_username'] ?? 'N/A',
+    );
+  }
+}
+
+//-------------------------------------------------------------------------------
+class Chcekscoremanychoicedata {
+  final List<ManychoiceData> manychoiceData;
+  final List<SubmitManychoiceData> submitManychoiceData;
+
+  Chcekscoremanychoicedata({
+    required this.manychoiceData,
+    required this.submitManychoiceData,
+  });
+
+  factory Chcekscoremanychoicedata.fromJson(Map<String, dynamic> json) {
+    return Chcekscoremanychoicedata(
+      manychoiceData: (json['manychoice_data'] as List<dynamic>)
+          .map((item) => ManychoiceData.fromJson(item as Map<String, dynamic>))
+          .toList(),
+      submitManychoiceData: (json['submit_manychoice_data'] as List<dynamic>)
+          .map((item) =>
+              SubmitManychoiceData.fromJson(item as Map<String, dynamic>))
+          .toList(),
+    );
+  }
+}
+
+class ManychoiceData {
+  final int manychoiceAuto;
+  final int examsetsId;
+  final String manychoiceQuestion;
+  final String manychoiceA;
+  final String manychoiceB;
+  final String manychoiceC;
+  final String manychoiceD;
+  final String? manychoiceE;
+  final String? manychoiceF;
+  final String? manychoiceG;
+  final String? manychoiceH;
+  final String manychoiceAnswer;
+  final double manychoiceQuestionScore;
+
+  ManychoiceData({
+    required this.manychoiceAuto,
+    required this.examsetsId,
+    required this.manychoiceQuestion,
+    required this.manychoiceA,
+    required this.manychoiceB,
+    required this.manychoiceC,
+    required this.manychoiceD,
+    this.manychoiceE,
+    this.manychoiceF,
+    this.manychoiceG,
+    this.manychoiceH,
+    required this.manychoiceAnswer,
+    required this.manychoiceQuestionScore,
+  });
+
+  factory ManychoiceData.fromJson(Map<String, dynamic> json) {
+    return ManychoiceData(
+      manychoiceAuto: int.tryParse(json['manychoice_auto'].toString()) ?? 0, // แปลงจาก String เป็น int
+      examsetsId: int.tryParse(json['examsets_id'].toString()) ?? 0, // แปลงจาก String เป็น int
+      manychoiceQuestion: json['manychoice_question'] as String,
+      manychoiceA: json['manychoice_a'] as String,
+      manychoiceB: json['manychoice_b'] as String,
+      manychoiceC: json['manychoice_c'] as String,
+      manychoiceD: json['manychoice_d'] as String,
+      manychoiceE: json['manychoice_e'] as String?,
+      manychoiceF: json['manychoice_f'] as String?,
+      manychoiceG: json['manychoice_g'] as String?,
+      manychoiceH: json['manychoice_h'] as String?,
+      manychoiceAnswer: json['manychoice_answer'] as String,
+      manychoiceQuestionScore:
+          (json['manychoice_question_score'] is String
+              ? double.tryParse(json['manychoice_question_score'].toString()) ?? 0.0
+              : (json['manychoice_question_score'] as num).toDouble()), // แปลงจาก String เป็น double
+    );
+  }
+}
+
+class SubmitManychoiceData {
+  final int submitManychoiceAuto;
+  final int examsetsId;
+  final int questionId;
+  final String submitManychoiceReply;
+  final double submitManychoiceScore;
+  final String submitManychoiceTime;
+  final String usersUsername;
+
+  SubmitManychoiceData({
+    required this.submitManychoiceAuto,
+    required this.examsetsId,
+    required this.questionId,
+    required this.submitManychoiceReply,
+    required this.submitManychoiceScore,
+    required this.submitManychoiceTime,
+    required this.usersUsername,
+  });
+
+  factory SubmitManychoiceData.fromJson(Map<String, dynamic> json) {
+    return SubmitManychoiceData(
+      submitManychoiceAuto: int.tryParse(json['submit_manychoice_auto'].toString()) ?? 0, // แปลงจาก String เป็น int
+      examsetsId: int.tryParse(json['examsets_id'].toString()) ?? 0, // แปลงจาก String เป็น int
+      questionId: int.tryParse(json['question_id'].toString()) ?? 0, // แปลงจาก String เป็น int
+      submitManychoiceReply: json['submit_manychoice_reply'] as String,
+      submitManychoiceScore: (json['submit_manychoice_score'] is String
+          ? double.tryParse(json['submit_manychoice_score'].toString()) ?? 0.0
+          : (json['submit_manychoice_score'] as num).toDouble()), // แปลงจาก String เป็น double
+      submitManychoiceTime: json['submit_manychoice_time'] as String,
+      usersUsername: json['users_username'] as String,
+    );
+  }
+}
+//-------------------------------------------------------------------------------------------------------------------------
+
+
+// class สำหรับเก็บข้อมูลนักเรียน
+class liststudents {
+  final String studentNumber;
+  final String studentId;
+  final String firstName;
+  final String lastName;
+  final String phoneNumber;
+  final String username;
+  final String checkinStatus;
+
+  liststudents({
+    required this.studentNumber,
+    required this.studentId,
+    required this.firstName,
+    required this.lastName,
+    required this.phoneNumber,
+    required this.username,
+    required this.checkinStatus,
+  });
+
+  factory liststudents.fromJson(Map<String, dynamic> json) {
+    return liststudents(
+      studentNumber: json['users_number'] ?? '',
+      studentId: json['users_id'] ?? '',
+      firstName: json['users_thfname'] ?? '',
+      lastName: json['users_thlname'] ?? '',
+      phoneNumber: json['users_phone'] ?? '',
+      username: json['users_username'] ?? '',
+      checkinStatus: json['checkin_status'] ?? '-',
+    );
+  }
+}
+
+//-------------------------------------------------------------------------------
+
+class HistoryCheckin {
+  final String checkinClassroomAuto;
+  final String checkinClassroomDate;
+  final String usersUsername;
+  final String checkinClassroomClassID;
+  final String checkinClassroomStatus;
+  final String usersPrefix;
+  final String usersThfname;
+  final String usersThlname;
+  final String usersNumber;
+  final String usersId;
+  final String usersPhone;
+
+  HistoryCheckin({
+    required this.checkinClassroomAuto,
+    required this.checkinClassroomDate,
+    required this.usersUsername,
+    required this.checkinClassroomClassID,
+    required this.checkinClassroomStatus,
+    required this.usersPrefix,
+    required this.usersThfname,
+    required this.usersThlname,
+    required this.usersNumber,
+    required this.usersId,
+    required this.usersPhone,
+  });
+
+  factory HistoryCheckin.fromJson(Map<String, dynamic> json) {
+    return HistoryCheckin(
+      checkinClassroomAuto: json['checkin_classroom_auto'],
+      checkinClassroomDate: json['checkin_classroom_date'],
+      usersUsername: json['users_username'],
+      checkinClassroomClassID: json['checkin_classroom_classID'],
+      checkinClassroomStatus: json['checkin_classroom_status'],
+      usersPrefix: json['users_prefix'],
+      usersThfname: json['users_thfname'],
+      usersThlname: json['users_thlname'],
+      usersNumber: json['users_number'],
+      usersId: json['users_id'],
+      usersPhone: json['users_phone'],
+    );
+  }
+}

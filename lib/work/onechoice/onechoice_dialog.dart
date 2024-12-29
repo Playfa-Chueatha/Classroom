@@ -111,6 +111,14 @@ class _ManychoiceDialogState extends State<OnechoiceDialog> {
           }
         },
       ),
+      actions: [
+        TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text('ปิด'),
+              ),
+      ],
     );
   }
 }
