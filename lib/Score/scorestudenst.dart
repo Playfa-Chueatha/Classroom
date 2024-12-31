@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_esclass_2/Data/Data.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
-List<liststudents> dataliststudents = [];
 
-class Scorestudenst extends StatefulWidget {
+
+class Scorestudenstofrteacher extends StatefulWidget {
   final String username;
   final String thfname;
   final String thlname;
@@ -13,232 +15,117 @@ class Scorestudenst extends StatefulWidget {
   final String classroomYear;
   final String classroomNumRoom;
 
-  const Scorestudenst({
+  const Scorestudenstofrteacher({
     super.key,
-    required this.username, 
-    required this.thfname, 
-    required this.thlname, 
-    required this.classroomName, 
-    required this.classroomMajor, 
-    required this.classroomYear, 
-    required this.classroomNumRoom, 
+    required this.username,
+    required this.thfname,
+    required this.thlname,
+    required this.classroomName,
+    required this.classroomMajor,
+    required this.classroomYear,
+    required this.classroomNumRoom,
   });
 
   @override
-  State<Scorestudenst> createState() => _ScorestudentsState();
+  State<Scorestudenstofrteacher> createState() => _ScorestudentsState();
 }
 
-class _ScorestudentsState extends State<Scorestudenst> {
-  List<List<TextEditingController>> scoreControllers = [];
-  List<String> scoreColumnNames = ["คะแนน 1"];
-  bool isEditing = true; // Add this variable to control the editing state
-
-  @override
-  void initState() {
-    super.initState();
-    // Initialize scoreControllers for each student
-    scoreControllers = dataliststudents.map((student) {
-      return scoreColumnNames.map((name) => TextEditingController()).toList();
-    }).toList();
-  }
-
-  @override
-  void dispose() {
-    // Dispose controllers
-    for (var controllers in scoreControllers) {
-      for (var controller in controllers) {
-        controller.dispose();
-      }
-    }
-    super.dispose();
-  }
-
-  void addScoreColumn() {
-    setState(() {
-      scoreColumnNames.add("คะแนน ${scoreColumnNames.length + 1}");
-      // Add a new TextEditingController for each student
-      for (var controllers in scoreControllers) {
-        controllers.add(TextEditingController());
-      }
-    });
-  }
-
-  void removeScoreColumn(int index) {
-    setState(() {
-      scoreColumnNames.removeAt(index);
-      for (var controllers in scoreControllers) {
-        controllers.removeAt(index);
-      }
-    });
-  }
-
-  void editScoreColumn(int index) async {
-    TextEditingController columnNameController = TextEditingController(text: scoreColumnNames[index]);
-    bool shouldUpdate = await showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('แก้ไขหัวข้อคะแนน'),
-          content: TextField(
-            controller: columnNameController,
-            decoration: const InputDecoration(
-              labelText: 'ชื่อหัวข้อคะแนน',
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(false);
-              },
-              child: const Text('ยกเลิก'),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(true);
-              },
-              child: const Text('ตกลง'),
-            ),
-          ],
-        );
-      }
+class _ScorestudentsState extends State<Scorestudenstofrteacher> {
+  // ดึงข้อมูลจาก API
+  Future<ScoreStudentsInClass> fetchData() async {
+    final response = await http.post(
+      Uri.parse('https://www.edueliteroom.com/connect/fetch_scorestudentsinclass.php'),
+      body: {
+        'classroomName': widget.classroomName,
+        'classroomMajor': widget.classroomMajor,
+        'classroomYear': widget.classroomYear,
+        'classroomNumRoom': widget.classroomNumRoom,
+      },
     );
+    print("Response body: ${response.body}");
 
-    if (shouldUpdate) {
-      setState(() {
-        scoreColumnNames[index] = columnNameController.text;
-      });
+    if (response.statusCode == 200) {
+      return ScoreStudentsInClass.fromJson(json.decode(response.body));
+    } else {
+      throw Exception('Failed to load data');
     }
-  }
-
-  void toggleEditing() {
-    setState(() {
-      isEditing = !isEditing; // Toggle the editing state
-    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 255, 255, 255),
       appBar: AppBar(
         title: const Text('รายชื่อนักเรียน'),
-        backgroundColor: Colors.white,
-        actions: [
-          OutlinedButton(
-            onPressed: () {
-              toggleEditing(); // Toggle editing state when saving
-            },
-            child: Text(isEditing ? 'บันทึกคะแนน' : 'แก้ไขคะแนน'),
-          ),
-        ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Row(
-                children: [
-                  ElevatedButton(
-                    onPressed: addScoreColumn,
-                    child: const Text('เพิ่มช่องคะแนน'),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              DataTable(
-                columnSpacing: 20.0,
-                columns: [
-                  DataColumn(
-                    label: SizedBox(
-                      width: 60,
-                      child: const Text('เลขที่ห้อง'),
+      body: FutureBuilder<ScoreStudentsInClass>(
+        future: fetchData(),
+        builder: (context, snapshot) {
+          // ตรวจสอบสถานะของ Future
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator()); // ระหว่างโหลดข้อมูล
+          } else if (snapshot.hasError) {
+            return Center(child: Text('เกิดข้อผิดพลาด: ${snapshot.error}'));
+          } else if (!snapshot.hasData) {
+            return const Center(child: Text('ไม่มีข้อมูล'));
+          }
+
+          final data = snapshot.data;
+
+          // สร้างแผนที่เก็บคะแนนตาม examsetId และ examsetDirection
+          Map<String, Map<String, String>> scoreMap = {};
+          Map<String, String> examsetDirections = {}; // เก็บ examsetDirection
+
+          for (var score in data!.scores) {
+            if (!scoreMap.containsKey(score.examsetId)) {
+              scoreMap[score.examsetId] = {};
+            }
+            scoreMap[score.examsetId]![score.username] = score.scoreTotal;
+
+            // บันทึก examsetDirection และ examsetFullMark (อ้างอิงจากข้อมูล score)
+            examsetDirections[score.examsetId] = score.scoreType;  // เชื่อมกับ examsetDirection เช่น Midterm, Final
+          }
+
+          // แสดงข้อมูลในตาราง
+          return SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: DataTable(
+              columns: [
+                const DataColumn(label: Text('เลขที่')),
+                const DataColumn(label: Text('รหัสนักเรียน')),
+                const DataColumn(label: Text('ชื่อ')),
+                const DataColumn(label: Text('นามสกุล')),
+                // แสดงคอลัมน์ที่เชื่อมโยงกับ examsetTime และ examsetFullMark
+                ...examsetDirections.entries.map((entry) {
+                  // ดึงข้อมูลจาก examsetDetails ที่ตรงกับ examsetId
+                  final examset = data.examsetDetails.firstWhere(
+                      (examset) => examset.examsetId == entry.key);
+
+                  return DataColumn(
+                    label: Tooltip(
+                      message: entry.value, // แสดง examsetDirection ใน tooltip
+                      child: Text('${examset.examsetTime}(${examset.examsetFullMark})'), // แสดง examsetTime(examsetFullMark)
                     ),
-                  ),
-                  DataColumn(
-                    label: SizedBox(
-                      width: 150,
-                      child: const Text('รหัสนักเรียน'),
-                    ),
-                  ),
-                  DataColumn(
-                    label: SizedBox(
-                      width: 150,
-                      child: const Text('ชื่อ'),
-                    ),
-                  ),
-                  DataColumn(
-                    label: SizedBox(
-                      width: 150,
-                      child: const Text('นามสกุล'),
-                    ),
-                  ),
-                  // Add columns for scores dynamically
-                  ...scoreColumnNames.asMap().entries.map((entry) {
-                    int index = entry.key;
-                    String name = entry.value;
-                    return DataColumn(
-                      label: SizedBox(
-                        width: 150,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(name),
-                            Row(
-                              children: [
-                                IconButton(
-                                  icon: const Icon(Icons.edit, size: 16),
-                                  onPressed: () => editScoreColumn(index),
-                                ),
-                                IconButton(
-                                  icon: const Icon(Icons.delete, size: 16),
-                                  onPressed: () => removeScoreColumn(index),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
+                  );
+                }),
+              ],
+              rows: data.userDetails.map<DataRow>((user) {
+                return DataRow(cells: [
+                  DataCell(Text(user.userNumber)),
+                  DataCell(Text(user.userId)),
+                  DataCell(Text(user.thFname)),
+                  DataCell(Text(user.thLname)),
+                  // แสดงคะแนนจาก scoreMap โดยอิงจาก username และ examsetId
+                  ...examsetDirections.keys.map((examsetId) {
+                    return DataCell(
+                      Text(scoreMap[examsetId]?[user.username] ?? '-'),
                     );
                   }),
-                ],
-                rows: dataliststudents.asMap().entries.map((entry) {
-                  var student = entry.value;
-                  var controllers = scoreControllers[entry.key];
-                  return DataRow(
-                    cells: [
-                      DataCell(Text(student.studentNumber)),
-                      DataCell(Text(student.studentId)),
-                      DataCell(Text(student.firstName)),
-                      DataCell(Text(student.lastName)),
-                      // Add cells for scores dynamically
-                      ...controllers.map((controller) => DataCell(
-                        Center(child: 
-                        TextField(
-                          controller: controller,
-                          decoration: const InputDecoration(
-                            contentPadding: EdgeInsets.all(8.0),
-                          ),
-                          keyboardType: TextInputType.number,
-                          inputFormatters: [
-                            FilteringTextInputFormatter.digitsOnly,
-                            LengthLimitingTextInputFormatter(3),
-                          ],
-                          readOnly: !isEditing, // Set readOnly based on isEditing
-                        ),)
-                      )),
-                    ],
-                  );
-                }).toList(),
-              ),
-            ],
-          ),
-        ),
+                ]);
+              }).toList(),
+            ),
+          );
+        },
       ),
     );
   }
 }
-
-

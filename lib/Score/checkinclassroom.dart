@@ -212,8 +212,8 @@ class _CheckinclassroomState extends State<Checkinclassroom> {
         statusColor = Colors.purple;
         break;
       default:
-        statusText = 'ไม่มีข้อมูล';
-        statusColor = Colors.black;
+        statusText = 'ยังไม่ได้เช็คชื่อ';
+        statusColor = const Color.fromARGB(255, 66, 66, 66);
         break;
     }
 

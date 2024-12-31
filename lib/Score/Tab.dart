@@ -73,7 +73,7 @@ class _TabScoreState extends State<TabScore> {
                           thlname: widget.thlname,
                           username: widget.username,
                     )),
-                    Center(child: Scorestudenst(
+                    Center(child: Scorestudenstofrteacher(
                           classroomMajor: widget.classroomMajor,
                           classroomName: widget.classroomName,
                           classroomNumRoom: widget.classroomNumRoom,

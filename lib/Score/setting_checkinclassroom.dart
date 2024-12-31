@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_esclass_2/Data/Data.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
@@ -30,6 +31,84 @@ class SettingCheckinClassroomDialog extends StatefulWidget {
 class _SettingCheckinClassroomDialogState
     extends State<SettingCheckinClassroomDialog> {
   late Future<List<HistoryCheckin>> futureCheckins;
+  bool _isEditing = false;
+
+  final Map<String, TextEditingController> _scoreControllers = {};
+void _saveAffectiveScores() async {
+  print("บันทึกคะแนนจิตพิสัยเริ่มทำงาน");
+
+  List<Map<String, String>> scoresToSave = [];
+  List<HistoryCheckin> checkins = await futureCheckins;
+
+  if (checkins.isEmpty) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('ไม่มีข้อมูลการเช็คชื่อ')));
+    return;
+  }
+
+  _scoreControllers.forEach((username, controller) {
+    if (controller.text.isEmpty) {
+      return;
+    }
+
+    HistoryCheckin checkin = checkins.firstWhere(
+      (checkin) => checkin.usersUsername == username,
+      orElse: () => HistoryCheckin(
+        checkinClassroomAuto: '',
+        checkinClassroomDate: '',
+        usersUsername: '',
+        checkinClassroomClassID: '',
+        checkinClassroomStatus: 'ไม่มีข้อมูล',
+        usersPrefix: '',
+        usersThfname: '',
+        usersThlname: '',
+        usersNumber: '',
+        usersId: '',
+        usersPhone: '',
+        affectiveDomainScore: ''
+      ),
+    );
+
+    if (checkin.usersUsername.isNotEmpty && controller.text.isNotEmpty) {
+      scoresToSave.add({
+        'usersUsername': checkin.usersUsername,
+        'affectiveDomainScore': controller.text,
+        'affectiveDomainClassID': checkin.checkinClassroomClassID,
+      });
+      print("เพิ่มคะแนน: ${controller.text} สำหรับ ${checkin.usersUsername}");
+    }
+  });
+
+  
+  if (scoresToSave.isNotEmpty) {
+    final response = await http.post(
+      Uri.parse('https://www.edueliteroom.com/connect/save_affective_scores.php'),
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode({'scores': scoresToSave}),
+    );
+
+
+    if (response.statusCode == 200) {
+      json.decode(response.body);
+      SnackBar(
+      content: Text('บันทึกสำเร็จ'),
+        backgroundColor: Colors.green, // พื้นหลังสีเขียว
+      );
+      
+      setState(() {
+        futureCheckins = fetchHistoryCheckin(
+          widget.classroomName,
+          widget.classroomMajor,
+          widget.classroomYear,
+          widget.classroomNumRoom,
+        );
+      });
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('เกิดข้อผิดพลาด: ${response.body}')));
+    }
+  }
+}
+
+
 
   @override
   void initState() {
@@ -95,97 +174,241 @@ class _SettingCheckinClassroomDialogState
               List<String> dates = groupedData.keys.toList()
                 ..sort((a, b) => DateTime.parse(a).compareTo(DateTime.parse(b)));
 
-              return DataTable(
-                columnSpacing: 20.0,
-                columns: [
-                  DataColumn(label: const Text('เลขที่')),
-                  DataColumn(label: const Text('รหัสนักเรียน')),
-                  DataColumn(label: const Text('ชื่อ')),
-                  DataColumn(label: const Text('นามสกุล')),
-                  DataColumn(label: const Text('เบอร์โทร')),
-                  ...dates.map((date) => DataColumn(label: Text(date))),
-                ],
-                rows: (() {
-                  // กรองข้อมูลนักเรียนให้ไม่ซ้ำ
-                  final uniqueStudents = <String>{};
-                  return (checkins
-                        ..sort((a, b) => int.parse(a.usersNumber).compareTo(int.parse(b.usersNumber))))
-                      .where((checkin) => uniqueStudents.add(checkin.usersId)) // กรองนักเรียนซ้ำ
-                      .map((checkin) {
-                    // ดึงข้อมูลการเช็คชื่อของนักเรียนแต่ละคน
-                    var studentCheckins =
-                        checkins.where((c) => c.usersId == checkin.usersId).toList();
-                    var firstCheckin = studentCheckins.first;
+              // การนับจำนวนสถานะในแต่ละวัน
+              Map<String, Map<String, int>> statusCount = {};
 
-                    return DataRow(
-                      cells: [
-                        DataCell(Text(firstCheckin.usersNumber)),
-                        DataCell(Text(firstCheckin.usersId)),
-                        DataCell(Text(firstCheckin.usersThfname)),
-                        DataCell(Text(firstCheckin.usersThlname)),
-                        DataCell(Text(firstCheckin.usersPhone)),
-                        ...dates.map((date) {
-                          // ค้นหาสถานะการเช็คชื่อในวันนั้น
-                          var status = studentCheckins
-                              .firstWhere(
-                                (c) => c.checkinClassroomDate == date,
-                                orElse: () => HistoryCheckin(
-                                  checkinClassroomAuto: '',
-                                  checkinClassroomDate: date,
-                                  usersUsername: '',
-                                  checkinClassroomClassID: '',
-                                  checkinClassroomStatus: 'ไม่มีข้อมูล',
-                                  usersPrefix: '',
-                                  usersThfname: '',
-                                  usersThlname: '',
-                                  usersNumber: '',
-                                  usersId: checkin.usersId,
-                                  usersPhone: '',
+              // คำนวณจำนวนสถานะ
+              for (var checkin in checkins) {
+                String date = checkin.checkinClassroomDate;
+                String status = checkin.checkinClassroomStatus;
+
+                if (!statusCount.containsKey(date)) {
+                  statusCount[date] = {
+                    'มาเรียน': 0,
+                    'มาสาย': 0,
+                    'ขาดเรียน': 0,
+                    'ลาป่วย': 0,
+                    'ลากิจ': 0,
+                    'ไม่มีข้อมูล': 0,
+                  };
+                }
+
+                switch (status) {
+                  case 'present':
+                    statusCount[date]!['มาเรียน'] = statusCount[date]!['มาเรียน']! + 1;
+                    break;
+                  case 'late':
+                    statusCount[date]!['มาสาย'] = statusCount[date]!['มาสาย']! + 1;
+                    break;
+                  case 'absent':
+                    statusCount[date]!['ขาดเรียน'] = statusCount[date]!['ขาดเรียน']! + 1;
+                    break;
+                  case 'sick leave':
+                    statusCount[date]!['ลาป่วย'] = statusCount[date]!['ลาป่วย']! + 1;
+                    break;
+                  case 'personal leave':
+                    statusCount[date]!['ลากิจ'] = statusCount[date]!['ลากิจ']! + 1;
+                    break;
+                  default:
+                    statusCount[date]!['ไม่มีข้อมูล'] = statusCount[date]!['ไม่มีข้อมูล']! + 1;
+                    break;
+                }
+              }
+
+              String convertStatusToDisplayText(String status) {
+                switch (status) {
+                  case 'present':
+                    return 'มาเรียน';
+                  case 'late':
+                    return 'มาสาย';
+                  case 'absent':
+                    return 'ขาดเรียน';
+                  case 'sick leave':
+                    return 'ลาป่วย';
+                  case 'personal leave':
+                    return 'ลากิจ';
+                  default:
+                    return 'ไม่มีข้อมูล';
+                }
+              }
+
+              return Column(
+                children: [
+                  DataTable(
+                    columnSpacing: 20.0,
+                    columns: [
+                      DataColumn(label: const Text('เลขที่')),
+                      DataColumn(label: const Text('รหัสนักเรียน')),
+                      DataColumn(label: const Text('ชื่อ')),
+                      DataColumn(label: const Text('นามสกุล')),
+                      DataColumn(label: const Text('Username')),
+                      DataColumn(label: const Text('เบอร์โทร')),
+                      DataColumn(
+                        label: Container(
+                          color: const Color.fromARGB(255, 83, 133, 25), // กำหนดสีพื้นหลังที่นี่
+                          padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+                          child: const Text(
+                            'คะแนนปัจจุบัน',
+                            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white), // กำหนดสีข้อความในคอลัมน์
+                          ),
+                        ),
+                      ),
+
+                      ...dates.map((date) => DataColumn(label: Text(date))),
+                      DataColumn(label: const Text('มาเรียน')),
+                      DataColumn(label: const Text('มาสาย')),
+                      DataColumn(label: const Text('ขาดเรียน')),
+                      DataColumn(label: const Text('ลาป่วย')),
+                      DataColumn(label: const Text('ลากิจ')),
+                      
+                      if (_isEditing) DataColumn(label: const Text('คะแนนจิตพิสัย')), // เพิ่มคอลัมน์คะแนนจิตพิสัย
+                    ],
+                    rows: (() {
+                      final uniqueStudents = <String>{};
+                      return (checkins
+                             ..sort((a, b) => int.parse(a.usersNumber).compareTo(int.parse(b.usersNumber)))).where((checkin) => uniqueStudents.add(checkin.usersId))
+                          .map((checkin) {
+                        var studentCheckins = checkins.where((c) => c.usersId == checkin.usersId).toList();
+                        var firstCheckin = studentCheckins.first;
+
+                        // คำนวณจำนวนสถานะในแต่ละแถว
+                        int presentCount = studentCheckins.where((c) => c.checkinClassroomStatus == 'present').length;
+                        int lateCount = studentCheckins.where((c) => c.checkinClassroomStatus == 'late').length;
+                        int absentCount = studentCheckins.where((c) => c.checkinClassroomStatus == 'absent').length;
+                        int sickLeaveCount = studentCheckins.where((c) => c.checkinClassroomStatus == 'sick leave').length;
+                        int personalLeaveCount = studentCheckins.where((c) => c.checkinClassroomStatus == 'personal leave').length;
+
+                        return DataRow(
+                          cells: [
+                            DataCell(Text(firstCheckin.usersNumber)),
+                            DataCell(Text(firstCheckin.usersId)),
+                            DataCell(Text(firstCheckin.usersThfname)),
+                            DataCell(Text(firstCheckin.usersThlname)),
+                            DataCell(Text(firstCheckin.usersUsername)),
+                            DataCell(Text(firstCheckin.usersPhone)),
+                            DataCell(
+                              Container(
+                                color: const Color.fromARGB(255, 108, 204, 151), // สีพื้นหลัง
+                                padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        firstCheckin.affectiveDomainScore.isEmpty
+                                            ? 'ยังไม่ได้เพิ่มคะแนน'
+                                            : firstCheckin.affectiveDomainScore,
+                                        style: TextStyle(color: Colors.black), // กำหนดสีข้อความ
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                              )
-                              .checkinClassroomStatus;
+                              ),
+                            ),
+                            ...dates.map((date) {
+                              var status = studentCheckins
+                                  .firstWhere(
+                                    (c) => c.checkinClassroomDate == date,
+                                    orElse: () => HistoryCheckin(
+                                      checkinClassroomAuto: '',
+                                      checkinClassroomDate: date,
+                                      usersUsername: '',
+                                      checkinClassroomClassID: '',
+                                      checkinClassroomStatus: 'ไม่มีข้อมูล',
+                                      usersPrefix: '',
+                                      usersThfname: '',
+                                      usersThlname: '',
+                                      usersNumber: '',
+                                      usersId: checkin.usersId,
+                                      usersPhone: '',
+                                      affectiveDomainScore:'',
+                                    ),
+                                  )
+                                  .checkinClassroomStatus;
 
-                              String statusText = '';
-                          Color statusColor = Colors.black; // ค่าเริ่มต้นคือสีดำ
+                              String statusText = convertStatusToDisplayText(status);
+                              Color statusColor = Colors.black;
 
-                          // กำหนดข้อความและสีตามสถานะ
-                          switch (status) {
-                            case 'present':
-                              statusText = 'มาเรียน';
-                              statusColor = Colors.green;
-                              break;
-                            case 'late':
-                              statusText = 'มาสาย';
-                              statusColor = const Color.fromARGB(255, 165, 149, 2);
-                              break;
-                            case 'absent':
-                              statusText = 'ขาดเรียน';
-                              statusColor = Colors.red;
-                              break;
-                            case 'sick leave':
-                              statusText = 'ลาป่วย';
-                              statusColor = Colors.blue;
-                              break;
-                            case 'personal leave':
-                              statusText = 'ลากิจ';
-                              statusColor = Colors.purple;
-                              break;
-                            default:
-                              statusText = 'ไม่มีข้อมูล';
-                              statusColor = Colors.black;
-                              break;
-                          }
+                              switch (status) {
+                                case 'present':
+                                  statusText = 'มาเรียน';
+                                  statusColor = Colors.green;
+                                  break;
+                                case 'late':
+                                  statusText = 'มาสาย';
+                                  statusColor = const Color.fromARGB(255, 165, 149, 2);
+                                  break;
+                                case 'absent':
+                                  statusText = 'ขาดเรียน';
+                                  statusColor = Colors.red;
+                                  break;
+                                case 'sick leave':
+                                  statusText = 'ลาป่วย';
+                                  statusColor = Colors.blue;
+                                  break;
+                                case 'personal leave':
+                                  statusText = 'ลากิจ';
+                                  statusColor = Colors.purple;
+                                  break;
+                                default:
+                                  statusText = 'ไม่มีข้อมูล';
+                                  statusColor = Colors.black;
+                                  break;
+                              }
 
-
-                          return DataCell(Text(
-                            statusText,
-                            style: TextStyle(color: statusColor),
-                          ));
-                        }),
-                      ],
-                    );
-                  }).toList();
-                })(),
+                              return DataCell(Text(
+                                statusText,
+                                style: TextStyle(color: statusColor),
+                              ));
+                            }),
+                            DataCell(Text(presentCount.toString())),
+                            DataCell(Text(lateCount.toString())),
+                            DataCell(Text(absentCount.toString())),
+                            DataCell(Text(sickLeaveCount.toString())),
+                            DataCell(Text(personalLeaveCount.toString())),
+                            if (_isEditing)
+                              DataCell(
+                                TextField(
+                                  controller: _scoreControllers[firstCheckin.usersUsername] = TextEditingController(),
+                                  decoration: InputDecoration(hintText: 'กรอกคะแนน'),
+                                ),
+                              ),
+                          ],
+                        );
+                      }).toList();
+                    })(),
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.all(20),
+                        child: TextButton(
+                          onPressed: () {
+                            setState(() {
+                              _isEditing = !_isEditing;
+                            });
+                          },
+                          style: ButtonStyle(
+                            backgroundColor: MaterialStateProperty.all(const Color.fromARGB(255, 0, 165, 165)),
+                            padding: MaterialStateProperty.all(EdgeInsets.symmetric(horizontal: 16, vertical: 8)),
+                          ),
+                          child: Text(
+                            _isEditing ? 'ปิดกรอกคะแนน' : 'เพิ่มคะแนนจิตพิสัย',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ),
+                      ),
+                      if (_isEditing)
+                        Padding(
+                          padding: EdgeInsets.all(20),
+                          child: ElevatedButton(
+                            onPressed: _saveAffectiveScores,
+                            child: const Text('บันทึกคะแนนจิตพิสัย'),
+                          ),
+                        ),
+                    ],
+                  ),
+                ],
               );
             }
           },
@@ -199,50 +422,6 @@ class _SettingCheckinClassroomDialogState
           child: const Text('ปิด'),
         ),
       ],
-    );
-  }
-}
-
-class HistoryCheckin {
-  final String checkinClassroomAuto;
-  final String checkinClassroomDate;
-  final String usersUsername;
-  final String checkinClassroomClassID;
-  final String checkinClassroomStatus;
-  final String usersPrefix;
-  final String usersThfname;
-  final String usersThlname;
-  final String usersNumber;
-  final String usersId;
-  final String usersPhone;
-
-  HistoryCheckin({
-    required this.checkinClassroomAuto,
-    required this.checkinClassroomDate,
-    required this.usersUsername,
-    required this.checkinClassroomClassID,
-    required this.checkinClassroomStatus,
-    required this.usersPrefix,
-    required this.usersThfname,
-    required this.usersThlname,
-    required this.usersNumber,
-    required this.usersId,
-    required this.usersPhone,
-  });
-
-  factory HistoryCheckin.fromJson(Map<String, dynamic> json) {
-    return HistoryCheckin(
-      checkinClassroomAuto: json['checkin_classroom_auto'],
-      checkinClassroomDate: json['checkin_classroom_date'],
-      usersUsername: json['users_username'],
-      checkinClassroomClassID: json['checkin_classroom_classID'],
-      checkinClassroomStatus: json['checkin_classroom_status'],
-      usersPrefix: json['users_prefix'],
-      usersThfname: json['users_thfname'],
-      usersThlname: json['users_thlname'],
-      usersNumber: json['users_number'],
-      usersId: json['users_id'],
-      usersPhone: json['users_phone'],
     );
   }
 }
