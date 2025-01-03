@@ -1081,162 +1081,122 @@ class HistoryCheckin {
       usersNumber: json['users_number'],
       usersId: json['users_id'],
       usersPhone: json['users_phone'],
-      affectiveDomainScore: json['affective_domain_score'] ?? '',
+      affectiveDomainScore: json['affective_domain_score'] ?? '-',
     );
   }
 }
 
 //-------------------------------------------------------------
-class UserDetail {
-  final String thFname;
-  final String thLname;
-  final String userId;
-  final String userNumber;
-  final String username;
+class UserDetails {
+  final String usersThfname;
+  final String usersThlname;
+  final String usersId;
+  final int usersNumber;  
+  final String usersUsername;
 
-  UserDetail({
-    required this.thFname,
-    required this.thLname,
-    required this.userId,
-    required this.userNumber,
-    required this.username,
+  UserDetails({
+    required this.usersThfname,
+    required this.usersThlname,
+    required this.usersId,
+    required this.usersNumber,
+    required this.usersUsername,
   });
 
-  factory UserDetail.fromJson(Map<String, dynamic> json) {
-    return UserDetail(
-      thFname: json['users_thfname'],
-      thLname: json['users_thlname'],
-      userId: json['users_id'],
-      userNumber: json['users_number'],
-      username: json['users_username'],
+  factory UserDetails.fromJson(Map<String, dynamic> json) {
+    return UserDetails(
+      usersThfname: json['users_thfname'],
+      usersThlname: json['users_thlname'],
+      usersId: json['users_id'].toString(), // แปลงให้เป็น String
+      usersNumber: int.parse(json['users_number'].toString()), // แปลงให้เป็น int
+      usersUsername: json['users_username'],
+    );
+  }
+}
+
+class ExamsetDetails {
+  final int examsetId;
+  final String examsetDirection;
+  final String examsetFullMark;
+  final String examsetTime;
+  final String examsetType;
+
+  ExamsetDetails({
+    required this.examsetId,
+    required this.examsetDirection,
+    required this.examsetFullMark,
+    required this.examsetTime,
+    required this.examsetType,
+  });
+
+  factory ExamsetDetails.fromJson(Map<String, dynamic> json) {
+    return ExamsetDetails(
+      examsetId: int.parse(json['examsets_auto'].toString()), // แปลงให้เป็น int
+      examsetDirection: json['examsets_direction'],
+      examsetFullMark: json['examsets_fullmark'].toString(), // แปลงให้เป็น String
+      examsetTime: json['examsets_time'],
+      examsetType: json['examsets_type'],
     );
   }
 
-  Map<String, dynamic> toJson() {
-    return {
-      'users_thfname': thFname,
-      'users_thlname': thLname,
-      'users_id': userId,
-      'users_number': userNumber,
-      'users_username': username,
-    };
+  String getFormattedExamsetTime() {
+    if (examsetTime.isEmpty) {
+      return 'Invalid Date'; // ถ้าเป็น null หรือว่าง ให้คืนค่าที่เหมาะสม
+    }
+
+    try {
+      DateTime parsedDate = DateTime.parse(examsetTime);
+      return DateFormat('dd-MM-yyyy').format(parsedDate);
+    } catch (e) {
+      return 'Invalid Date'; // กรณีที่ไม่สามารถแปลงเป็นวันที่ได้
+    }
   }
 }
 
 class Score {
-  final String scoreId;
-  final String examsetId;
+  final int examsetId;
+  final String username;
   final String scoreTotal;
   final String scoreType;
-  final String username;
 
   Score({
-    required this.scoreId,
     required this.examsetId,
+    required this.username,
     required this.scoreTotal,
     required this.scoreType,
-    required this.username,
   });
 
   factory Score.fromJson(Map<String, dynamic> json) {
     return Score(
-      scoreId: json['score_auto'],
-      examsetId: json['examsets_id'],
-      scoreTotal: json['score_total'],
-      scoreType: json['score_type'],
-      username: json['users_username'],
+      examsetId: json['examsets_id'] != null ? int.parse(json['examsets_id'].toString()) : 0, // ตรวจสอบค่า null
+      username: json['users_username'] ?? '', // ตรวจสอบค่าหรือให้ค่าเริ่มต้น
+      scoreTotal: json['score_total']?.toString() ?? '0', // ตรวจสอบค่าหรือให้ค่าเริ่มต้น
+      scoreType: json['score_type'] ?? '', // ตรวจสอบค่าหรือให้ค่าเริ่มต้น
     );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'score_auto': scoreId,
-      'examsets_id': examsetId,
-      'score_total': scoreTotal,
-      'score_type': scoreType,
-      'users_username': username,
-    };
-  }
-}
-
-class ExamsetDetail {
-  final String examsetId;
-  final String examsetDirection;
-  final String examsetFullMark;
-  final String examsetDeadline;
-  final String examsetTime;
-  final String examsetType;
-  final bool examsetClosed;
-  final String examsetInspectionStatus;
-
-  ExamsetDetail({
-    required this.examsetId,
-    required this.examsetDirection,
-    required this.examsetFullMark,
-    required this.examsetDeadline,
-    required this.examsetTime,
-    required this.examsetType,
-    required this.examsetClosed,
-    required this.examsetInspectionStatus,
-  });
-
-  factory ExamsetDetail.fromJson(Map<String, dynamic> json) {
-    return ExamsetDetail(
-      examsetId: json['examsets_auto'],
-      examsetDirection: json['examsets_direction'],
-      examsetFullMark: json['examsets_fullmark'],
-      examsetDeadline: json['examsets_deadline'],
-      examsetTime: json['examsets_time'],
-      examsetType: json['examsets_type'],
-      examsetClosed: json['examsets_closed'] == 1,
-      examsetInspectionStatus: json['examsets_Inspection_status'],
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'examsets_auto': examsetId,
-      'examsets_direction': examsetDirection,
-      'examsets_fullmark': examsetFullMark,
-      'examsets_deadline': examsetDeadline,
-      'examsets_time': examsetTime,
-      'examsets_type': examsetType,
-      'examsets_closed': examsetClosed ? 1 : 0,
-      'examsets_Inspection_status': examsetInspectionStatus,
-    };
   }
 }
 
 class ScoreStudentsInClass {
-  final List<UserDetail> userDetails;
+  final List<UserDetails> userDetails;
+  final List<ExamsetDetails> examsetsDetails;
   final List<Score> scores;
-  final List<ExamsetDetail> examsetDetails; // Add examsetDetails here
 
   ScoreStudentsInClass({
     required this.userDetails,
+    required this.examsetsDetails,
     required this.scores,
-    required this.examsetDetails, // Include examsetDetails in constructor
   });
 
   factory ScoreStudentsInClass.fromJson(Map<String, dynamic> json) {
     return ScoreStudentsInClass(
       userDetails: (json['userDetails'] as List)
-          .map((item) => UserDetail.fromJson(item))
+          .map((item) => UserDetails.fromJson(item))
+          .toList(),
+      examsetsDetails: (json['examsetsDetails'] as List)
+          .map((item) => ExamsetDetails.fromJson(item))
           .toList(),
       scores: (json['scores'] as List)
           .map((item) => Score.fromJson(item))
           .toList(),
-      examsetDetails: (json['examsetsDetails'] as List) // Ensure to parse examsetDetails
-          .map((item) => ExamsetDetail.fromJson(item))
-          .toList(),
     );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'userDetails': userDetails.map((item) => item.toJson()).toList(),
-      'scores': scores.map((item) => item.toJson()).toList(),
-      'examsetsDetails': examsetDetails.map((item) => item.toJson()).toList(),
-    };
   }
 }

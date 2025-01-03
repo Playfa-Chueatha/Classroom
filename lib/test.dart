@@ -1,12 +1,10 @@
 // import 'package:flutter/material.dart';
-// import 'package:flutter/services.dart';
 // import 'package:flutter_esclass_2/Data/Data.dart';
-// import 'package:http/http.dart' as http;
 // import 'dart:convert';
+// import 'package:http/http.dart' as http;
+// import 'package:intl/intl.dart';
 
-// List<liststudents> dataliststudents = [];
-
-// class Scorestudenstofrteachertest extends StatefulWidget {
+// class Scorestudenstofrteacher extends StatefulWidget {
 //   final String username;
 //   final String thfname;
 //   final String thlname;
@@ -15,276 +13,514 @@
 //   final String classroomYear;
 //   final String classroomNumRoom;
 
-//   const Scorestudenstofrteachertest({
+//   const Scorestudenstofrteacher({
 //     super.key,
-//     required this.username, 
-//     required this.thfname, 
-//     required this.thlname, 
-//     required this.classroomName, 
-//     required this.classroomMajor, 
-//     required this.classroomYear, 
-//     required this.classroomNumRoom, 
+//     required this.username,
+//     required this.thfname,
+//     required this.thlname,
+//     required this.classroomName,
+//     required this.classroomMajor,
+//     required this.classroomYear,
+//     required this.classroomNumRoom,
 //   });
 
 //   @override
-//   State<Scorestudenstofrteachertest> createState() => _ScorestudentsState();
+//   State<Scorestudenstofrteacher> createState() => _ScorestudentsState();
 // }
 
-// class _ScorestudentsState extends State<Scorestudenstofrteachertest> {
-//   List<List<TextEditingController>> scoreControllers = [];
-//   List<Scorestudentsinclass> scoreStudents = [];
-//   List<String> scoreColumnNames = ["คะแนน 1"];
-//   bool isEditing = true; // Add this variable to control the editing state
-
-
-//   Future<void> fetchClassroomData(String classroomName, String classroomMajor, String classroomYear, String classroomNumRoom) async {
-//   const String url = 'https://www.edueliteroom.com/connect/fetch_scorestudentsinclass.php';
-
-//   final response = await http.post(
-//     Uri.parse(url),
-//     body: {
-//       'classroomName': classroomName,
-//       'classroomMajor': classroomMajor,
-//       'classroomYear': classroomYear,
-//       'classroomNumRoom': classroomNumRoom,
-//     },
-//   );
-//   print(response.body);
-//   if (response.statusCode == 200) {
-//     final responseData = json.decode(response.body);
-//     print(response.body);
-//     if (responseData.containsKey('error')) {
-//       // Handle error if classroom not found
-//       print('Error: ${responseData['error']}');
-//       return;
-//     } else {
-//       // Process and display the data in your UI
-//       // สมมุติว่า responseData['scorestudents'] เป็นรายการข้อมูลนักเรียน
-//       var scoreStudentsList = responseData['scorestudents'] as List;
-//       List<Scorestudentsinclass> scoreStudents = scoreStudentsList
-//           .map((studentData) => Scorestudentsinclass.fromJson(studentData))
-//           .toList();
-      
-//       // เรียกใช้ฟังก์ชันหรือวิธีการที่จะแสดงผลข้อมูลใน UI
-//       // เช่น ถ้าคุณใช้ StatefulWidget คุณสามารถใช้ setState() เพื่ออัพเดท UI
-//       setState(() {
-//         scoreStudents = scoreStudents;
-//       });
-//     }
-//   } else {
-//     throw Exception('Failed to load data');
-//   }
-// }
-
-
-
+// class _ScorestudentsState extends State<Scorestudenstofrteacher> {
+//   late Future<ScoreStudentsInClass> futureData;
+//   Map<String, List<ExamsetDetails>> groupedExamsets = {};
+//   bool isEditing = false;
+  
+//   late Future<List<HistoryCheckin>> historyCheckinsFuture;
+//   Map<String, Map<int, String>> editedScores = {};
+//   List<HistoryCheckin> historyCheckins = [];
+//   bool _isStatusFound = false;
+//   String? scoreMessage;
 
 //   @override
 //   void initState() {
 //     super.initState();
-//     fetchClassroomData();
-//     scoreControllers = dataliststudents.map((student) {
-//       return scoreColumnNames.map((name) => TextEditingController()).toList();
-//     }).toList();
-//   }
-
-//   @override
-//   void dispose() {
-//     // Dispose controllers
-//     for (var controllers in scoreControllers) {
-//       for (var controller in controllers) {
-//         controller.dispose();
-//       }
-//     }
-//     super.dispose();
-//   }
-
-//   void addScoreColumn() {
+//     // กำหนดค่า futureData ที่จะดึงข้อมูลทันทีที่เริ่มสร้าง widget
+//     futureData = fetchScoreData();
+//     affectivefull(
+//     classroomName: widget.classroomName,
+//     classroomMajor: widget.classroomMajor,
+//     classroomYear: widget.classroomYear,
+//     classroomNumRoom: widget.classroomNumRoom,
+//     username: widget.username,
+//   ).then((data) {
 //     setState(() {
-//       scoreColumnNames.add("คะแนน ${scoreColumnNames.length + 1}");
-//       // Add a new TextEditingController for each student
-//       for (var controllers in scoreControllers) {
-//         controllers.add(TextEditingController());
+      
+//       if (data['status'] == 'found') {
+//         scoreMessage = data['affectivefull_domain_score'].toString(); 
+//         _isStatusFound = true; 
+//       } else {
+//         scoreMessage = 'ไม่พบข้อมูลคะแนน';
+//         _isStatusFound = false; 
 //       }
 //     });
-//   }
-
-//   void removeScoreColumn(int index) {
+//   }).catchError((error) {
 //     setState(() {
-//       scoreColumnNames.removeAt(index);
-//       for (var controllers in scoreControllers) {
-//         controllers.removeAt(index);
-//       }
+//       scoreMessage = 'เกิดข้อผิดพลาด: $error'; 
+//       _isStatusFound = false; 
 //     });
+//   });
+//     historyCheckinsFuture = fetchHistoryCheckin(
+//       widget.classroomName, widget.classroomMajor, widget.classroomYear, widget.classroomNumRoom);
 //   }
 
-//   void editScoreColumn(int index) async {
-//     TextEditingController columnNameController = TextEditingController(text: scoreColumnNames[index]);
-//     bool shouldUpdate = await showDialog(
-//       context: context,
-//       builder: (context) {
-//         return AlertDialog(
-//           title: const Text('แก้ไขหัวข้อคะแนน'),
-//           content: TextField(
-//             controller: columnNameController,
-//             decoration: const InputDecoration(
-//               labelText: 'ชื่อหัวข้อคะแนน',
-//             ),
-//           ),
-//           actions: [
-//             TextButton(
-//               onPressed: () {
-//                 Navigator.of(context).pop(false);
-//               },
-//               child: const Text('ยกเลิก'),
-//             ),
-//             TextButton(
-//               onPressed: () {
-//                 Navigator.of(context).pop(true);
-//               },
-//               child: const Text('ตกลง'),
-//             ),
-//           ],
-//         );
-//       }
+//   // ฟังก์ชันการดึงข้อมูลคะแนนนักเรียน
+//   Future<ScoreStudentsInClass> fetchScoreData() async {
+//     final response = await http.post(
+//       Uri.parse('https://www.edueliteroom.com/connect/fetch_scorestudentsinclass.php'),
+//       body: {
+//         'classroomName': widget.classroomName,
+//         'classroomMajor': widget.classroomMajor,
+//         'classroomYear': widget.classroomYear,
+//         'classroomNumRoom': widget.classroomNumRoom,
+//       },
 //     );
 
-//     if (shouldUpdate) {
-//       setState(() {
-//         scoreColumnNames[index] = columnNameController.text;
-//       });
+//     if (response.statusCode == 200) {
+//       final jsonData = json.decode(response.body);
+//       if (jsonData != null) {
+//         return ScoreStudentsInClass.fromJson(jsonData);
+//       } else {
+//         throw Exception('ข้อมูลไม่ถูกต้อง');
+//       }
+//     } else {
+//       throw Exception('Failed to load data');
 //     }
 //   }
 
-//   void toggleEditing() {
-//     setState(() {
-//       isEditing = !isEditing; // Toggle the editing state
-//     });
+//   // ฟังก์ชันการบันทึกคะแนน
+//   Future<void> saveScores() async {
+//     bool hasError = false;
+
+//     for (var username in editedScores.keys) {
+//       for (var examsetId in editedScores[username]!.keys) {
+//         final score = editedScores[username]![examsetId];
+
+//         if (username.isEmpty || examsetId == 0 || score == null || score.isEmpty) {
+//           print('Missing required parameter: username=$username, examsetId=$examsetId, score=$score');
+//           hasError = true;
+//           continue;
+//         }
+
+//         final response = await http.post(
+//           Uri.parse('https://www.edueliteroom.com/connect/update_scorestudents.php'),
+//           headers: {"Content-Type": "application/json"},
+//           body: json.encode({
+//             'username': username,
+//             'examsetId': examsetId,
+//             'scoreTotal': score,
+//           }),
+//         );
+
+//         if (response.statusCode != 200) {
+//           hasError = true;
+//           print('Error saving score for $username (Examset ID: $examsetId): ${response.body}');
+//         }
+//       }
+//     }
+
+//     if (!hasError) {
+//       setState(() {
+//         isEditing = false;
+//         editedScores.clear();
+//         futureData = fetchScoreData();  // ดึงข้อมูลใหม่เมื่อบันทึกคะแนน
+//       });
+//       ScaffoldMessenger.of(context).showSnackBar(
+//         SnackBar(content: Text('บันทึกคะแนนสำเร็จ!')),
+//       );
+//     } else {
+//       ScaffoldMessenger.of(context).showSnackBar(
+//         SnackBar(content: Text('เกิดข้อผิดพลาดในการบันทึกคะแนน!')),
+//       );
+//     }
 //   }
+
+//   // ฟังก์ชันการดึงข้อมูลการเช็คชื่อ
+//   Future<List<HistoryCheckin>> fetchHistoryCheckin(
+//       String classroomName, String classroomMajor, String classroomYear, String classroomNumRoom) async {
+//     final response = await http.post(
+//       Uri.parse('https://www.edueliteroom.com/connect/historycheckin.php'),
+//       body: {
+//         'classroomName': classroomName,
+//         'classroomMajor': classroomMajor,
+//         'classroomYear': classroomYear,
+//         'classroomNumRoom': classroomNumRoom,
+//       },
+//     );
+
+//     if (response.statusCode == 200) {
+//       List<dynamic> data = json.decode(response.body);
+//       return data.map((json) => HistoryCheckin.fromJson(json)).toList();
+//     } else {
+//       throw Exception('Failed to load data');
+//     }
+//   }
+
+//   // ฟังก์ชันการจัดกลุ่มข้อสอบ
+//   void groupAndSortExamsets(List<ExamsetDetails> examsets) {
+//     groupedExamsets = {};
+//     for (var examset in examsets) {
+//       if (!groupedExamsets.containsKey(examset.examsetType)) {
+//         groupedExamsets[examset.examsetType] = [];
+//       }
+//       groupedExamsets[examset.examsetType]!.add(examset);
+//     }
+
+//     groupedExamsets = Map.fromEntries(
+//       groupedExamsets.entries.toList()..sort((a, b) => a.key.compareTo(b.key)),
+//     );
+//   }
+
+
+//   Future<Map<String, dynamic>> affectivefull({
+//   required String classroomName,
+//   required String classroomMajor,
+//   required String classroomYear,
+//   required String classroomNumRoom,
+//   required String username,
+// }) async {
+//   try {
+//     final response = await http.post(
+//       Uri.parse('https://www.edueliteroom.com/connect/get_affectivefull_domain_score.php'), // URL ของไฟล์ PHP
+//       body: {
+//         'classroomName': classroomName,
+//         'classroomMajor': classroomMajor,
+//         'classroomYear': classroomYear,
+//         'classroomNumRoom': classroomNumRoom,
+//         'username': username,
+//       },
+//     );
+//     print(response.body);
+
+//     if (response.statusCode == 200) {
+      
+//       Map<String, dynamic> data = json.decode(response.body);
+//       return data; 
+//     } else {
+      
+//       throw Exception('Failed to load data');
+//     }
+//   } catch (e) {
+//     throw Exception('Failed to make request: $e');
+//   }
+// }
 
 //   @override
 //   Widget build(BuildContext context) {
 //     return Scaffold(
-//       backgroundColor: const Color.fromARGB(255, 255, 255, 255),
 //       appBar: AppBar(
-//         title: const Text('รายชื่อนักเรียน'),
-//         backgroundColor: Colors.white,
+//         title: Text('คะแนนนักเรียน'),
 //         actions: [
-//           OutlinedButton(
-//             onPressed: () {
-//               toggleEditing(); // Toggle editing state when saving
-//             },
-//             child: Text(isEditing ? 'บันทึกคะแนน' : 'แก้ไขคะแนน'),
-//           ),
+//           if (isEditing)
+//             IconButton(
+//               icon: Icon(Icons.save),
+//               onPressed: saveScores,
+//             )
+//           else
+//             IconButton(
+//               icon: Icon(Icons.edit),
+//               onPressed: () {
+//                 setState(() {
+//                   isEditing = true;
+//                 });
+//               },
+//             ),
 //         ],
 //       ),
-//       body: Padding(
-//         padding: const EdgeInsets.all(16.0),
-//         child: SingleChildScrollView(
-//           scrollDirection: Axis.horizontal,
-//           child: Column(
-//             crossAxisAlignment: CrossAxisAlignment.end,
-//             children: [
-//               Row(
-//                 children: [
-//                   ElevatedButton(
-//                     onPressed: addScoreColumn,
-//                     child: const Text('เพิ่มช่องคะแนน'),
-//                   ),
-//                 ],
-//               ),
-//               const SizedBox(height: 16),
-//               DataTable(
-//                 columnSpacing: 20.0,
-//                 columns: [
-//                   DataColumn(
-//                     label: SizedBox(
-//                       width: 60,
-//                       child: const Text('เลขที่ห้อง'),
+//       body: FutureBuilder<ScoreStudentsInClass>(
+//         future: futureData, // ใช้ futureData ที่กำหนดไว้แล้ว
+//         builder: (context, snapshot) {
+//           if (snapshot.connectionState == ConnectionState.waiting) {
+//             return Center(child: CircularProgressIndicator());
+//           } else if (snapshot.hasError) {
+//             return Center(child: Text('Error: ${snapshot.error}'));
+//           } else if (!snapshot.hasData) {
+//             return Center(child: Text('ไม่มีข้อมูล'));
+//           }
+
+//           final data = snapshot.data!;
+//           Map<int, Map<String, String>> scoreMap = {};
+
+//           for (var score in data.scores) {
+//             if (!scoreMap.containsKey(score.examsetId)) {
+//               scoreMap[score.examsetId] = {};
+//             }
+//             scoreMap[score.examsetId]![score.username] = score.scoreTotal;
+//           }
+
+//           return FutureBuilder<List<HistoryCheckin>>(
+//             future: historyCheckinsFuture, // ใช้ historyCheckinsFuture ที่ดึงข้อมูล
+//             builder: (context, historySnapshot) {
+//               if (historySnapshot.connectionState == ConnectionState.waiting) {
+//                 return Center(child: CircularProgressIndicator());
+//               } else if (historySnapshot.hasError) {
+//                 return Center(child: Text('Error: ${historySnapshot.error}'));
+//               } else if (!historySnapshot.hasData) {
+//                 return Center(child: Text('ไม่มีข้อมูลการเช็คชื่อ'));
+//               }
+
+//               historyCheckins = historySnapshot.data!;
+
+//               return SingleChildScrollView(
+//                 scrollDirection: Axis.horizontal,
+//                 child: Column(
+//                   children: [
+
+//                     Container(
+//                       padding: EdgeInsets.all(8.0), 
+//                       decoration: BoxDecoration(
+//                         border: Border.all(
+//                           color: Colors.black, 
+//                           width: 2, 
+//                         ),
+//                         borderRadius: BorderRadius.circular(8.0), 
+//                       ),
+//                       alignment: Alignment.center, 
+//                       child: Row(
+
+//                         children: [
+//                           Container(
+//                             height: 15,
+//                             width: 15,
+//                             padding: EdgeInsets.all(8.0),
+//                             color: Colors.blue.shade100,
+//                           ),
+//                           Text('ถาม-ตอบ', style: TextStyle(fontSize: 14)),
+//                           SizedBox(width: 10),
+//                           Container(
+//                             height: 15,
+//                             width: 15,
+//                             padding: EdgeInsets.all(8.0),
+//                             color: Colors.green.shade100,
+//                           ),
+//                           Text('ปรนัยตัวเลือกเดียว', style: TextStyle(fontSize: 14)),
+//                           SizedBox(width: 10),
+//                           Container(
+//                             height: 15,
+//                             width: 15,
+//                             padding: EdgeInsets.all(8.0),
+//                             color: Colors.yellow.shade100,
+//                           ),
+//                           Text('ปรนัยหลายตัวเลือก', style: TextStyle(fontSize: 14)),
+//                           SizedBox(width: 10),
+//                           Container(
+//                             height: 15,
+//                             width: 15,
+//                             padding: EdgeInsets.all(8.0),
+//                             color: Colors.pink.shade100,
+//                           ),
+//                           Text('ส่งไฟล์', style: TextStyle(fontSize: 14)),
+//                         ],
+//                       ),
 //                     ),
-//                   ),
-//                   DataColumn(
-//                     label: SizedBox(
-//                       width: 150,
-//                       child: const Text('รหัสนักเรียน'),
-//                     ),
-//                   ),
-//                   DataColumn(
-//                     label: SizedBox(
-//                       width: 150,
-//                       child: const Text('ชื่อ'),
-//                     ),
-//                   ),
-//                   DataColumn(
-//                     label: SizedBox(
-//                       width: 150,
-//                       child: const Text('นามสกุล'),
-//                     ),
-//                   ),
-//                   // Add columns for scores dynamically
-//                   ...scoreColumnNames.asMap().entries.map((entry) {
-//                     int index = entry.key;
-//                     String name = entry.value;
-//                     return DataColumn(
+//                   SizedBox(height: 18),
+
+
+
+                  
+                
+//                 DataTable(
+//                   columnSpacing: 5,
+//                   columns: [
+                    
+//                     const DataColumn(label:  SizedBox(width: 50, child: Text('เลขที่'),)),
+//                     const DataColumn(label:  SizedBox(width: 100, child: Text('รหัสนักเรียน'),)),
+//                     const DataColumn(label:  SizedBox(width: 252, child: Text('ชื่อ-นามสกุล'),)),                 
+//                     DataColumn(
 //                       label: SizedBox(
-//                         width: 150,
-//                         child: Row(
-//                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//                           children: [
-//                             Text(name),
-//                             Row(
+//                         width: 100,
+//                         height: 40,
+//                         child: 
+//                        Column(
+//                         children: [
+//                           Text('คะแนนจิตพิสัย'),
+//                           _isStatusFound
+//                               ? Text('($scoreMessage คะแนน)', style: TextStyle(fontSize: 12),)
+//                               : Text('(ยังไม่เพิ่มคะแนน)', style: TextStyle(fontSize: 12),),
+//                         ],
+//                       ),
+//                     )),
+//                     ...data.examsetsDetails.map((examset) {
+//                       String formattedDate = '';
+//                       try {
+//                         DateTime parsedDate = DateTime.parse(examset.examsetTime);
+//                         formattedDate = DateFormat('dd-MM-yyyy').format(parsedDate);
+//                       } catch (e) {
+//                         formattedDate = 'Invalid Date';
+//                       }
+//                       Color backgroundColor = Colors.white;
+//                         switch (examset.examsetType) {
+//                           case 'auswer':
+//                             backgroundColor = Colors.blue.shade100; 
+//                             break;
+//                           case 'onechoice':
+//                             backgroundColor = Colors.green.shade100; 
+//                             break;
+//                           case 'manychoice':
+//                             backgroundColor = Colors.yellow.shade100; 
+//                             break;
+//                           case 'upfile':
+//                             backgroundColor = Colors.pink.shade100; 
+//                             break;
+//                           default:
+//                             backgroundColor = Colors.white; 
+//                         }
+
+//                       return DataColumn(
+//                         label: Tooltip(
+//                           message:
+//                               '${examset.examsetDirection} วันที่เพิ่มงาน: $formattedDate',
+//                           child: Container(
+//                             width: 70,
+//                             height: 40, 
+//                             color: backgroundColor, 
+//                             child: Column(
 //                               children: [
-//                                 IconButton(
-//                                   icon: const Icon(Icons.edit, size: 16),
-//                                   onPressed: () => editScoreColumn(index),
+//                                 Text(
+//                                   examset.examsetDirection,
+//                                   style: TextStyle(fontWeight: FontWeight.bold),
 //                                 ),
-//                                 IconButton(
-//                                   icon: const Icon(Icons.delete, size: 16),
-//                                   onPressed: () => removeScoreColumn(index),
+//                                 Text(
+//                                   '(${examset.examsetFullMark} คะแนน)',
+//                                   style: TextStyle(fontSize: 12),
 //                                 ),
 //                               ],
 //                             ),
-//                           ],
+//                           ),
+//                         ),
+//                       );
+//                     }),
+//                     DataColumn(
+//                       label: Container(
+//                         alignment: Alignment.center,
+//                         width: 70,
+//                         height: 40, 
+//                         color: Colors.blue,                       
+//                         child: const Text(
+//                           'คะแนนรวม',
+//                           style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
 //                         ),
 //                       ),
-//                     );
-//                   }),
-//                 ],
-//                 rows: dataliststudents.asMap().entries.map((entry) {
-//                   var student = entry.value;
-//                   var controllers = scoreControllers[entry.key];
-//                   return DataRow(
-//                     cells: [
-//                       DataCell(Text(student.studentNumber)),
-//                       DataCell(Text(student.studentId)),
-//                       DataCell(Text(student.firstName)),
-//                       DataCell(Text(student.lastName)),
-//                       // Add cells for scores dynamically
-//                       ...controllers.map((controller) => DataCell(
-//                         Center(child: 
-//                         TextField(
-//                           controller: controller,
-//                           decoration: const InputDecoration(
-//                             contentPadding: EdgeInsets.all(8.0),
+//                     ),
+//                   ],
+//                   rows: data.userDetails.map((user) {
+//                     List<DataCell> cells = [
+//                       DataCell(SizedBox(width: 50, child: Text('${user.usersNumber}'),)),
+//                       DataCell(SizedBox(width: 100, child: Text(user.usersId),)),
+//                       DataCell(SizedBox(width: 250, child: Text('${user.usersThfname} ${user.usersThlname}'),)),
+//                       DataCell(
+//                         Container(
+//                           width: 70,
+//                           height: 40,
+//                           alignment: Alignment.center, // จัดข้อความให้อยู่ตรงกลาง
+//                           child: Center( // ใช้ Center เพื่อจัดให้ข้อมูลอยู่กลาง
+//                             child: Text(
+//                               historyCheckins.firstWhere(
+//                                 (checkin) =>
+//                                     checkin.usersUsername == user.usersUsername,
+//                                 orElse: () => HistoryCheckin(
+//                                   checkinClassroomAuto: '',
+//                                   checkinClassroomDate: '',
+//                                   usersUsername: user.usersUsername,
+//                                   checkinClassroomClassID: '',
+//                                   checkinClassroomStatus: '',
+//                                   usersPrefix: '',
+//                                   usersThfname: '',
+//                                   usersThlname: '',
+//                                   usersNumber: '',
+//                                   usersId: '',
+//                                   usersPhone: '',
+//                                   affectiveDomainScore: '-',
+//                                 ),
+//                               ).affectiveDomainScore,
+//                               textAlign: TextAlign.center, 
+//                             ),
 //                           ),
-//                           keyboardType: TextInputType.number,
-//                           inputFormatters: [
-//                             FilteringTextInputFormatter.digitsOnly,
-//                             LengthLimitingTextInputFormatter(3),
-//                           ],
-//                           readOnly: !isEditing, // Set readOnly based on isEditing
-//                         ),)
-//                       )),
-//                     ],
-//                   );
-//                 }).toList(),
-//               ),
-//             ],
-//           ),
-//         ),
+//                         ),
+//                       ),
+//                       ...data.examsetsDetails.map((examset) {
+//                         final currentScore =
+//                             scoreMap[examset.examsetId]?[user.usersUsername] ?? '-';
+
+                        
+//                         Color backgroundColor = Colors.white;
+//                         switch (examset.examsetType) {
+//                           case 'auswer':
+//                             backgroundColor = Colors.blue.shade100; 
+//                             break;
+//                           case 'onechoice':
+//                             backgroundColor = Colors.green.shade100; 
+//                             break;
+//                           case 'manychoice':
+//                             backgroundColor = Colors.yellow.shade100; // Example color for type3
+//                             break;
+//                           case 'upfile':
+//                             backgroundColor = Colors.pink.shade100; // Example color for type3
+//                             break;
+//                           default:
+//                             backgroundColor = Colors.white; // Default background color
+//                         }
+
+//                         return DataCell(
+//                           Container(
+//                             width: 70,  // กำหนดความกว้าง
+//                             height: 40, // กำหนดความสูง
+//                             color: backgroundColor, // กำหนดสีพื้นหลัง
+//                             child: Center(  // ใช้ Center เพื่อจัดข้อความให้อยู่กลาง
+//                               child: isEditing
+//                                   ? TextFormField(
+//                                       initialValue: currentScore,
+//                                       onChanged: (value) {
+//                                         setState(() {
+//                                           editedScores.putIfAbsent(
+//                                               user.usersUsername, () => {})[examset.examsetId] = value;
+//                                         });
+//                                       },
+//                                     )
+//                                   : Text(currentScore),
+//                             ),
+//                           ),
+//                         );
+                        
+
+
+//                       }),
+//                       DataCell(
+//                         Container(
+//                           alignment: Alignment.center, 
+//                           height: 40,
+//                           width: 70,
+//                           decoration: BoxDecoration(
+//                             color: Colors.blue
+//                           ),
+//                           child: Text(
+//                             data.examsetsDetails.fold<int>(0, (sum, examset) {
+//                               final currentScore = scoreMap[examset.examsetId]?[user.usersUsername] ?? '-';
+                    
+//                               final score = currentScore == '-' ? 0 : int.tryParse(currentScore) ?? 0;
+//                               return sum + score;
+//                             }).toString(),
+//                           ),)
+//                     ),
+
+//                     ];
+
+//                     return DataRow(cells: cells);
+//                   }).toList(),
+//                 ),
+//                   ])
+//               );
+//             },
+//           );
+//         },
 //       ),
 //     );
 //   }
 // }
-
-
