@@ -27,6 +27,7 @@ class CheckworkTeacher extends StatefulWidget {
 
 class _CheckworkTeacherState extends State<CheckworkTeacher> {
   late Future<UserSubmission> userSubmissionFuture;
+  UserSubmission? userSubmissionData;
   Map<int, TextEditingController> controllers = {};
   double total = 0.0;
   
@@ -39,6 +40,7 @@ class _CheckworkTeacherState extends State<CheckworkTeacher> {
     required String checkworkScore,
     required String usersUsername,
     required String examAutoId,
+    required double total,
   }) async {
     final url = Uri.parse('https://www.edueliteroom.com/connect/submit_score_auswer.php');
 
@@ -49,10 +51,13 @@ class _CheckworkTeacherState extends State<CheckworkTeacher> {
       'checkwork_auswer_score': checkworkScore,
       'users_username': usersUsername,
       'examsets_id': examAutoId,
+      'total_score': total.toString(),
     };
+    print(body);
 
     try {
       final response = await http.post(url, body: body);
+
 
       try {
         final data = jsonDecode(response.body); 
@@ -95,6 +100,7 @@ class _CheckworkTeacherState extends State<CheckworkTeacher> {
       usersThfname: widget.studentData['users_thfname'],
       usersThlname: widget.studentData['users_thlname'],
       usersNumber: widget.studentData['users_number'].toString(),
+      examAutoId: widget.exam.autoId.toString(),
     );
     debugPrint = (String? message, {int? wrapWidth}) {};
   }
@@ -122,7 +128,6 @@ class _CheckworkTeacherState extends State<CheckworkTeacher> {
           '${widget.studentData['users_thfname']} '
           '${widget.studentData['users_thlname']} '
           'เลขที่: ${widget.studentData['users_number']}'
-          ' Examset: ${widget.exam.autoId}',
         ),
         actions: [
           Center(
@@ -147,13 +152,13 @@ class _CheckworkTeacherState extends State<CheckworkTeacher> {
                 } else if (snapshot.hasError) {
                   return Center(child: Text('Error: ${snapshot.error}'));
                 } else if (snapshot.hasData) {
-                  final userSubmission = snapshot.data!;
+                  userSubmissionData = snapshot.data;
                   return ListView.builder(
                     padding: const EdgeInsets.all(16.0),
-                    itemCount: userSubmission.submissions.length,
+                    itemCount: userSubmissionData!.submissions.length,
                     shrinkWrap: true, // ให้สามารถเลื่อนรายการได้โดยไม่ต้องใช้ Expand
                     itemBuilder: (context, index) {
-                      final submission = userSubmission.submissions[index];
+                      final submission = userSubmissionData!.submissions[index];
 
                       // สร้าง FocusNode และ TextEditingController ใหม่หากยังไม่มี
                       if (!controllers.containsKey(submission.questionId)) {
@@ -250,6 +255,7 @@ class _CheckworkTeacherState extends State<CheckworkTeacher> {
                         checkworkScore: controller.text,
                         usersUsername: submissions.usersUsername,
                         examAutoId: widget.exam.autoId.toString(),
+                        total: total,
                       );
                     }
 
@@ -343,6 +349,7 @@ class ApiService {
     required String usersThfname,
     required String usersThlname,
     required String usersNumber,
+    required String examAutoId, // เพิ่มพารามิเตอร์ examAutoId
   }) async {
     const url = 'https://www.edueliteroom.com/connect/fetch_submitforcheck.php';
     
@@ -353,8 +360,10 @@ class ApiService {
         'users_thfname': usersThfname,
         'users_thlname': usersThlname,
         'users_number': usersNumber,
+        'auto_id': examAutoId, // ส่งค่า examAutoId ในคำขอ
       },
     );
+
 
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
@@ -367,3 +376,4 @@ class ApiService {
     }
   }
 }
+

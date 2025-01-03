@@ -640,9 +640,9 @@ void didUpdateWidget(covariant Detail_work_S oldWidget) {
                                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                             children: [
                                               Text('คุณยังไม่ได้ส่งงาน'),
-                                              IconButton(
-                                                onPressed: () async {
-                                                  Navigator.push(
+                                              OutlinedButton(
+                                                  onPressed: () {
+                                                    Navigator.push(
                                                       context,
                                                       MaterialPageRoute(
                                                         builder: (context) => Doauswerstudents(
@@ -654,10 +654,10 @@ void didUpdateWidget(covariant Detail_work_S oldWidget) {
                                                         ),
                                                       ),
                                                     );
-                                                  
-                                                },
-                                                icon: Icon(Icons.upload, size: 30),
-                                              ),
+                                                  },
+                                                  child: Text('ไปตอบคำถาม'),
+                                                ),
+                                              
                                             ],
                                           );
                                         }
