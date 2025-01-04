@@ -1168,9 +1168,9 @@ class Score {
   factory Score.fromJson(Map<String, dynamic> json) {
     return Score(
       examsetId: json['examsets_id'] != null ? int.parse(json['examsets_id'].toString()) : 0, // ตรวจสอบค่า null
-      username: json['users_username'] ?? '', // ตรวจสอบค่าหรือให้ค่าเริ่มต้น
-      scoreTotal: json['score_total']?.toString() ?? '0', // ตรวจสอบค่าหรือให้ค่าเริ่มต้น
-      scoreType: json['score_type'] ?? '', // ตรวจสอบค่าหรือให้ค่าเริ่มต้น
+      username: json['users_username'] ?? '', 
+      scoreTotal: json['score_total']?.toString() ?? '0',
+      scoreType: json['score_type'] ?? '', 
     );
   }
 }

@@ -39,6 +39,11 @@ class _ScorestudentsState extends State<Scorestudenstofrteacher> {
   List<HistoryCheckin> historyCheckins = [];
   bool _isStatusFound = false;
   String? scoreMessage;
+  final Map<String, TextEditingController> _controllers = {};
+  Map<String, Map<String, double>> adjustedScores = {};
+  
+
+
 
   @override
   void initState() {
@@ -213,8 +218,23 @@ class _ScorestudentsState extends State<Scorestudenstofrteacher> {
   }
 }
 
+// Helper function
+Color getExamsetColor(String? type) {
+  switch (type) {
+    case 'auswer':
+      return Colors.blue.shade100;
+    case 'onechoice':
+      return Colors.green.shade100;
+    case 'manychoice':
+      return Colors.yellow.shade100;
+    case 'upfile':
+      return Colors.pink.shade100;
+    default:
+      return Colors.white;
+  }
+}
 
-
+  
 
   @override
   Widget build(BuildContext context) {
@@ -271,6 +291,7 @@ class _ScorestudentsState extends State<Scorestudenstofrteacher> {
               }
 
               historyCheckins = historySnapshot.data!;
+              
 
               return SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
@@ -330,195 +351,258 @@ class _ScorestudentsState extends State<Scorestudenstofrteacher> {
 
                   
                 
-                DataTable(
-                  columnSpacing: 5,
-                  columns: [
-                    
-                    const DataColumn(label:  SizedBox(width: 50, child: Text('เลขที่'),)),
-                    const DataColumn(label:  SizedBox(width: 100, child: Text('รหัสนักเรียน'),)),
-                    const DataColumn(label:  SizedBox(width: 252, child: Text('ชื่อ-นามสกุล'),)),                 
-                    DataColumn(
-                      label: SizedBox(
-                        width: 100,
-                        height: 40,
-                        child: 
-                       Column(
-                        children: [
-                          Text('คะแนนจิตพิสัย'),
-                          _isStatusFound
-                              ? Text('($scoreMessage คะแนน)', style: TextStyle(fontSize: 12),)
-                              : Text('(ยังไม่เพิ่มคะแนน)', style: TextStyle(fontSize: 12),),
-                        ],
-                      ),
-                    )),
-                    ...data.examsetsDetails.map((examset) {
-                      String formattedDate = '';
-                      try {
-                        DateTime parsedDate = DateTime.parse(examset.examsetTime);
-                        formattedDate = DateFormat('dd-MM-yyyy').format(parsedDate);
-                      } catch (e) {
-                        formattedDate = 'Invalid Date';
-                      }
-                      Color backgroundColor = Colors.white;
-                        switch (examset.examsetType) {
-                          case 'auswer':
-                            backgroundColor = Colors.blue.shade100; 
-                            break;
-                          case 'onechoice':
-                            backgroundColor = Colors.green.shade100; 
-                            break;
-                          case 'manychoice':
-                            backgroundColor = Colors.yellow.shade100; 
-                            break;
-                          case 'upfile':
-                            backgroundColor = Colors.pink.shade100; 
-                            break;
-                          default:
-                            backgroundColor = Colors.white; 
-                        }
-
-                      return DataColumn(
-                        label: Tooltip(
-                          message:
-                              '${examset.examsetDirection} วันที่เพิ่มงาน: $formattedDate',
-                          child: Container(
-                            width: 70,
-                            height: 40, 
-                            color: backgroundColor, 
+               DataTable(
+                      columnSpacing: 5,
+                      columns: [
+                        const DataColumn(label: SizedBox(width: 50, child: Text('เลขที่'))),
+                        const DataColumn(label: SizedBox(width: 100, child: Text('รหัสนักเรียน'))),
+                        const DataColumn(label: SizedBox(width: 252, child: Text('ชื่อ-นามสกุล'))),
+                        DataColumn(
+                          label: SizedBox(
+                            width: 100,
+                            height: 40,
                             child: Column(
                               children: [
-                                Text(
-                                  examset.examsetDirection,
-                                  style: TextStyle(fontWeight: FontWeight.bold),
-                                ),
-                                Text(
-                                  '(${examset.examsetFullMark} คะแนน)',
-                                  style: TextStyle(fontSize: 12),
-                                ),
+                                Text('คะแนนจิตพิสัย'),
+                                _isStatusFound
+                                    ? Text('($scoreMessage คะแนน)', style: TextStyle(fontSize: 12))
+                                    : Text('(ยังไม่เพิ่มคะแนน)', style: TextStyle(fontSize: 12)),
                               ],
                             ),
                           ),
                         ),
-                      );
-                    }),
-                    DataColumn(
-                      label: Container(
-                        alignment: Alignment.center,
-                        width: 70,
-                        height: 40, 
-                        color: Colors.blue,                       
-                        child: const Text(
-                          'คะแนนรวม',
-                          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
-                        ),
-                      ),
-                    ),
-                  ],
-                  rows: data.userDetails.map((user) {
-                    List<DataCell> cells = [
-                      DataCell(SizedBox(width: 50, child: Text('${user.usersNumber}'),)),
-                      DataCell(SizedBox(width: 100, child: Text(user.usersId),)),
-                      DataCell(SizedBox(width: 250, child: Text('${user.usersThfname} ${user.usersThlname}'),)),
-                      DataCell(
-                        Container(
-                          width: 70,
-                          height: 40,
-                          alignment: Alignment.center, // จัดข้อความให้อยู่ตรงกลาง
-                          child: Center( // ใช้ Center เพื่อจัดให้ข้อมูลอยู่กลาง
-                            child: Text(
-                              historyCheckins.firstWhere(
-                                (checkin) =>
-                                    checkin.usersUsername == user.usersUsername,
-                                orElse: () => HistoryCheckin(
-                                  checkinClassroomAuto: '',
-                                  checkinClassroomDate: '',
-                                  usersUsername: user.usersUsername,
-                                  checkinClassroomClassID: '',
-                                  checkinClassroomStatus: '',
-                                  usersPrefix: '',
-                                  usersThfname: '',
-                                  usersThlname: '',
-                                  usersNumber: '',
-                                  usersId: '',
-                                  usersPhone: '',
-                                  affectiveDomainScore: '-',
+                        ...data.examsetsDetails.map((examset) {
+                          String formattedDate = '';
+                          try {
+                            DateTime parsedDate = DateTime.parse(examset.examsetTime);
+                            formattedDate = DateFormat('dd-MM-yyyy').format(parsedDate);
+                          } catch (e) {
+                            formattedDate = 'Invalid Date';
+                          }
+                          Color backgroundColor = getExamsetColor(examset.examsetType);
+
+                          return DataColumn(
+                            label: Tooltip(
+                              message: '${examset.examsetDirection} วันที่เพิ่มงาน: $formattedDate',
+                              child: Container(
+                                width: 70,
+                                height: 40,
+                                color: backgroundColor,
+                                child: Column(
+                                  children: [
+                                    Text(
+                                      examset.examsetDirection,
+                                      style: TextStyle(fontWeight: FontWeight.bold),
+                                    ),
+                                    Text(
+                                      '(${examset.examsetFullMark} คะแนน)',
+                                      style: TextStyle(fontSize: 12),
+                                    ),
+                                  ],
                                 ),
-                              ).affectiveDomainScore,
-                              textAlign: TextAlign.center, 
+                              ),
+                            ),
+                          );
+                        }),
+                        DataColumn(
+                          label: Container(
+                            alignment: Alignment.center,
+                            width: 70,
+                            height: 40,
+                            color: Colors.blue,
+                            child: const Text(
+                              'คะแนนรวม',
+                              style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
                             ),
                           ),
                         ),
-                      ),
-                      ...data.examsetsDetails.map((examset) {
-                        final currentScore =
-                            scoreMap[examset.examsetId]?[user.usersUsername] ?? '-';
-
-                        
-                        Color backgroundColor = Colors.white;
-                        switch (examset.examsetType) {
-                          case 'auswer':
-                            backgroundColor = Colors.blue.shade100; 
-                            break;
-                          case 'onechoice':
-                            backgroundColor = Colors.green.shade100; 
-                            break;
-                          case 'manychoice':
-                            backgroundColor = Colors.yellow.shade100; // Example color for type3
-                            break;
-                          case 'upfile':
-                            backgroundColor = Colors.pink.shade100; // Example color for type3
-                            break;
-                          default:
-                            backgroundColor = Colors.white; // Default background color
-                        }
-
-                        return DataCell(
-                          Container(
-                            width: 70,  // กำหนดความกว้าง
-                            height: 40, // กำหนดความสูง
-                            color: backgroundColor, // กำหนดสีพื้นหลัง
-                            child: Center(  // ใช้ Center เพื่อจัดข้อความให้อยู่กลาง
-                              child: isEditing
-                                  ? TextFormField(
-                                      initialValue: currentScore,
-                                      onChanged: (value) {
-                                        setState(() {
-                                          editedScores.putIfAbsent(
-                                              user.usersUsername, () => {})[examset.examsetId] = value;
-                                        });
-                                      },
-                                    )
-                                  : Text(currentScore),
+                      ],
+                      rows: [
+                        ...data.userDetails.map((user) {
+                          List<DataCell> cells = [
+                            DataCell(SizedBox(width: 50, child: Text('${user.usersNumber}'))),
+                            DataCell(SizedBox(width: 100, child: Text(user.usersId))),
+                            DataCell(SizedBox(width: 250, child: Text('${user.usersThfname} ${user.usersThlname}'))),
+                            DataCell(
+                              Container(
+                                width: 70,
+                                alignment: Alignment.center,
+                                child: Text(
+                                  historyCheckins.firstWhere(
+                                    (checkin) => checkin.usersUsername == user.usersUsername,
+                                    orElse: () => HistoryCheckin(
+                                      affectiveDomainScore: '-',
+                                      usersUsername: '', checkinClassroomAuto: '', checkinClassroomDate: '', checkinClassroomClassID: '', checkinClassroomStatus: '', usersPrefix: '', usersThfname: '', usersThlname: '', usersNumber: '', usersId: '', usersPhone: '',
+                                    ),
+                                  ).affectiveDomainScore,
+                                ),
+                              ),
                             ),
-                          ),
-                        );
-                        
+                            ...data.examsetsDetails.map((examset) {
+                              final currentScore =
+                                  scoreMap[examset.examsetId]?[user.usersUsername] ?? '-';
+                              Color backgroundColor = getExamsetColor(examset.examsetType);
+
+                              return DataCell(
+                                Container(
+                                  width: 70,
+                                  height: 40,
+                                  color: backgroundColor,
+                                  child: Center(
+                                    child: isEditing
+                                        ? TextFormField(
+                                            initialValue: currentScore,
+                                            onChanged: (value) {
+                                              setState(() {
+                                                editedScores.putIfAbsent(user.usersUsername, () => {})[examset.examsetId] = value;
+                                              });
+                                            },
+                                          )
+                                        : Text(currentScore),
+                                  ),
+                                ),
+                              );
+                            }),
+                            DataCell(
+                              Container(
+                                alignment: Alignment.center,
+                                height: 40,
+                                width: 70,
+                                decoration: BoxDecoration(color: Colors.blue),
+                                child: Text(
+                                  data.examsetsDetails.fold<int>(0, (sum, examset) {
+                                    final currentScore = scoreMap[examset.examsetId]?[user.usersUsername] ?? '-';
+                                    final score = currentScore == '-' ? 0 : int.tryParse(currentScore) ?? 0;
+                                    return sum + score;
+                                  }).toString(),
+                                ),
+                              ),
+                            ),
+                          ];
+                          return DataRow(cells: cells);
+                        }),
 
 
-                      }),
-                      DataCell(
-                        Container(
-                          alignment: Alignment.center, 
-                          height: 40,
-                          width: 70,
-                          decoration: BoxDecoration(
-                            color: Colors.blue
-                          ),
-                          child: Text(
-                            data.examsetsDetails.fold<int>(0, (sum, examset) {
-                              final currentScore = scoreMap[examset.examsetId]?[user.usersUsername] ?? '-';
-                    
-                              final score = currentScore == '-' ? 0 : int.tryParse(currentScore) ?? 0;
-                              return sum + score;
-                            }).toString(),
-                          ),)
-                    ),
 
-                    ];
+                        if (isEditing)
+                          DataRow(
+                          cells: [
+                            DataCell(SizedBox(width: 50, child: Text(' '))),
+                            DataCell(SizedBox(width: 100, child: Text(' '))),
+                            DataCell(SizedBox(width: 250, child: Text(' '))),
+                            DataCell(SizedBox(width: 70, child: Text(' '))),
+                            ...data.examsetsDetails.map((examset) {
+                              
+                              final controller = _controllers.putIfAbsent(
+                                examset.examsetId.toString(),
+                                () => TextEditingController(),
+                              );
 
-                    return DataRow(cells: cells);
-                  }).toList(),
-                ),
+                              return DataCell(
+                                SizedBox(
+                                  width: 70,
+                                  height: 40,
+                                  child: TextFormField(
+                                    controller: controller,
+                                    onChanged: (value) {
+                                      setState(() {
+                                        
+                                        editedScores['new'] ??= {};
+                                        editedScores['new']?[examset.examsetId] = value;
+                                      });
+                                    },
+                                    decoration: InputDecoration(
+                                      border: OutlineInputBorder(),
+                                      contentPadding: EdgeInsets.symmetric(horizontal: 8),
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ),
+                              );
+                            }),
+                            DataCell(
+                              SizedBox(
+                                width: 70,
+                                child: IconButton(
+                                  onPressed: () async {
+                                    
+                                    List<Map<String, dynamic>> updatedScores = []; 
+
+                                    editedScores['new']?.forEach((examsetId, newValue) {
+                                      if (newValue.isNotEmpty) {
+                                        final examset = data.examsetsDetails.firstWhere((e) => e.examsetId == examsetId);
+                                        final fullMark = int.tryParse(examset.examsetFullMark) ?? 1;
+                                        final newScore = int.tryParse(newValue) ?? 0;
+
+                                        
+                                        final currentScores = scoreMap[examsetId]?.values.map((score) {
+                                          return int.tryParse(score) ?? 0;
+                                        }).toList() ?? [];
+
+                                        
+                                        for (var score in currentScores) {
+                                          final adjustedScore = (score / fullMark) * newScore;
+                                          
+                                          print('Examset ID: $examsetId');
+                                          print('Full Mark: $fullMark');
+                                          print('Current Score: $score');
+                                          print('New Score: $newScore');
+                                          print('Adjusted Score: $adjustedScore');
+
+                                          
+                                          final user = data.scores.firstWhere(
+                                            (s) => s.examsetId == examsetId && s.scoreTotal == score.toString(),
+                                            orElse: () => Score(examsetId: 0, username: 'Unknown', scoreTotal: '0', scoreType: ''),
+                                          );
+                                          final username = user.username;
+                                          print('Username: $username');
+
+                                          
+                                          updatedScores.add({
+                                            'examsetId': examsetId,
+                                            'username': username,
+                                            'newScore': newScore,
+                                            'adjustedScore': adjustedScore,
+                                          });
+                                        }
+                                      }
+                                    });
+
+                                    
+                                    if (updatedScores.isNotEmpty) {
+                                      final url = Uri.parse('https://www.edueliteroom.com/connect/update_scoresfull.php'); 
+                                      final response = await http.post(
+                                        url,
+                                        headers: {'Content-Type': 'application/json'},
+                                        body: json.encode({'scores': updatedScores}),
+                                      );
+                                      print(response.body);
+
+                                      if (response.statusCode == 200) {
+
+                                        setState(() {
+                                          isEditing = true;
+                                          _controllers.forEach((key, controller) {
+                                            controller.clear();
+                                          });
+                                          futureData = fetchScoreData();  // ดึงข้อมูลใหม่เมื่อบันทึกคะแนน
+                                        });
+                                        // ถ้าสำเร็จ
+                                        print('Data saved successfully');
+                                      } else {
+                                        print('Failed to save data');
+                                      }
+                                    }
+
+                                  },
+                                  icon: Icon(Icons.save),
+                                ),
+                              ),
+                            )
+                          ],
+                        ),
+                      ],
+                    )
                   ])
               );
             },
