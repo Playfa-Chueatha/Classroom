@@ -83,7 +83,7 @@ class _ManychoiceDialogState extends State<OnechoiceDialog> {
                               Text('D: ${oneChoice.onechoiceD}'),
                               const SizedBox(height: 8),
                               Text(
-                                'คำตอบที่ถูกต้อง: ${oneChoice.onechoiceAnswer.toUpperCase()} คะแนน: ${oneChoice.onechoiceQuestionScore}',
+                                'คำตอบที่ถูกต้อง: ${oneChoice.onechoiceAnswer.toUpperCase()} ( ${oneChoice.onechoiceQuestionScore} คะแนน )',
                                 style: const TextStyle(color: Colors.green),
                               ),
                             ],

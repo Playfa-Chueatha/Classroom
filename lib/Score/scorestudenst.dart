@@ -238,6 +238,7 @@ Color getExamsetColor(String? type) {
 
   @override
   Widget build(BuildContext context) {
+    
     return Scaffold(
       appBar: AppBar(
         title: Text('คะแนนนักเรียน'),
@@ -291,8 +292,9 @@ Color getExamsetColor(String? type) {
               }
 
               historyCheckins = historySnapshot.data!;
-              
+              data.userDetails.sort((a, b) => a.usersNumber.compareTo(b.usersNumber));
 
+              
               return SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: Column(
@@ -418,7 +420,10 @@ Color getExamsetColor(String? type) {
                         ),
                       ],
                       rows: [
-                        ...data.userDetails.map((user) {
+                        ...data.userDetails
+                        .toList()
+                        
+                        .map((user) {
                           List<DataCell> cells = [
                             DataCell(SizedBox(width: 50, child: Text('${user.usersNumber}'))),
                             DataCell(SizedBox(width: 100, child: Text(user.usersId))),
@@ -431,10 +436,10 @@ Color getExamsetColor(String? type) {
                                   historyCheckins.firstWhere(
                                     (checkin) => checkin.usersUsername == user.usersUsername,
                                     orElse: () => HistoryCheckin(
-                                      affectiveDomainScore: '-',
+                                      affectiveDomainScore: 0.0,
                                       usersUsername: '', checkinClassroomAuto: '', checkinClassroomDate: '', checkinClassroomClassID: '', checkinClassroomStatus: '', usersPrefix: '', usersThfname: '', usersThlname: '', usersNumber: '', usersId: '', usersPhone: '',
                                     ),
-                                  ).affectiveDomainScore,
+                                  ).affectiveDomainScore.toString(),
                                 ),
                               ),
                             ),
@@ -470,14 +475,26 @@ Color getExamsetColor(String? type) {
                                 width: 70,
                                 decoration: BoxDecoration(color: Colors.blue),
                                 child: Text(
-                                  data.examsetsDetails.fold<int>(0, (sum, examset) {
+                                  (data.examsetsDetails.fold<double>(0.0, (sum, examset) {
                                     final currentScore = scoreMap[examset.examsetId]?[user.usersUsername] ?? '-';
-                                    final score = currentScore == '-' ? 0 : int.tryParse(currentScore) ?? 0;
+                                    final score = currentScore == '-'
+                                        ? 0.0
+                                        : double.tryParse(currentScore) ?? 0.0; // คะแนนแบบฝึกหัด
                                     return sum + score;
-                                  }).toString(),
+                                  }) + 
+                                  // รวมคะแนนจิตพิสัย (แบบทศนิยม)
+                                  historyCheckins.firstWhere(
+                                    (checkin) => checkin.usersUsername == user.usersUsername,
+                                    orElse: () => HistoryCheckin(
+                                      affectiveDomainScore: 0.0, // ค่าพื้นฐานถ้าไม่พบข้อมูล
+                                      usersUsername: '', checkinClassroomAuto: '', checkinClassroomDate: '', usersNumber: '', usersId: '', checkinClassroomClassID: '', checkinClassroomStatus: '', usersPrefix: '', usersThfname: '', usersThlname: '', usersPhone: '',
+                                    ),
+                                  ).affectiveDomainScore
+                                  ).toStringAsFixed(2), // แสดงผลรวมทั้งสองคะแนน
                                 ),
                               ),
-                            ),
+                            )
+
                           ];
                           return DataRow(cells: cells);
                         }),
@@ -504,11 +521,19 @@ Color getExamsetColor(String? type) {
                                   height: 40,
                                   child: TextFormField(
                                     controller: controller,
+                                    keyboardType: TextInputType.numberWithOptions(decimal: true), // กำหนดให้กรอกตัวเลขทศนิยมได้
                                     onChanged: (value) {
                                       setState(() {
-                                        
-                                        editedScores['new'] ??= {};
-                                        editedScores['new']?[examset.examsetId] = value;
+                                        // ตรวจสอบและแปลงค่าเป็นทศนิยม 2 ตำแหน่ง
+                                        final double? newValue = double.tryParse(value);
+                                        if (newValue != null) {
+                                          // เก็บค่าที่มีทศนิยม 2 ตำแหน่ง
+                                          editedScores['new'] ??= {};
+                                          editedScores['new']?[examset.examsetId] = newValue.toStringAsFixed(2); // ฟอร์แมตเป็นทศนิยม 2 ตำแหน่ง
+                                        } else {
+                                          // ถ้าเป็นค่าว่างหรือไม่สามารถแปลงเป็นตัวเลขได้ จะเก็บค่าเป็นค่าว่าง
+                                          editedScores['new']?[examset.examsetId] = '';
+                                        }
                                       });
                                     },
                                     decoration: InputDecoration(
@@ -521,84 +546,80 @@ Color getExamsetColor(String? type) {
                               );
                             }),
                             DataCell(
-                              SizedBox(
-                                width: 70,
-                                child: IconButton(
-                                  onPressed: () async {
-                                    
-                                    List<Map<String, dynamic>> updatedScores = []; 
+                            SizedBox(
+                              width: 70,
+                              child: IconButton(
+                                onPressed: () async {
+                            List<Map<String, dynamic>> updatedScores = []; 
 
-                                    editedScores['new']?.forEach((examsetId, newValue) {
-                                      if (newValue.isNotEmpty) {
-                                        final examset = data.examsetsDetails.firstWhere((e) => e.examsetId == examsetId);
-                                        final fullMark = int.tryParse(examset.examsetFullMark) ?? 1;
-                                        final newScore = int.tryParse(newValue) ?? 0;
+                            editedScores['new']?.forEach((examsetId, newValue) {
+                              if (newValue.isNotEmpty) {
+                                final examset = data.examsetsDetails.firstWhere((e) => e.examsetId == examsetId);
+                                
+                                // แปลงเป็นค่าทศนิยม 2 ตำแหน่ง
+                                final fullMark = double.tryParse(examset.examsetFullMark) ?? 1.0;
+                                final newScore = double.tryParse(newValue) ?? 0.0;
 
-                                        
-                                        final currentScores = scoreMap[examsetId]?.values.map((score) {
-                                          return int.tryParse(score) ?? 0;
-                                        }).toList() ?? [];
+                                // คำนวณคะแนนปัจจุบัน
 
-                                        
-                                        for (var score in currentScores) {
-                                          final adjustedScore = (score / fullMark) * newScore;
-                                          
-                                          print('Examset ID: $examsetId');
-                                          print('Full Mark: $fullMark');
-                                          print('Current Score: $score');
-                                          print('New Score: $newScore');
-                                          print('Adjusted Score: $adjustedScore');
+                                // คำนวณคะแนนที่ปรับ
+                                for (var user in data.userDetails) {
+                                  final currentScore = scoreMap[examsetId]?[user.usersUsername] ?? '0.0';
+                                  final currentScoreValue = double.tryParse(currentScore) ?? 0.0;
+                                  final adjustedScore = (currentScoreValue / fullMark) * newScore;
 
-                                          
-                                          final user = data.scores.firstWhere(
-                                            (s) => s.examsetId == examsetId && s.scoreTotal == score.toString(),
-                                            orElse: () => Score(examsetId: 0, username: 'Unknown', scoreTotal: '0', scoreType: ''),
-                                          );
-                                          final username = user.username;
-                                          print('Username: $username');
+                                  print('Examset ID: $examsetId');
+                                  print('Full Mark: $fullMark');
+                                  print('Current Score: $currentScore');
+                                  print('New Score: $newScore');
+                                  print('Adjusted Score: $adjustedScore');
 
-                                          
-                                          updatedScores.add({
-                                            'examsetId': examsetId,
-                                            'username': username,
-                                            'newScore': newScore,
-                                            'adjustedScore': adjustedScore,
-                                          });
-                                        }
-                                      }
-                                    });
+                                  // ใช้ username จาก UserDetails โดยตรง
+                                  final username = user.usersUsername;
+                                  print('Adjusted Score: $username');
 
-                                    
-                                    if (updatedScores.isNotEmpty) {
-                                      final url = Uri.parse('https://www.edueliteroom.com/connect/update_scoresfull.php'); 
-                                      final response = await http.post(
-                                        url,
-                                        headers: {'Content-Type': 'application/json'},
-                                        body: json.encode({'scores': updatedScores}),
-                                      );
-                                      print(response.body);
+                                  // บันทึกข้อมูลคะแนนที่ปรับ
+                                  updatedScores.add({
+                                    'examsetId': examsetId,
+                                    'username': username,
+                                    'newScore': newScore,
+                                    'adjustedScore': adjustedScore.toStringAsFixed(2),  // ฟอร์แมตเป็นทศนิยม 2 ตำแหน่ง
+                                  });
+                                }
+                              }
+                            });
 
-                                      if (response.statusCode == 200) {
+                            if (updatedScores.isNotEmpty) {
+                              final url = Uri.parse('https://www.edueliteroom.com/connect/update_scoresfull.php');
+                              final response = await http.post(
+                                url,
+                                headers: {'Content-Type': 'application/json'},
+                                body: json.encode({'scores': updatedScores}),
+                              );
+                              print(response.body);
 
-                                        setState(() {
-                                          isEditing = true;
-                                          _controllers.forEach((key, controller) {
-                                            controller.clear();
-                                          });
-                                          futureData = fetchScoreData();  // ดึงข้อมูลใหม่เมื่อบันทึกคะแนน
-                                        });
-                                        // ถ้าสำเร็จ
-                                        print('Data saved successfully');
-                                      } else {
-                                        print('Failed to save data');
-                                      }
-                                    }
+                              if (response.statusCode == 200) {
+                                setState(() {
+                                  isEditing = true;
+                                  _controllers.forEach((key, controller) {
+                                    controller.clear();
+                                  });
+                                  futureData = fetchScoreData();  // ดึงข้อมูลใหม่เมื่อบันทึกคะแนน
+                                });
+                                // ถ้าสำเร็จ
+                                print('Data saved successfully');
+                              } else {
+                                print('Failed to save data');
+                              }
+                            }
+                          },
 
-                                  },
-                                  icon: Icon(Icons.save),
-                                ),
+                                icon: Icon(Icons.save),
                               ),
-                            )
+                            ),
+                          )
+
+
                           ],
                         ),
                       ],

@@ -264,7 +264,7 @@ Future<void> fetchUnreadNotifications() async {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => Score_S(thfname: widget.thfname, thlname: widget.thlname, username: widget.username)),
+                  MaterialPageRoute(builder: (context) => Score_S(thfname: widget.thfname, thlname: widget.thlname, username: widget.username, classroomMajor: '', classroomName: '', classroomYear: '', classroomNumRoom: '')),
                 );
               },
               icon: const Icon(Icons.list_alt),

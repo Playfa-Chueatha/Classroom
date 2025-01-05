@@ -167,7 +167,7 @@ void didUpdateWidget(covariant Detail_work_S oldWidget) {
   Future<void> _saveFileToPost(int examsetsId, List<PlatformFile> selectedFiles) async {
   if (selectedFiles.isEmpty) {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text('บันทึกคำสั่งงานเรียบร้อย'),
+      content: Text('บันทึกการส่งงานเรียบร้อย'),
       backgroundColor: Colors.green,
     ));
     return; 
@@ -184,11 +184,8 @@ void didUpdateWidget(covariant Detail_work_S oldWidget) {
         Uri.parse('https://www.edueliteroom.com/connect/submit_upfile.php'),
       );
 
-      
       request.fields['examsets_id'] = examsetsId.toString();
       request.fields['username'] = widget.username; 
-
-      print('Uploading file for examsetsId: $examsetsId and username: ${widget.username}');
 
       request.files.add(http.MultipartFile.fromBytes(
         'file',
@@ -201,10 +198,20 @@ void didUpdateWidget(covariant Detail_work_S oldWidget) {
       if (response.statusCode == 200) {
         final responseData = await response.stream.bytesToString();
         print('File uploaded successfully: $responseData');
+
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text('บันทึกคำสั่งงานเรียบร้อย'),
           backgroundColor: Colors.green,
         ));
+
+        // ดึงข้อมูลใหม่หลังจากการบันทึกสำเร็จ
+        await _checkSubmit();
+
+        // อัปเดตสถานะการส่งใน UI
+        setState(() {
+          hasSubmitted = true;
+          selectedFiles.clear(); // ล้างไฟล์ที่เลือก
+        });
       } else {
         throw 'Error uploading file: ${response.statusCode}, ${response.reasonPhrase}';
       }
@@ -213,6 +220,7 @@ void didUpdateWidget(covariant Detail_work_S oldWidget) {
     }
   }
 }
+
 
   
 
@@ -247,7 +255,7 @@ void didUpdateWidget(covariant Detail_work_S oldWidget) {
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
             ),
             SizedBox(height: 8),
-            Text('${exam.fullMark}'),
+            Text(exam.fullMark.toStringAsFixed(2)),
             SizedBox(height: 16),
             Text(
               'วันที่ครบกำหนด:',
@@ -308,17 +316,17 @@ void didUpdateWidget(covariant Detail_work_S oldWidget) {
                                     final submitDate = DateTime.parse(submitTime);
                                     final deadlineDate = DateTime.parse(widget.exam.deadline);
 
-                                    // เปรียบเทียบเฉพาะวัน (ไม่สนใจเวลา)
+                                    
                                     if (submitDate.year == deadlineDate.year &&
                                         submitDate.month == deadlineDate.month &&
                                         submitDate.day == deadlineDate.day) {
-                                      // กรณีส่งในวันเดียวกัน
+                                      
                                       return Text(
                                         'คุณได้ส่งไฟล์เรียบร้อยแล้ว ',
                                         style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold),
                                       );
                                     } else if (!submitDate.isAfter(deadlineDate)) {
-                                      // กรณีส่งตรงเวลา หรือก่อนเวลา
+                                      
                                       return Text(
                                         'คุณได้ส่งไฟล์เรียบร้อยแล้ว ',
                                         style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold),
@@ -332,9 +340,9 @@ void didUpdateWidget(covariant Detail_work_S oldWidget) {
                                       );
                                     }
                                   },
-                                  )else
+                                  ) else
                                   Text(
-                                    'ข้อมูลเวลาไม่ถูกต้อง',
+                                    'ข้อมูลเวลาไม่ถูกต้อง ${widget.exam.deadline} / $submitTime',
                                     style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
                                   ),
                                   
@@ -515,6 +523,7 @@ void didUpdateWidget(covariant Detail_work_S oldWidget) {
                                       await _saveFileToPost(exam.autoId, selectedFiles);
                                       setState(() {
                                         hasSubmitted = true;
+                                        
                                       });
                                     },
                                     child: Text('ส่งงาน'),
@@ -525,13 +534,13 @@ void didUpdateWidget(covariant Detail_work_S oldWidget) {
 
 
 
-            //auswer
-            if (exam.type == 'auswer') ...[
-              SizedBox(height: 16),
-              Text('สถานะการส่งงาน:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-              SizedBox(height: 8),
-              hasSubmitted
-                  ? Row(
+                          //auswer
+                          if (exam.type == 'auswer') ...[
+                          SizedBox(height: 16),
+                          Text('สถานะการส่งงาน:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+                          SizedBox(height: 8),
+                          hasSubmitted
+                              ? Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                   if (submitTime.isNotEmpty && widget.exam.deadline.isNotEmpty) 
@@ -1098,7 +1107,9 @@ void didUpdateWidget(covariant Detail_work_S oldWidget) {
 
                                         } else {
                                             return Row(
+                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                               children: [
+                                                Text('เลยวันครบกำหนดมา ${difference.inDays} วันแล้วรีบทำข้อสอบโดยเร็ว', style: TextStyle(color: Colors.orange, fontSize: 14),),
                                                 OutlinedButton(
                                                   onPressed: () {
                                                     Navigator.push(
@@ -1115,7 +1126,7 @@ void didUpdateWidget(covariant Detail_work_S oldWidget) {
                                                   },
                                                   child: Text('ไปทำข้อสอบ'),
                                                 ),
-                                                Text('เลยวันครบกำหนดมา ${difference.inDays} วันแล้วรีบทำข้อสอบโดยเร็ว', style: TextStyle(color: Colors.orange, fontSize: 14),),
+                                                
 
                                               ],
                                             );

@@ -41,9 +41,9 @@ class _many_choice extends State<many_choice> with SingleTickerProviderStateMixi
   String? selectedDueDate;
   DateTime? _dueDate;
   String? _direction;
-  int? _fullMarks;
+  late double _fullMarks = 0.0;
   bool isLoading = false;
-  int? totalMark;
+  double? totalMark;
   bool isChecked = false;
   bool isCheckeddueDate = false;
   final List<Map<String, dynamic>> _selectedClassrooms = [];
@@ -54,7 +54,7 @@ class _many_choice extends State<many_choice> with SingleTickerProviderStateMixi
 
   Future<int?> saveAssignment({
     required String direction,
-    required int fullMark,
+    required double fullMark,
     required DateTime deadline,
     required String username,
     required String classroomName,
@@ -125,7 +125,7 @@ class _many_choice extends State<many_choice> with SingleTickerProviderStateMixi
   if (formKey.currentState!.validate()) {
     formKey.currentState!.save();
 
-    if (_direction != null && _fullMarks != null && _dueDate != null) {
+    if (_direction != null && _dueDate != null) {
       setState(() => isLoading = true);
 
       final isClosed = isCheckeddueDate ? 'Yes' : 'No'; 
@@ -134,7 +134,7 @@ class _many_choice extends State<many_choice> with SingleTickerProviderStateMixi
         for (var classroom in _selectedClassrooms) {
           final examsetsId = await saveAssignment(
             direction: _direction!,
-            fullMark: _fullMarks!,
+            fullMark: _fullMarks,
             deadline: _dueDate!,
             username: widget.username,
             classroomName: classroom['classroom_name'],
@@ -189,7 +189,7 @@ class _many_choice extends State<many_choice> with SingleTickerProviderStateMixi
               content: Text('ไม่สามารถบันทึกการบ้านได้'),
               backgroundColor: Colors.red,
             ));
-            return; // ออกจากลูปหากไม่สามารถบันทึกการบ้านได้
+            return; 
           }
         }
 
@@ -299,7 +299,7 @@ Future<void> saveQuestionsAndChoices(
       'g': question['g']?.toString() ?? '',
       'h': question['h']?.toString() ?? '',
       'answer': convertAnswer(question['answer']), 
-      'score': int.tryParse(question['score'].toString()) ?? 0 
+      'score': double.tryParse(question['score'].toString()) ?? 0 
     };
   }).toList();
 
@@ -401,14 +401,17 @@ bool _isQuestionFilled(int index) {
 
   void _calculateTotalMarks() {
     setState(() {
-      totalMark = _savedQuestions.fold<int?>(0, (sum, question) {
-        int questionMark = int.tryParse(question.fullMarkinchoiceController.text) ?? 0;
-        return sum! + questionMark;
+      totalMark = _savedQuestions.fold<double>(0.0, (sum, question) {
+        double questionMark = double.tryParse(question.fullMarkinchoiceController.text) ?? 0.0;
+        return sum + questionMark;
       });
       
-      
-      if (totalMark == 0) {
+      // หาก totalMark เป็น 0 จะตั้งค่าให้เป็น null
+      if (totalMark == 0.0) {
         totalMark = null;
+      } else {
+        // แปลง totalMark ให้เป็นทศนิยม 2 ตำแหน่ง
+        totalMark = double.parse(totalMark!.toStringAsFixed(2));
       }
     });
   }
@@ -520,7 +523,9 @@ bool _isQuestionFilled(int index) {
                           return null;
                         },
                         onSaved: (value) {
-                          _fullMarks = int.tryParse(value!) ?? 0;
+                          if (value != null && value.isNotEmpty) {
+                            _fullMarks = double.parse(double.parse(value).toStringAsFixed(2));
+                          }
                         },
                       ),
                     ),
@@ -598,7 +603,7 @@ bool _isQuestionFilled(int index) {
                                   decoration: const InputDecoration(labelText: 'คะแนนเต็ม'),
                                   keyboardType: TextInputType.number,
                                   inputFormatters: [
-                                    FilteringTextInputFormatter.digitsOnly,
+                                    FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,2}')),
                                   ],
                                   enabled: isChecked, 
                                   onChanged: (value) {
@@ -619,7 +624,9 @@ bool _isQuestionFilled(int index) {
                                     return null;
                                   },
                                   onSaved: (value) {
-                                    defaultMark.text = value ?? '';
+                                    if (value != null && value.isNotEmpty) {
+                                        defaultMark.text = double.parse(value).toStringAsFixed(2);
+                                      }
                                   },
                                 ),
                               ),
@@ -719,14 +726,20 @@ bool _isQuestionFilled(int index) {
                     child: ElevatedButton(
                       onPressed: () {
 
-                        final enteredFullMarks = int.tryParse(fullMarksController.text) ?? 0;
+                        final enteredFullMarks = double.tryParse(fullMarksController.text) ?? 0.0;
+                        final calculatedTotalMark = totalMark ?? 0.0;
 
-                        if (totalMark != enteredFullMarks) {
+                        if (calculatedTotalMark.toStringAsFixed(2) !=
+                            enteredFullMarks.toStringAsFixed(2)) {
+                              print('คะแนนรวมทั้งหมด (${calculatedTotalMark.toStringAsFixed(2)}) ไม่ตรงกับคะแนนเต็ม (${enteredFullMarks.toStringAsFixed(2)})');
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
-                              content: Text('คะแนนรวมทั้งหมด ($totalMark) ไม่ตรงกับคะแนนเต็ม (${fullMarksController.text})'),
+                              content: Text(
+                                'คะแนนรวมทั้งหมด (${calculatedTotalMark.toStringAsFixed(2)}) '
+                                'ไม่ตรงกับคะแนนเต็ม (${enteredFullMarks.toStringAsFixed(2)})',
+                              ),
                               backgroundColor: Colors.red,
-                              duration: Duration(seconds: 3),
+                              duration: const Duration(seconds: 3),
                             ),
                           );
                         } else {
@@ -888,19 +901,19 @@ bool _isQuestionFilled(int index) {
                   child: TextFormField(
                     controller: question.fullMarkinchoiceController,
                     inputFormatters: [
-                      FilteringTextInputFormatter.digitsOnly,
+                      FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,2}$')),
                     ],
                     decoration: InputDecoration(
                       labelText: 'คะแนน',
                     ),
-                    keyboardType: TextInputType.number,
+                    keyboardType: TextInputType.numberWithOptions(decimal: true),
                   ),
                 )
               else 
                 Padding(
                   padding: const EdgeInsets.only(top: 10),
                   child: Text(
-                    'คะแนน: ${defaultMark.text.isNotEmpty ? defaultMark.text : '0'}',
+                    'คะแนน: ${defaultMark.text.isNotEmpty ? defaultMark.text : '0.00'}',
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                 ),

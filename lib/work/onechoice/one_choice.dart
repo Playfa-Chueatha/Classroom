@@ -35,11 +35,11 @@ class _OneChoiceState extends State<OneChoice_test> with SingleTickerProviderSta
   final List<Question> _savedQuestions = []; 
   List<String> questionsAndChoices = [];
   String? _direction;
-  int? _fullMarks;
+  late double _fullMarks = 0.0;
   String? selectedDueDate;
   DateTime? _dueDate;
   bool isLoading = false;
-  int? totalMark;
+  double? totalMark;
   bool isChecked = false;
   bool isCheckeddueDate = false;
   final List<Map<String, dynamic>> _selectedClassrooms = [];
@@ -50,7 +50,7 @@ class _OneChoiceState extends State<OneChoice_test> with SingleTickerProviderSta
 
   Future<int?> saveAssignment({
     required String direction,
-    required int fullMark,
+    required double fullMark,
     required DateTime deadline,
     required String username,
     required String classroomName,
@@ -113,7 +113,7 @@ void _submitAssignment() async {
 
     final isClosed = isCheckeddueDate ? 'Yes' : 'No'; 
 
-    if (_direction != null && _fullMarks != null && _dueDate != null && _selectedClassrooms.isNotEmpty) {
+    if (_direction != null && _dueDate != null && _selectedClassrooms.isNotEmpty) {
       setState(() => isLoading = true);
 
       try {
@@ -127,7 +127,7 @@ void _submitAssignment() async {
           // บันทึกการบ้านและรับ `examsetsId` สำหรับคลาสนั้น
           final examsetsId = await saveAssignment(
             direction: _direction!,
-            fullMark: _fullMarks!,
+            fullMark: _fullMarks,
             deadline: _dueDate!,
             username: widget.username,
             classroomName: classroomName,
@@ -162,9 +162,8 @@ void _submitAssignment() async {
               }
             }
 
-            // ตรวจสอบคำถามและตัวเลือก
             if (questionsAndChoices.isNotEmpty) {
-              // ส่งข้อมูลคำถามไปยัง PHP
+              
               await saveQuestionsAndChoices(examsetsId, questionsAndChoices);
             } else {
               ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -180,7 +179,7 @@ void _submitAssignment() async {
           }
         }
 
-        // หลังวนลูปเสร็จ, นำทางไปยังหน้าอื่น
+        
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => AssignWork_class_T(
@@ -252,7 +251,7 @@ Future<void> saveQuestionsAndChoices(
       'c': question['c'],           
       'd': question['d'],   
       'answer': convertAnswer(question['answer']),
-      'score': int.tryParse(question['score'].toString()) ?? 0 
+      'score': double.tryParse(question['score'].toString()) ?? 0 
     };
   }).toList();
 
@@ -418,21 +417,20 @@ void _deleteQuestion(int index) {
 
   void _calculateTotalMarks() {
     setState(() {
-      totalMark = _savedQuestions.fold<int?>(0, (sum, question) {
-        int questionMark = int.tryParse(question.fullMarkinchoiceController.text) ?? 0;
-        return sum! + questionMark;
+      totalMark = _savedQuestions.fold<double>(0.0, (sum, question) {
+        double questionMark = double.tryParse(question.fullMarkinchoiceController.text) ?? 0.0;
+        return sum + questionMark;
       });
       
-      if (totalMark == 0) {
+      // หาก totalMark เป็น 0 จะตั้งค่าให้เป็น null
+      if (totalMark == 0.0) {
         totalMark = null;
+      } else {
+        // แปลง totalMark ให้เป็นทศนิยม 2 ตำแหน่ง
+        totalMark = double.parse(totalMark!.toStringAsFixed(2));
       }
     });
   }
-
-
-
-
-
 
 
 
@@ -471,18 +469,21 @@ void _deleteQuestion(int index) {
                       child: TextFormField(
                         controller: fullMarksController,
                         decoration: const InputDecoration(labelText: 'คะแนนเต็ม'),
-                        keyboardType: TextInputType.number,
-                        inputFormatters: [
-                          FilteringTextInputFormatter.digitsOnly,
-                        ],
+                        keyboardType: TextInputType.numberWithOptions(decimal: true),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'กรุณากรอกคะแนนเต็ม';
                           }
+                          final number = double.tryParse(value);
+                          if (number == null) {
+                            return 'กรุณากรอกตัวเลขที่ถูกต้อง';
+                          }
                           return null;
                         },
                         onSaved: (value) {
-                          _fullMarks = int.tryParse(value!) ?? 0;
+                          if (value != null && value.isNotEmpty) {
+                            _fullMarks = double.parse(double.parse(value).toStringAsFixed(2));
+                          }
                         },
                       ),
                     ),
@@ -561,9 +562,9 @@ void _deleteQuestion(int index) {
                                 child: TextFormField(
                                   controller: defaultMark,
                                   decoration: const InputDecoration(labelText: 'คะแนนเต็ม'),
-                                  keyboardType: TextInputType.number,
+                                  keyboardType: TextInputType.numberWithOptions(decimal: true),
                                   inputFormatters: [
-                                    FilteringTextInputFormatter.digitsOnly,
+                                    FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,2}')),
                                   ],
                                   enabled: isChecked, 
                                   onChanged: (value) {
@@ -584,7 +585,9 @@ void _deleteQuestion(int index) {
                                     return null;
                                   },
                                   onSaved: (value) {
-                                    defaultMark.text = value ?? '';
+                                    if (value != null && value.isNotEmpty) {
+                                        defaultMark.text = double.parse(value).toStringAsFixed(2);
+                                      }
                                   },
                                 ),
                               ),
@@ -678,30 +681,38 @@ void _deleteQuestion(int index) {
                     ),
                             
                 Padding(
-                  padding: EdgeInsets.only(top: 20),
-                  child: Align(
-                    alignment: Alignment.centerRight,
-                    child: ElevatedButton(
-                      onPressed: () {
+              padding: const EdgeInsets.only(top: 20),
+              child: Align(
+                alignment: Alignment.centerRight,
+                child: ElevatedButton(
+                  onPressed: () {
+                    
+                    final enteredFullMarks = double.tryParse(fullMarksController.text) ?? 0.0;
+                    final calculatedTotalMark = totalMark ?? 0.0;
 
-                        final enteredFullMarks = int.tryParse(fullMarksController.text) ?? 0;
-
-                        if (totalMark != enteredFullMarks) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('คะแนนรวมทั้งหมด ($totalMark) ไม่ตรงกับคะแนนเต็ม (${fullMarksController.text})'),
-                              backgroundColor: Colors.red,
-                              duration: Duration(seconds: 3),
-                            ),
-                          );
-                        } else {
-                          _submitAssignment();
-                        }
-                      },
-                      child: Text('มอบหมายงาน'),
-                    ),
-                  ),
+                    
+                    if (calculatedTotalMark.toStringAsFixed(2) !=
+                        enteredFullMarks.toStringAsFixed(2)) {
+                          print('คะแนนรวมทั้งหมด (${calculatedTotalMark.toStringAsFixed(2)}) ไม่ตรงกับคะแนนเต็ม (${enteredFullMarks.toStringAsFixed(2)})');
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            'คะแนนรวมทั้งหมด (${calculatedTotalMark.toStringAsFixed(2)}) '
+                            'ไม่ตรงกับคะแนนเต็ม (${enteredFullMarks.toStringAsFixed(2)})',
+                          ),
+                          backgroundColor: Colors.red,
+                          duration: const Duration(seconds: 3),
+                        ),
+                      );
+                    } else {
+                      _submitAssignment();
+                    }
+                  },
+                  child: const Text('มอบหมายงาน'),
                 ),
+              ),
+            ),
+
 
                 
 
@@ -829,19 +840,19 @@ void _deleteQuestion(int index) {
                 child: TextFormField(
                   controller: question.fullMarkinchoiceController,
                   inputFormatters: [
-                    FilteringTextInputFormatter.digitsOnly,
+                     FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,2}$')),
                   ],
                   decoration: InputDecoration(
                     labelText: 'คะแนน',
                   ),
-                  keyboardType: TextInputType.number,
+                  keyboardType: TextInputType.numberWithOptions(decimal: true),
                 ),
               )
             else 
               Padding(
                 padding: const EdgeInsets.only(top: 10),
                 child: Text(
-                  'คะแนน: ${defaultMark.text.isNotEmpty ? defaultMark.text : '0'}',
+                  'คะแนน: ${defaultMark.text.isNotEmpty ? defaultMark.text : '0.00'}',
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
               ),

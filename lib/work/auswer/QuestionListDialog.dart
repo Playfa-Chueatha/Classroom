@@ -87,7 +87,6 @@ class _QuestionListDialogState extends State<QuestionListDialog> {
                       contentPadding: EdgeInsets.all(16),
                       title: Row(
                         children: [
-                          Text('${widget.exam.autoId}'),
                           Text(
                             'ข้อที่ ${index + 1}: ',
                             style: TextStyle(fontWeight: FontWeight.bold),

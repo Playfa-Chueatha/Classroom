@@ -71,7 +71,7 @@ void _saveAffectiveScores() async {
         usersNumber: '',
         usersId: '',
         usersPhone: '',
-        affectiveDomainScore: ''
+        affectiveDomainScore: 0.0
       ),
     );
 
@@ -470,7 +470,7 @@ Widget build(BuildContext context) {
                                     usersNumber: '',
                                     usersId: checkin.usersId,
                                     usersPhone: '',
-                                    affectiveDomainScore: '',
+                                    affectiveDomainScore: 0.0,
                                   ),
                                 )
                                 .checkinClassroomStatus;
@@ -523,9 +523,9 @@ Widget build(BuildContext context) {
                                 children: [
                                   Expanded(
                                     child: Text(
-                                      firstCheckin.affectiveDomainScore.isEmpty
+                                      (firstCheckin.affectiveDomainScore == 0.0)
                                           ? 'ยังไม่ได้เพิ่มคะแนน'
-                                          : firstCheckin.affectiveDomainScore,
+                                          : firstCheckin.affectiveDomainScore.toString(),
                                       style: TextStyle(color: Colors.black),
                                     ),
                                   ),

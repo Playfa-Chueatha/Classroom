@@ -241,7 +241,8 @@ void didUpdateWidget(covariant Detail_work oldWidget) {
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
             ),
             SizedBox(height: 8),
-            Text('${exam.fullMark}'),
+            Text(exam.fullMark.toStringAsFixed(2)),
+
             SizedBox(height: 16),
             Text(
               'วันที่ครบกำหนด:',

@@ -45,13 +45,13 @@ class _Answer_QuestionState extends State<Auswer_Question> {
 
   List<TextEditingController> questionControllers = [];
   List<TextEditingController> markControllers = [];
-  List<int> questionMarks = []; 
+  List<double> questionMarks = []; 
   final List<String> _questions = [];
   String? selectedDueDate;
   DateTime? _dueDate;
-  int? totalMark;
+  double? totalMark;
   String? _direction;
-  int? _fullMarks;
+  late double _fullMarks = 0.0;
   bool isChecked = false;
   bool isCheckeddueDate = false;
   final List<Map<String, dynamic>> _selectedClassrooms = [];
@@ -60,7 +60,7 @@ class _Answer_QuestionState extends State<Auswer_Question> {
   
 Future<int?> saveAssignment({
     required String direction,
-    required int fullMark,
+    required double fullMark,
     required DateTime deadline,
     required String username,
     required String classroomName,
@@ -121,7 +121,7 @@ void _submitAssignmentsForClassrooms() async {
     final deadline = _dueDate;
     final isClosed = isCheckeddueDate ? 'Yes' : 'No'; 
 
-    if (direction != null && fullMark != null && deadline != null) {
+    if (direction != null && deadline != null) {
       try {
         // วนลูปผ่านห้องเรียนที่เลือก
         for (var classroom in _selectedClassrooms) {
@@ -178,9 +178,10 @@ Future<void> _submitQuestions(int examsetsId) async {
   try {
     List<Map<String, dynamic>> questionData = [];
     for (int i = 0; i < _questions.length; i++) {
+      // ตรวจสอบว่า isChecked ถูกตั้งค่าแล้วหรือยัง
       final questionScore = isChecked
-          ? int.tryParse(defaultMark.text) ?? 0
-          : int.tryParse(markControllers[i].text) ?? 0;
+          ? double.tryParse(defaultMark.text)?.toStringAsFixed(2) ?? '0.00' 
+          : double.tryParse(markControllers[i].text)?.toStringAsFixed(2) ?? '0.00'; 
 
       questionData.add({
         'question_detail': _questions[i],
@@ -224,11 +225,12 @@ Future<void> _submitQuestions(int examsetsId) async {
 
 
 
+
  
   @override
   void initState() {
     super.initState();
-    fullMarksController.text = _fullMarks?.toString() ?? '';
+    fullMarksController.text = _fullMarks.toStringAsFixed(2);
      _selectedClassrooms.add({
       'classroom_name': widget.classroomName,
       'classroom_major': widget.classroomMajor,
@@ -254,44 +256,48 @@ Future<void> _submitQuestions(int examsetsId) async {
   }
 
 void updateTotalMarks() {
-  int sum = 0;
+  double sum = 0.0;  // เปลี่ยนมาใช้ double เพื่อรองรับทศนิยม
 
- 
   if (isChecked) {
-    
-    sum = (int.tryParse(defaultMark.text) ?? 0) * _questions.length;
+    // ถ้าใช้ defaultMark เป็นคะแนนเต็ม
+    sum = (double.tryParse(defaultMark.text) ?? 0.0) * _questions.length;
   } else {
-    
+    // ถ้าใช้คะแนนที่กรอกในแต่ละคำถาม
     for (int i = 0; i < questionMarks.length; i++) {
       sum += questionMarks[i];
     }
   }
 
   setState(() {
-    totalMark = sum;
+    totalMark = sum;  // เก็บคะแนนรวมเป็น double
   });
 }
 
 
+
   void _addQuestion() {
-    String questionText = questionTextController.text;
-    int questionMark = int.tryParse(fullMarkinauswerController.text) ?? 0;
-    questionMarks.add(questionMark); 
+  String questionText = questionTextController.text;
+  double questionMark = double.tryParse(fullMarkinauswerController.text) ?? 0.0;  // ใช้ double แทน int
+  questionMarks.add(questionMark); // เพิ่มคะแนนที่เป็นทศนิยมลงใน list
 
-    if (questionText.isNotEmpty) {
-      setState(() {
-        _questions.add(questionText);
-        updateTotalMarks();
-        questionControllers.add(TextEditingController(text: questionTextController.text));
-        markControllers.add(TextEditingController(text: fullMarkinauswerController.text));
-        if (!isChecked) fullMarkinauswerController.clear();
-      });
+  if (questionText.isNotEmpty) {
+    setState(() {
+      _questions.add(questionText);  // เพิ่มคำถาม
+      updateTotalMarks();  // อัปเดตคะแนนรวม
+      questionControllers.add(TextEditingController(text: questionTextController.text));  // เพิ่ม controller ของคำถาม
+      markControllers.add(TextEditingController(text: fullMarkinauswerController.text));  // เพิ่ม controller ของคะแนน
 
-      questionTextController.clear();
-    } else {
-      print("กรุณากรอกคำถาม");
-    }
+      if (!isChecked) {
+        fullMarkinauswerController.clear();  // ล้างช่องกรอกคะแนนเต็ม
+      }
+    });
+
+    questionTextController.clear();  // ล้างช่องกรอกคำถาม
+  } else {
+    print("กรุณากรอกคำถาม");
   }
+}
+
 
   void _editQuestion(int index) {
     questionController.text = _questions[index];
@@ -369,17 +375,22 @@ void updateTotalMarks() {
                     Expanded(
                       child: TextFormField(
                         controller: fullMarksController,
-                        keyboardType: TextInputType.number,
-                        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                         decoration: const InputDecoration(labelText: 'คะแนนเต็ม'),
+                        keyboardType: TextInputType.numberWithOptions(decimal: true),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'กรุณากรอกคะแนนเต็ม';
                           }
+                          final number = double.tryParse(value);
+                          if (number == null) {
+                            return 'กรุณากรอกตัวเลขที่ถูกต้อง';
+                          }
                           return null;
                         },
                         onSaved: (value) {
-                          _fullMarks = int.tryParse(value ?? '') ?? 0; 
+                          if (value != null && value.isNotEmpty) {
+                            _fullMarks = double.parse(double.parse(value).toStringAsFixed(2));
+                          }
                         },
                       ),
                     ),
@@ -453,14 +464,15 @@ void updateTotalMarks() {
                                   child: TextFormField(
                                     controller: defaultMark,
                                     decoration: const InputDecoration(labelText: 'คะแนนเต็ม'),
-                                    keyboardType: TextInputType.number,
+                                    keyboardType: TextInputType.numberWithOptions(decimal: true), // อนุญาตให้กรอกทศนิยม
                                     inputFormatters: [
-                                      FilteringTextInputFormatter.digitsOnly,
+                                      FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,2}')), // กรองให้กรอกได้เฉพาะตัวเลขและทศนิยมไม่เกิน 2 ตำแหน่ง
                                     ],
-                                    enabled: isChecked, 
+                                    enabled: isChecked,
                                     onChanged: (value) {
                                       if (isChecked) {
                                         setState(() {
+                                          // อัปเดตตัวควบคุม fullMarkinauswerController
                                           fullMarkinauswerController.text = value;
                                         });
                                       }
@@ -470,14 +482,22 @@ void updateTotalMarks() {
                                         if (value == null || value.isEmpty) {
                                           return 'กรุณากรอกคะแนนเต็ม';
                                         }
+                                        final number = double.tryParse(value);
+                                        if (number == null) {
+                                          return 'กรุณากรอกตัวเลขที่ถูกต้อง';
+                                        }
                                       }
                                       return null;
                                     },
                                     onSaved: (value) {
-                                      defaultMark.text = value ?? '';
+                                      // แปลงค่าเป็นทศนิยม 2 ตำแหน่งก่อนบันทึก
+                                      if (value != null && value.isNotEmpty) {
+                                        defaultMark.text = double.parse(value).toStringAsFixed(2);
+                                      }
                                     },
                                   ),
                                 ),
+
                               ],
                             )
                           ),
@@ -602,7 +622,7 @@ void updateTotalMarks() {
                                   child: TextFormField(
                                     controller: markControllers[index],
                                     inputFormatters: [
-                                      FilteringTextInputFormatter.digitsOnly,
+                                      FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,2}')),
                                     ],
                                     decoration: const InputDecoration(labelText: 'คะแนน'),
                                     keyboardType: TextInputType.number,
@@ -641,6 +661,7 @@ void updateTotalMarks() {
                         alignment: Alignment.centerRight,
                         child: ElevatedButton(
                           onPressed: () {
+                            // ตรวจสอบว่าไม่มีคำถามในรายการ
                             if (_questions.isEmpty) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
@@ -649,7 +670,8 @@ void updateTotalMarks() {
                                 ),
                               );
                             } else {
-                              final enteredFullMarks = int.tryParse(fullMarksController.text) ?? 0;
+                              // ดึงค่าคะแนนเต็มที่ผู้ใช้กรอก
+                              final enteredFullMarks = double.tryParse(fullMarksController.text) ?? 0.0;
 
                               // ตรวจสอบคะแนนรวมว่าเข้ากันไหม
                               if (totalMark != enteredFullMarks) {
@@ -673,6 +695,7 @@ void updateTotalMarks() {
                       ),
                     ),
 
+
                     Row(
                       children: [
                         Expanded(
@@ -687,32 +710,43 @@ void updateTotalMarks() {
                                   ? Padding(
                                       padding: const EdgeInsets.only(top: 10),
                                       child: Text(
-                                        'คะแนน: ${defaultMark.text.isNotEmpty ? defaultMark.text : '0'}',
+                                        'คะแนน: ${defaultMark.text.isNotEmpty ? double.tryParse(defaultMark.text)?.toStringAsFixed(2) ?? '0.00' : '0.00'}',
                                         style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                                       ),
                                     )
                                   : SizedBox(
-                                      width: 100,
-                                      child: TextFormField(
-                                        controller: fullMarkinauswerController,
-                                        inputFormatters: [
-                                          FilteringTextInputFormatter.digitsOnly,
-                                        ],
-                                        decoration: InputDecoration(
-                                          labelText: 'คะแนน',
-                                        ),
-                                        keyboardType: TextInputType.number,
-                                        onChanged: (value) {
-                                          if (!isChecked) {
-                                            setState(() {
-                                              
-                                            });
-                                          }
-                                        },
-                                      ),
-                                    ),
-                      
-                        
+                          width: 100,
+                          child: TextFormField(
+                            controller: fullMarkinauswerController,
+                            inputFormatters: [
+                              // ตัวกรองให้กรอกเฉพาะตัวเลขและทศนิยม 1 หรือ 2 ตำแหน่ง
+                              FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,2}')),
+                            ],
+                            decoration: InputDecoration(
+                              labelText: 'คะแนน',
+                            ),
+                            keyboardType: TextInputType.numberWithOptions(decimal: true),
+                            onSaved : (value) {
+                              if (!isChecked) {
+                                setState(() {
+                                  if (value!.isNotEmpty) {
+                                    final doubleValue = double.tryParse(value);
+                                    if (doubleValue != null) {
+                                      // แปลงค่าให้เป็นทศนิยม 2 ตำแหน่ง
+                                      String formattedValue = doubleValue.toStringAsFixed(2);
+                                      
+                                      // ป้องกันการเกิดปัญหาการแก้ไขในตำแหน่งที่ไม่ถูกต้อง
+                                      if (formattedValue != fullMarkinauswerController.text) {
+                                        fullMarkinauswerController.text = formattedValue;
+                                        fullMarkinauswerController.selection = TextSelection.fromPosition(TextPosition(offset: fullMarkinauswerController.text.length));
+                                      }
+                                    }
+                                  }
+                                });
+                              }
+                            },
+                          ),
+                        ),      
                         IconButton(
                           icon: const Icon(Icons.add),
                           onPressed: () {

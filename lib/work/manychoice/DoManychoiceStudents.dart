@@ -66,7 +66,7 @@ class _DomanychoicestudentsState extends State<Domanychoicestudents> {
         
 
 
-        int score = 0;
+        num score = 0;
 
         // แปลงคำตอบที่ถูกต้องเป็น List (ไม่สนใจตัวพิมพ์)
         List<String> correctAnswers = manyChoice.manychoiceAnswer
@@ -82,7 +82,7 @@ class _DomanychoicestudentsState extends State<Domanychoicestudents> {
         // ตรวจสอบว่าคำตอบที่เลือกตรงกับคำตอบที่ถูกต้อง
         if (selectedAnswerListLower.length == correctAnswers.length &&
             selectedAnswerListLower.every((answer) => correctAnswers.contains(answer))) {
-          score = manyChoice.manychoiceQuestionScore;
+          score = manyChoice.manychoiceQuestionScore as num;
         }
 
 
@@ -91,7 +91,7 @@ class _DomanychoicestudentsState extends State<Domanychoicestudents> {
           'examsets_id': examsetsId,
           'question_id': manyChoice.manychoiceAuto,
           'submit_manychoice_reply': selectedAnswerList.map((e) => e.toUpperCase()).join(','),
-          'submit_manychoice_score': score.toString(),
+          'submit_manychoice_score': score.toStringAsFixed(2),
           'submit_manychoice_time': DateTime.now().toIso8601String(),
           'users_username': widget.username,
         });
@@ -100,10 +100,10 @@ class _DomanychoicestudentsState extends State<Domanychoicestudents> {
       }
     }
 
-    // ส่งคำตอบไปยัง PHP ผ่าน HTTP POST
+    
     final response = await http.post(
       Uri.parse('https://www.edueliteroom.com/connect/submit_manychoice.php'),
-      headers: {'Content-Type': 'application/json'},  // Ensure content-type is correct
+      headers: {'Content-Type': 'application/json'},  
       body: json.encode({'answers': answersToSubmit}),
     );
 
@@ -152,7 +152,7 @@ class _DomanychoicestudentsState extends State<Domanychoicestudents> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('ตัวอย่างข้อสอบ ID: ${widget.exam.autoId}'),
+        title: Text('ตัวอย่างข้อสอบ: ${widget.exam.direction} ( ${widget.exam.fullMark} คะแนน)'),
       ),
       body: FutureBuilder<List<Manychoice>>(
         future: manyChoiceData,
@@ -169,7 +169,7 @@ class _DomanychoicestudentsState extends State<Domanychoicestudents> {
             return SingleChildScrollView(
               child: Column(
                 children: [
-                  Text('${widget.exam.autoId}'),
+                  
                   SizedBox(
                     height: MediaQuery.of(context).size.height - 100,
                     child: ListView.builder(

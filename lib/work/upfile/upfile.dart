@@ -37,7 +37,7 @@ class _Answer_QuestionState extends State<upfilework> {
   final List<String> _links = [];
   List<PlatformFile> selectedFiles = [];
   String? _direction;
-  int? _fullMarks;
+  late double _fullMarks = 0.0;
   String? selectedDueDate;
   DateTime? _dueDate;
   bool isCheckeddueDate = false;
@@ -46,7 +46,7 @@ class _Answer_QuestionState extends State<upfilework> {
 
   Future<int?> saveAssignment({
   required String direction,
-  required int fullMark,
+  required double fullMark,
   required DateTime deadline,
   required String username,
   required String classroomName,
@@ -63,7 +63,7 @@ class _Answer_QuestionState extends State<upfilework> {
       Uri.parse(apiUrl),
       body: {
         "direction": direction,
-        "fullMark": fullMark.toString(),
+        "fullMark": fullMark.toStringAsFixed(2),
         "deadline": DateFormat('yyyy-MM-dd').format(deadline),
         "username": username,
         "classroomName": classroomName,
@@ -144,7 +144,7 @@ class _Answer_QuestionState extends State<upfilework> {
   @override
   void initState() {
     super.initState();
-    fullMarksController.text = _fullMarks?.toString() ?? '';
+    fullMarksController.text = _fullMarks.toStringAsFixed(2);
      _selectedClassrooms.add({
       'classroom_name': widget.classroomName,
       'classroom_major': widget.classroomMajor,
@@ -177,13 +177,13 @@ class _Answer_QuestionState extends State<upfilework> {
     final isClosed = isCheckeddueDate ? 'Yes' : 'No'; 
     print("Direction: $_direction, Full Mark: $_fullMarks, Deadline: $_dueDate");
 
-    if (_direction != null && _fullMarks != null && _dueDate != null) {
+    if (_direction != null && _dueDate != null) {
       try {
         // เริ่มการวนลูปผ่านห้องเรียนที่เลือก
         for (var classroom in _selectedClassrooms) {
           final examsetsId = await saveAssignment(
             direction: _direction!,
-            fullMark: _fullMarks!,
+            fullMark: _fullMarks,
             deadline: _dueDate!,
             username: widget.username,
             classroomName: classroom['classroom_name'],
@@ -290,10 +290,22 @@ class _Answer_QuestionState extends State<upfilework> {
                       child: TextFormField(
                         controller: fullMarksController,
                         decoration: const InputDecoration(labelText: 'คะแนนเต็ม'),
-                        keyboardType: TextInputType.number,
-                        validator: (value) =>
-                            value == null || value.isEmpty ? 'กรุณากรอกคะแนนเต็ม' : null,
-                        onSaved: (value) => _fullMarks = int.tryParse(value!) ?? 0,
+                        keyboardType: TextInputType.numberWithOptions(decimal: true),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'กรุณากรอกคะแนนเต็ม';
+                          }
+                          final number = double.tryParse(value);
+                          if (number == null) {
+                            return 'กรุณากรอกตัวเลขที่ถูกต้อง';
+                          }
+                          return null;
+                        },
+                        onSaved: (value) {
+                          if (value != null && value.isNotEmpty) {
+                            _fullMarks = double.parse(double.parse(value).toStringAsFixed(2));
+                          }
+                        },
                       ),
                     ),
                     const SizedBox(width: 16),

@@ -35,45 +35,52 @@ class _CheckworkTeacherState extends State<CheckworkTeacher> {
   final Map<int, FocusNode> focusNodes = {};
 
   Future<void> submitScore({
-    required int questionId,
-    required String questionDetail,
-    required String checkworkScore,
-    required String usersUsername,
-    required String examAutoId,
-    required double total,
-  }) async {
-    final url = Uri.parse('https://www.edueliteroom.com/connect/submit_score_auswer.php');
+  required int questionId,
+  required String questionDetail,
+  required String checkworkScore,
+  required String usersUsername,
+  required String examAutoId,
+  required double total,
+}) async {
+  final url = Uri.parse('https://www.edueliteroom.com/connect/submit_score_auswer.php');
 
-    final body = {
-      'action': 'save_checkwork',
-      'question_id': questionId.toString(),
-      'question_detail': questionDetail,
-      'checkwork_auswer_score': checkworkScore,
-      'users_username': usersUsername,
-      'examsets_id': examAutoId,
-      'total_score': total.toString(),
-    };
-    print(body);
+  // แปลงคะแนนเป็นทศนิยม 2 ตำแหน่ง
+  String formattedScore = double.tryParse(checkworkScore) != null
+      ? double.parse(checkworkScore).toStringAsFixed(2)
+      : '0.00';
+
+  String formattedTotal = total.toStringAsFixed(2); // แปลงคะแนนรวมเป็นทศนิยม 2 ตำแหน่ง
+
+  final body = {
+    'action': 'save_checkwork',
+    'question_id': questionId.toString(),
+    'question_detail': questionDetail,
+    'checkwork_auswer_score': formattedScore,
+    'users_username': usersUsername,
+    'examsets_id': examAutoId,
+    'total_score': formattedTotal,
+  };
+  print(body);
+
+  try {
+    final response = await http.post(url, body: body);
 
     try {
-      final response = await http.post(url, body: body);
-
-
-      try {
-        final data = jsonDecode(response.body); 
-        if (data['success'] == true) {
-          print('Data saved successfully!');
-        } else {
-          print('Error: ${data['error']}');
-        }
-      } catch (e) {
-        print('Error decoding JSON: $e');
+      final data = jsonDecode(response.body);
+      if (data['success'] == true) {
+        print('Data saved successfully!');
+      } else {
+        print('Error: ${data['error']}');
       }
-
     } catch (e) {
-      print('Error: $e');
+      print('Error decoding JSON: $e');
     }
+
+  } catch (e) {
+    print('Error: $e');
   }
+}
+
 
   void _calculateTotal() {
     double newTotal = 0.0;
@@ -198,7 +205,7 @@ class _CheckworkTeacherState extends State<CheckworkTeacher> {
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
-                                  'คะแนน: ${submission.questionMark}',
+                                  'คะแนน: ${submission.questionMark.toStringAsFixed(2)}',
                                   style: TextStyle(
                                     fontSize: 14.0,
                                     fontWeight: FontWeight.bold,
@@ -298,7 +305,7 @@ class _CheckworkTeacherState extends State<CheckworkTeacher> {
 }
 
 class ScoreInputForm extends StatelessWidget {
-  final int maxMark;
+  final double maxMark;
   final TextEditingController controller;
   final FocusNode focusNode;
   final ValueChanged<String> onChanged;
@@ -306,7 +313,7 @@ class ScoreInputForm extends StatelessWidget {
   const ScoreInputForm({
     super.key,
     required this.maxMark,
-    required this.controller, 
+    required this.controller,
     required this.focusNode,
     required this.onChanged,
   });
@@ -317,8 +324,8 @@ class ScoreInputForm extends StatelessWidget {
       width: 200,
       child: TextFormField(
         controller: controller,
-        focusNode: focusNode,  // ใช้ FocusNode ในการควบคุมการโฟกัส
-        keyboardType: TextInputType.number,
+        focusNode: focusNode,
+        keyboardType: TextInputType.numberWithOptions(decimal: true),
         onChanged: onChanged,
         decoration: InputDecoration(
           labelText: 'กรอกคะแนน',
@@ -327,21 +334,24 @@ class ScoreInputForm extends StatelessWidget {
           ),
         ),
         inputFormatters: [
-          FilteringTextInputFormatter.digitsOnly,
+          // กรองเฉพาะตัวเลขและทศนิยมที่มีไม่เกิน 2 ตำแหน่ง
+          FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,2}$')), 
           TextInputFormatter.withFunction((oldValue, newValue) {
             if (newValue.text.isNotEmpty) {
-              final newValueInt = int.tryParse(newValue.text);
-              if (newValueInt != null && newValueInt > maxMark) {
-                return oldValue; // ถ้าค่ามากกว่าคะแนนสูงสุดไม่ให้แก้ไข
+              // แปลงค่าที่กรอกเป็นทศนิยมเพื่อให้ตรวจสอบว่าไม่เกินคะแนนเต็ม
+              final newValueDouble = double.tryParse(newValue.text);
+              if (newValueDouble != null && newValueDouble > maxMark) {
+                return oldValue;  // คืนค่ากลับหากเกิน maxMark
               }
             }
-            return newValue;
+            return newValue;  // คืนค่าปกติ
           }),
         ],
       ),
     );
   }
 }
+
 
 class ApiService {
   Future<UserSubmission> fetchUserSubmission({

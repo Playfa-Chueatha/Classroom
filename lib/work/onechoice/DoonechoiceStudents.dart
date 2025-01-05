@@ -92,13 +92,13 @@ class _DoonechoicestudentsState extends State<Doonechoicestudents> {
         String letterAnswer = convertToLetter(selectedAnswer);
 
         // ตรวจสอบว่าคำตอบที่เลือกถูกต้องหรือไม่
-        int score = (letterAnswer == oneChoice.onechoiceAnswer) ? oneChoice.onechoiceQuestionScore : 0;
+        num score = (letterAnswer == oneChoice.onechoiceAnswer) ? oneChoice.onechoiceQuestionScore : 0;
 
         answersToSubmit.add({
           'examsets_id': examsetsId,
           'question_id': oneChoice.onechoiceAuto.toString(),
           'submit_onechoice_reply': letterAnswer,
-          'submit_onechoice_score': score.toString(),
+          'submit_onechoice_score': score.toStringAsFixed(2),
           'submit_onechoice_time': DateTime.now().toIso8601String(), // Timestamp
           'users_username': widget.username,
         });
@@ -167,7 +167,7 @@ class _DoonechoicestudentsState extends State<Doonechoicestudents> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  'คำถาม ${index + 1}: ${oneChoice.onechoiceQuestion} ( ${oneChoice.onechoiceQuestionScore} คะแนน) ${oneChoice.onechoiceAuto}',
+                                  'คำถาม ${index + 1}: ${oneChoice.onechoiceQuestion} ( ${oneChoice.onechoiceQuestionScore} คะแนน)',
                                   style: const TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,

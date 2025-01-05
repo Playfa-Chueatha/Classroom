@@ -40,7 +40,7 @@ class _ManychoiceDialogState extends State<ManychoiceDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text('ตัวอย่างข้อสอบ ID: ${widget.exam.autoId}'),
+      title: Text('ตัวอย่างข้อสอบ: ${widget.exam.direction} ( ${widget.exam.fullMark} คะแนน )'),
       content: FutureBuilder<List<Manychoice>>(
         future: manyChoiceData,
         builder: (context, snapshot) {

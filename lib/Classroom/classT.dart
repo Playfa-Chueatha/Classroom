@@ -273,6 +273,7 @@ class ClassTState extends State<ClassT> {
                                                   ),
                                                   child:Text(post['posts_title'], style: TextStyle(fontSize: 20)),
                                                 ),
+                                                SizedBox(height: 16),
                                                 Text("ลิงค์ที่แนบมา:", style: TextStyle(fontSize: 18)),
                                                 SizedBox(height: 10),
 
@@ -291,7 +292,7 @@ class ClassTState extends State<ClassT> {
                                                     ),
                                                   ),
                                                 ),
-
+                                                SizedBox(height: 16),
                                                 Text("ไฟล์ที่แนบมา:", style: TextStyle(fontSize: 18)), 
                                                 SizedBox(height: 10),
                                                 Column(crossAxisAlignment: CrossAxisAlignment.start,children: files),

@@ -113,19 +113,7 @@ class _DoauswerstudentsState extends State<Doauswerstudents> {
 
     return Scaffold(
       backgroundColor: Colors.white,
-      // appBar: AppBar(
-      //   backgroundColor: const Color.fromARGB(255, 152, 186, 218),
-      //   title: Text(
-      //     'ตอบคำถาม',
-      //   ),
-      //   actions: [
-      //     appbarstudents(
-      //       thfname: widget.thfname,
-      //       thlname: widget.thlname,
-      //       username: widget.username,
-      //     ),
-      //   ],
-      // ),
+
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(20.0),
@@ -170,7 +158,7 @@ class _DoauswerstudentsState extends State<Doauswerstudents> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'คำถามที่ ${index + 1}: ${question.questionDetail} คะแนน ${question.questionMark}',
+                            'คำถามที่ ${index + 1}: ${question.questionDetail} ( ${question.questionMark} คะแนน )',
                             style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                           ),
                           const SizedBox(height: 8),

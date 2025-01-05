@@ -136,7 +136,7 @@ class FileData {
 class Examset {
   final int autoId;
   final String direction;
-  final int fullMark;
+  final double fullMark;
   final String deadline;
   final String time;
   final String type;
@@ -162,7 +162,7 @@ class Examset {
     return Examset(
       autoId: int.tryParse(json['examsets_auto']?.toString() ?? '') ?? 0, 
       direction: json['examsets_direction'] ?? 'N/A',
-      fullMark: int.tryParse(json['examsets_fullmark']?.toString() ?? '') ?? 0,
+      fullMark: double.tryParse(json['examsets_fullmark']?.toString() ?? '') ?? 0,
       deadline: json['examsets_deadline'] ?? 'N/A',
       time: json['examsets_time'] ?? 'N/A',
       type: json['examsets_type'] ?? 'N/A',
@@ -220,7 +220,7 @@ class AuswerQuestion {
   final int questionAuto;
   final int examsetsId;
   final String questionDetail;
-  final int questionMark;
+  final double questionMark;
 
   AuswerQuestion({
     required this.questionAuto,
@@ -234,7 +234,7 @@ class AuswerQuestion {
       questionAuto: int.parse(json['question_auto']),
       examsetsId: int.parse(json['examsets_id']),
       questionDetail: json['question_detail'],
-      questionMark: int.parse(json['auswer_question_score']),
+      questionMark: double.parse(json['auswer_question_score']),
       
     );
   }
@@ -350,7 +350,7 @@ class OneChoice {
   final String onechoiceC;
   final String onechoiceD;
   final String onechoiceAnswer;
-  final int onechoiceQuestionScore;  
+  final double onechoiceQuestionScore;  
 
   OneChoice({
     required this.onechoiceAuto,
@@ -379,9 +379,9 @@ class OneChoice {
       onechoiceC: json['onechoice_c'],
       onechoiceD: json['onechoice_d'],
       onechoiceAnswer: json['onechoice_answer'],
-      onechoiceQuestionScore: json['onechoice_question_score'] is int
+      onechoiceQuestionScore: json['onechoice_question_score'] is double
           ? json['onechoice_question_score']
-          : int.parse(json['onechoice_question_score'].toString()), 
+          : double.parse(json['onechoice_question_score'].toString()), 
     );
   }
 
@@ -415,7 +415,7 @@ class Manychoice {
   final String manychoiceG;
   final String manychoiceH;
   final String manychoiceAnswer;
-  final int manychoiceQuestionScore;
+  final double manychoiceQuestionScore;
 
   Manychoice({
     required this.manychoiceAuto,
@@ -447,7 +447,7 @@ class Manychoice {
       manychoiceG: json['manychoice_g'],
       manychoiceH: json['manychoice_h'],
       manychoiceAnswer: json['manychoice_answer'],
-      manychoiceQuestionScore: int.parse(json['manychoice_question_score']),
+      manychoiceQuestionScore: double.parse(json['manychoice_question_score']),
     );
   }
 }
@@ -536,20 +536,31 @@ class SubmitManyChoice {
   });
 
   factory SubmitManyChoice.fromJson(Map<String, dynamic> json) {
-    var replies = json['submit_manychoice_reply'];
     List<String> replyList = [];
+    try {
+      var replies = json['submit_manychoice_reply'];
+      if (replies == null) {
+        replyList = [];
+      } else if (replies is List) {
+        replyList = List<String>.from(replies);
+      } else if (replies is Map) {
+        replyList = replies.values.map((e) => e.toString()).toList();
+      } else if (replies is String) {
+        replyList = [replies];
+      } else {
+        debugPrint("Unexpected type for submit_manychoice_reply: ${replies.runtimeType}");
+      }
+    } catch (e) {
+      debugPrint("Error parsing submit_manychoice_reply: $e");
+    }
 
-    if (replies == null) {
-      replyList = [];
-    } else if (replies is List) {
-      replyList = List<String>.from(replies);
-    } else if (replies is Map) {
-      replyList = replies.values.map((e) => e.toString()).toList();
-    } else if (replies is String) {
-      replyList = [replies];
-    } else {
-      debugPrint("Unexpected type for submit_manychoice_reply: ${replies.runtimeType}");
-      replyList = [];
+    // บังคับค่า submitManyChoiceScore ให้เป็นทศนิยม 2 ตำแหน่ง
+    double score = 0.0;
+    try {
+      score = double.parse((json['submit_manychoice_score'] ?? 0).toString());
+      score = double.parse(score.toStringAsFixed(2)); // แปลงให้เป็นทศนิยม 2 ตำแหน่ง
+    } catch (e) {
+      debugPrint("Error parsing submit_manychoice_score: $e");
     }
 
     return SubmitManyChoice(
@@ -557,7 +568,7 @@ class SubmitManyChoice {
       examsetsId: json['examsets_id'] ?? 0,
       questionId: json['question_id'] ?? 0,
       submitManyChoiceReply: replyList,
-      submitManyChoiceScore: (json['submit_manychoice_score'] ?? 0).toDouble(),
+      submitManyChoiceScore: score,
       submitManyChoiceTime: json['submit_manychoice_time'] ?? '',
       usersUsername: json['users_username'] ?? '',
     );
@@ -569,12 +580,13 @@ class SubmitManyChoice {
       'examsets_id': examsetsId,
       'question_id': questionId,
       'submit_manychoice_reply': submitManyChoiceReply,
-      'submit_manychoice_score': submitManyChoiceScore,
+      'submit_manychoice_score': submitManyChoiceScore.toStringAsFixed(2), // บังคับทศนิยม 2 ตำแหน่ง
       'submit_manychoice_time': submitManyChoiceTime,
       'users_username': usersUsername,
     };
   }
 }
+
 //---------------------------------------------------------------
 
 
@@ -655,7 +667,7 @@ class CheckworkUpfile {
   final int checkworkUpfileAuto;
   final int examsetsId;
   final String questionDetail;
-  final int checkworkUpfileScore;
+  final double checkworkUpfileScore;
   final String usersUsername;
   final String checkworkUpfileTime;
   final String checkworkUpfileComments;
@@ -675,7 +687,7 @@ class CheckworkUpfile {
       checkworkUpfileAuto: int.parse(json['checkwork_upfile_auto']),
       examsetsId: int.parse(json['examsets_id']),
       questionDetail: json['question_detail'],
-      checkworkUpfileScore: int.parse(json['checkwork_upfile_score']),
+      checkworkUpfileScore: double.parse(json['checkwork_upfile_score']),
       usersUsername: json['users_username'],
       checkworkUpfileTime: json['checkwork_upfile_time'],
       checkworkUpfileComments: json['checkwork_upfile_comments'],
@@ -709,7 +721,7 @@ class Submission {
   final int questionId;
   final String questionDetail;
   final String submitAuswerReply;
-  final int questionMark;
+  final double questionMark;
 
 
   Submission({
@@ -726,7 +738,7 @@ class Submission {
       questionId: int.tryParse(json['question_id'].toString()) ?? 0,
       questionDetail: json['question_details']['question_detail'] ?? 'No details available',
       submitAuswerReply: json['submit_auswer_reply'] ?? '',
-      questionMark: int.tryParse(json['question_details']['auswer_question_score'].toString()) ?? 0,
+      questionMark: double.tryParse(json['question_details']['auswer_question_score'].toString()) ?? 0,
     );
   }
 }
@@ -738,10 +750,10 @@ class Submission {
 class AnswerData {
   final int questionId;
   final String questionDetail;
-  final int checkworkAuswerScore;
+  final double checkworkAuswerScore;
   final String submitAuswerReply;
   final String submitAuswerTime;
-  final int? auswerQuestionScore;  
+  final double? auswerQuestionScore;  
 
   AnswerData({
     required this.questionId,
@@ -757,12 +769,12 @@ class AnswerData {
       questionId: json['question_id'] != null ? int.parse(json['question_id']) : 0, // ตรวจสอบค่า null
       questionDetail: json['question_detail'] ?? '', // หาก null ให้เป็นค่าว่าง
       checkworkAuswerScore: json['checkwork_auswer_score'] != null
-          ? int.parse(json['checkwork_auswer_score'])
+          ? double.parse(json['checkwork_auswer_score'])
           : 0, // ตรวจสอบค่า null และแปลงเป็น int
       submitAuswerReply: json['submit_auswer_reply'] ?? '', // หาก null ให้เป็นค่าว่าง
       submitAuswerTime: json['submit_auswer_time'] ?? '', // หาก null ให้เป็นค่าว่าง
       auswerQuestionScore: json['auswer_question_score'] != null
-          ? int.parse(json['auswer_question_score'])
+          ? double.parse(json['auswer_question_score'])
           : null, // ใช้ null เมื่อไม่มีคะแนน
     );
   }
@@ -1051,7 +1063,7 @@ class HistoryCheckin {
   final String usersNumber;
   final String usersId;
   final String usersPhone;
-  final String affectiveDomainScore; 
+  final double affectiveDomainScore; 
 
   HistoryCheckin({
     required this.checkinClassroomAuto,
@@ -1081,7 +1093,7 @@ class HistoryCheckin {
       usersNumber: json['users_number'],
       usersId: json['users_id'],
       usersPhone: json['users_phone'],
-      affectiveDomainScore: json['affective_domain_score'] ?? '-',
+      affectiveDomainScore: double.tryParse(json['affective_domain_score']?.toString() ?? '0.0') ?? 0.0,
     );
   }
 }
@@ -1198,5 +1210,45 @@ class ScoreStudentsInClass {
           .map((item) => Score.fromJson(item))
           .toList(),
     );
+  }
+}
+
+//-----------------------------------------------------------------------------
+
+class Studentdetailwork {
+  String usersUsername;
+  String usersNumber;
+  String usersPrefix;
+  String usersThfname;
+  String usersThlname;
+
+  Studentdetailwork({
+    required this.usersUsername,
+    required this.usersNumber,
+    required this.usersPrefix,
+    required this.usersThfname,
+    required this.usersThlname,
+  });
+
+  // สร้าง factory constructor เพื่อแปลงจาก Map (ข้อมูลที่ได้จาก API)
+  factory Studentdetailwork.fromJson(Map<String, dynamic> json) {
+    return Studentdetailwork(
+      usersUsername: json['users_username'],
+      usersNumber: json['users_number'].toString(),
+      usersPrefix: json['users_prefix'] ?? '',
+      usersThfname: json['users_thfname'] ?? '',
+      usersThlname: json['users_thlname'] ?? '',
+    );
+  }
+
+  // แปลงเป็น Map เพื่อใช้ในการแสดงผลหรือติดต่อกับ API
+  Map<String, dynamic> toJson() {
+    return {
+      'users_username': usersUsername,
+      'users_number': usersNumber,
+      'users_prefix': usersPrefix,
+      'users_thfname': usersThfname,
+      'users_thlname': usersThlname,
+    };
   }
 }
