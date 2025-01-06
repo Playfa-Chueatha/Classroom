@@ -39,6 +39,7 @@ class _Score_SState extends State<Score_S> {
   int unreadCount = 0; 
   List<Even_teacher> dataevent = [];
   bool hasTodayEvent = false; 
+  
 
   Future<void> _getUnreadNotifications() async {
     Notification notificationService = Notification();
@@ -170,6 +171,138 @@ class _Score_SState extends State<Score_S> {
     ),
   );
 }
+  
+  Future<ScoreForStudents> fetchExamsetsAndScores({
+    required String classroomName,
+    required String classroomYear,
+    required String classroomNumRoom,
+    required String classroomMajor,
+    required String username,
+  }) async {
+    final url = Uri.parse("https://www.edueliteroom.com/connect/get_scoreforstudents.php");
+
+    final response = await http.post(
+      url,
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'classroomName': classroomName,
+        'classroomYear': classroomYear,
+        'classroomNumRoom': classroomNumRoom,
+        'classroomMajor': classroomMajor,
+        'username': username,
+      }),
+    );
+    // print(response.body);
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      if (data['status'] == 'success') {
+        return ScoreForStudents.fromJson(data);
+      } else {
+        throw Exception(data['message']);
+      }
+    } else {
+      throw Exception('Failed to fetch data: ${response.statusCode}');
+    }
+  }
+
+List<Map<String, dynamic>> mergeExamsetsAndScores(List<ExamSet> examsets, List<Scoretostudents> scores) {
+  return examsets.map((examset) {
+    // ค้นหาคะแนนที่ตรงกับ examsets_id
+    final matchingScore = scores.firstWhere(
+      (score) => score.examsetsId == examset.examsetsAuto,
+      orElse: () => Scoretostudents(
+        scoreAuto: 0,
+        examsetsId: 0,
+        scoreTotal: 0.0,
+        scoreType: 'N/A',
+        username: 'N/A',
+      ),
+    );
+
+    
+    final scoreTotal = matchingScore.scoreTotal != 0.0 ? matchingScore.scoreTotal : null;
+
+    return {
+      'direction': examset.direction, 
+      'fullmark': examset.fullmark,            
+      'scoreTotal': scoreTotal,                
+    };
+  }).toList();
+}
+
+  Future<List<AffectiveForStudents>> affective({
+  required String classroomName,
+  required String classroomMajor,
+  required String classroomYear,
+  required String classroomNumRoom,
+  required String username,
+}) async {
+  try {
+    final response = await http.post(
+      Uri.parse('https://www.edueliteroom.com/connect/get_affective_forstudents_score.php'),
+      body: {
+        'classroomName': classroomName,
+        'classroomMajor': classroomMajor,
+        'classroomYear': classroomYear,
+        'classroomNumRoom': classroomNumRoom,
+        'username': username,
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+
+      if (data['error'] != null) {
+        throw Exception(data['error']);
+      }
+
+      // แปลงข้อมูล JSON เป็น List ของ AffectiveForStudents
+      final checkinData = data['checkin_data'] as List;
+      return checkinData.map((item) => AffectiveForStudents.fromJson(item)).toList();
+    } else {
+      throw Exception('Failed to load data');
+    }
+  } catch (e) {
+    throw Exception('Failed to make request: $e');
+  }
+}
+
+Text _getStatusText(String status) {
+    String statusText = '';
+    Color statusColor = Colors.black;
+
+    switch (status) {
+      case 'present':
+        statusText = 'มาเรียน';
+        statusColor = Colors.green;
+        break;
+      case 'late':
+        statusText = 'มาสาย';
+        statusColor = const Color.fromARGB(255, 165, 149, 2);
+        break;
+      case 'absent':
+        statusText = 'ขาดเรียน';
+        statusColor = Colors.red;
+        break;
+      case 'sick leave':
+        statusText = 'ลาป่วย';
+        statusColor = Colors.blue;
+        break;
+      case 'personal leave':
+        statusText = 'ลากิจ';
+        statusColor = Colors.purple;
+        break;
+      default:
+        statusText = 'ยังไม่ได้เช็คชื่อ';
+        statusColor = const Color.fromARGB(255, 66, 66, 66);
+        break;
+    }
+
+    return Text(statusText, style: TextStyle(color: statusColor));
+  }
+
+
   @override
   void initState() {
     super.initState();
@@ -181,6 +314,7 @@ class _Score_SState extends State<Score_S> {
 
   @override
   Widget build(BuildContext context) {
+    
     return Scaffold(
       backgroundColor: Color.fromARGB(255, 195, 238, 250),
       appBar: AppBar(
@@ -277,6 +411,7 @@ class _Score_SState extends State<Score_S> {
 
                                     Expanded(
                                       child: ListView.builder(
+                                        shrinkWrap: true,
                                         itemCount: dataevent.length,
                                         itemBuilder: (context, index) {
                                           final event = dataevent[index];
@@ -314,56 +449,298 @@ class _Score_SState extends State<Score_S> {
                       ),
                       SizedBox(width: 50,),
                       Container(
-                        height: 1000,
-                        width: 1440,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(20)
-                        ), 
-                        child: Column(
-                          children: [
-                            Padding(
-                              padding: EdgeInsets.all(20),
-                              child: Text(' ${widget.classroomName} ${widget.classroomYear}/${widget.classroomNumRoom} (${widget.classroomMajor})',style: TextStyle(fontSize: 20),),
-                            )
+                                height: 1000,
+                                width: 1440,
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                child: SingleChildScrollView(
+                                  scrollDirection: Axis.vertical,
+                                  child: 
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Padding(
+                                      padding: EdgeInsets.all(20),
+                                      child: Column(
+                                        children: [
+                                          Text(
+                                            ' ${widget.classroomName} ${widget.classroomYear}/${widget.classroomNumRoom} (${widget.classroomMajor})',
+                                            style: TextStyle(fontSize: 20),
+                                          ),
+                                          SizedBox(height: 30),
+                                          FutureBuilder<ScoreForStudents>(
+                                            future: fetchExamsetsAndScores(
+                                              classroomName: widget.classroomName,
+                                              classroomYear: widget.classroomYear,
+                                              classroomNumRoom: widget.classroomNumRoom,
+                                              classroomMajor: widget.classroomMajor,
+                                              username: widget.username,
+                                            ),
+                                            builder: (context, snapshot) {
+                                              if (snapshot.connectionState == ConnectionState.waiting) {
+                                                return const Center(child: CircularProgressIndicator());
+                                              } else if (snapshot.hasError) {
+                                                return Center(child: Text('Error: ${snapshot.error}'));
+                                              } else {
+                                                final scoreForStudents = snapshot.data!;
+                                                final mergedData = mergeExamsetsAndScores(
+                                                  scoreForStudents.examsets,
+                                                  scoreForStudents.scores,
+                                                );
 
-                          ],
-                        ),
+                                                // คำนวณผลรวมของ fullmark และ scoreTotal
+                                                double totalFullmark = 0;
+                                                double totalScore = 0;
+                                                for (var data in mergedData) {
+                                                  totalFullmark += data['fullmark'] ?? 0;
+                                                  totalScore += data['scoreTotal'] ?? 0;
+                                                }
 
-                      )
+                                                return SingleChildScrollView(
+                                                  scrollDirection: Axis.horizontal,
+                                                  child: DataTable(
+                                                    columnSpacing: 5.0,
+                                                    columns: [
+                                                      DataColumn(label: Container(
+                                                        width: 1000,
+                                                        height: 50,
+                                                        alignment: Alignment.center,
+                                                        decoration: BoxDecoration(
+                                                          color: const Color.fromARGB(255, 71, 136, 190),
+                                                        ),
+                                                        child: Text('รายละเอียดงาน',style: TextStyle(color: Colors.white),)),
+                                                      ), 
+                                                      DataColumn(label: Container(
+                                                        width: 150,
+                                                        height: 50,
+                                                        alignment: Alignment.center,
+                                                        decoration: BoxDecoration(
+                                                          color: const Color.fromARGB(255, 71, 136, 190),
+                                                        ),
+                                                        child: Text('คะแนนเต็ม',style: TextStyle(color: Colors.white),)),
+                                                      ),
+                                                      DataColumn(label: Container(
+                                                        width: 150,
+                                                        height: 50,
+                                                        alignment: Alignment.center,
+                                                        decoration: BoxDecoration(
+                                                          color: const Color.fromARGB(255, 71, 136, 190),
+                                                        ),
+                                                        child: Text('คะแนนของคุณ',style: TextStyle(color: Colors.white),)),
+                                                      ),
+                                                      
+                                                    ],
+                                                    rows: [
+                                                      ...mergedData.map((data) {
+                                                        return DataRow(cells: [
+                                                          DataCell(
+                                                            SizedBox(
+                                                              width: 1000,
+                                                              child: Text(
+                                                                data['direction'] ?? '-',
+                                                                textAlign: TextAlign.left,
+                                                                softWrap: true, 
+                                                                overflow: TextOverflow.visible, 
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          DataCell(
+                                                            Container(
+                                                              width: 150,
+                                                              alignment: Alignment.center,
+                                                              child:  Text(
+                                                              (data['fullmark'] == null || data['fullmark'] == 0)
+                                                                  ? '-' 
+                                                                  : data['fullmark'].toStringAsFixed(2),
+                                                            ))),
+                                                          DataCell(
+                                                            Container(
+                                                              alignment: Alignment.center,
+                                                              width: 150,
+                                                              child: Text(
+                                                                (data['scoreTotal'] == null) 
+                                                                    ? '-' 
+                                                                    : data['scoreTotal'].toString(), 
+                                                              ))),
+                                                        ]);
+                                                      }),
 
-                        
+                                                      
+                                                      DataRow(cells: [
+                                                        DataCell(
+                                                          Container(
+                                                            width: 1000,
+                                                            height: 50,
+                                                            alignment: Alignment.center,
+                                                            decoration: BoxDecoration(
+                                                              color: const Color.fromARGB(255, 71, 136, 190),
+                                                            ),
+                                                            child: Text('ผลรวม',style: TextStyle(color: Colors.white),)
+                                                          ),
+                                                        ),
+                                                         DataCell(
+                                                          Container(
+                                                            width: 150,
+                                                            height: 50,
+                                                            alignment: Alignment.center,
+                                                            decoration: BoxDecoration(
+                                                              color: const Color.fromARGB(255, 71, 136, 190),
+                                                            ),
+                                                            child: Text(totalFullmark == 0 ? '-' : totalFullmark.toStringAsFixed(2),style: TextStyle(color: Colors.white),)
+                                                          ),
+                                                        ),
+                                                        DataCell(
+                                                          Container(
+                                                            width: 150,
+                                                            height: 50,
+                                                            alignment: Alignment.center,
+                                                            decoration: BoxDecoration(
+                                                              color: const Color.fromARGB(255, 71, 136, 190),
+                                                            ),
+                                                            child: Text(totalScore == 0 ? '-' : totalScore.toStringAsFixed(2),style: TextStyle(color: Colors.white),)
+                                                          ),
+                                                        ),
+                                                       
+                                                      ]),
+                                                    ],
+                                                  ),
+                                                );
+                                              }
+                                            },
+                                          ),
+                                          SizedBox(height: 20),
+                                          Text('สถานะการเช็คชื่อ:',style: TextStyle(
+                                            fontSize: 20
+                                          ),),
 
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            // ตารางแสดงประวัติการเช็คชื่อ
+                                            FutureBuilder<List<AffectiveForStudents>>(
+                                              future: affective(
+                                                classroomName: widget.classroomName,
+                                                classroomYear: widget.classroomYear,
+                                                classroomNumRoom: widget.classroomNumRoom,
+                                                classroomMajor: widget.classroomMajor,
+                                                username: widget.username,
+                                              ),
+                                              builder: (context, snapshot) {
+                                                if (snapshot.connectionState == ConnectionState.waiting) {
+                                                  return const CircularProgressIndicator();
+                                                } else if (snapshot.hasError) {
+                                                  return Text('Error: ${snapshot.error}');
+                                                } else {
+                                                  final data = snapshot.data!;
 
+                                                  return SingleChildScrollView(
+                                                    scrollDirection: Axis.horizontal,
+                                                    child: DataTable(
+                                                      columnSpacing: 20.0,
+                                                      columns: [
+                                                        DataColumn(label: Container(
+                                                          width: 200,
+                                                          alignment: Alignment.center,
+                                                          child: 
+                                                          Text('วันที่เช็คชื่อ', style: TextStyle(fontWeight: FontWeight.bold)))),
+                                                        const DataColumn(label: Text('สถานะเช็คชื่อ', style: TextStyle(fontWeight: FontWeight.bold))),
+                                                      ],
+                                                      rows: data.map((item) {
+                                                        return DataRow(cells: [
+                                                          DataCell(Container(
+                                                            alignment: Alignment.centerLeft,
+                                                            width: 200,
+                                                            child: 
+                                                              Text(item.checkinDate))),
+                                                          DataCell(_getStatusText(item.checkinStatus)),
+                                                        ]);
+                                                      }).toList(),
+                                                    ),
+                                                  );
+                                                }
+                                              },
+                                            ),
 
+                                            const SizedBox(width: 50),
 
+                                            // ตารางแสดงจำนวนสถานะการเช็คชื่อ
+                                            Container(
+                                              height: 200,
+                                              width: 400,
+                                              alignment: Alignment.center,
+                                              decoration: BoxDecoration(
+                                                borderRadius: BorderRadius.circular(20),
+                                                color: const Color.fromARGB(255, 195, 238, 250),
+                                              ),
+                                              child: FutureBuilder<List<AffectiveForStudents>>(
+                                                future: affective(
+                                                  classroomName: widget.classroomName,
+                                                  classroomYear: widget.classroomYear,
+                                                  classroomNumRoom: widget.classroomNumRoom,
+                                                  classroomMajor: widget.classroomMajor,
+                                                  username: widget.username,
+                                                ),
+                                                builder: (context, snapshot) {
+                                                  if (snapshot.connectionState == ConnectionState.waiting) {
+                                                    return const CircularProgressIndicator();
+                                                  } else if (snapshot.hasError) {
+                                                    return Text('Error: ${snapshot.error}');
+                                                  } else {
+                                                    final data = snapshot.data!;
+
+                                                    // คำนวณจำนวนแต่ละสถานะ
+                                                    final presentCount = data.where((item) => item.checkinStatus == 'present').length;
+                                                    final lateCount = data.where((item) => item.checkinStatus == 'late').length;
+                                                    final absentCount = data.where((item) => item.checkinStatus == 'absent').length;
+                                                    final sickLeaveCount = data.where((item) => item.checkinStatus == 'sick leave').length;
+                                                    final personalLeaveCount = data.where((item) => item.checkinStatus == 'personal leave').length;
+
+                                                    return SingleChildScrollView(
+                                                      scrollDirection: Axis.horizontal,
+                                                      child: DataTable(
+                                                        columnSpacing: 20.0,
+                                                        columns: const [
+                                                          DataColumn(label: Text('มาเรียน', style: TextStyle(fontWeight: FontWeight.bold))),
+                                                          DataColumn(label: Text('มาสาย', style: TextStyle(fontWeight: FontWeight.bold))),
+                                                          DataColumn(label: Text('ขาดเรียน', style: TextStyle(fontWeight: FontWeight.bold))),
+                                                          DataColumn(label: Text('ลาป่วย', style: TextStyle(fontWeight: FontWeight.bold))),
+                                                          DataColumn(label: Text('ลากิจ', style: TextStyle(fontWeight: FontWeight.bold))),
+                                                        ],
+                                                        rows: [
+                                                          DataRow(cells: [
+                                                            DataCell(Text(presentCount.toString())),
+                                                            DataCell(Text(lateCount.toString())),
+                                                            DataCell(Text(absentCount.toString())),
+                                                            DataCell(Text(sickLeaveCount.toString())),
+                                                            DataCell(Text(personalLeaveCount.toString())),
+                                                          ]),
+                                                        ],
+                                                      ),
+                                                    );
+                                                  }
+                                                },
+                                              ),
+                                            ),
+                                          ],
+                                        )
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                )
+                              ),
                             ],
-
                           ),
-
                         ),]
                       ),
-
-
-                      
-
-
-
-
-
-
-
                     ],
                   ),
                 )
-
-            
-          
-
-
         );
-    
-
   }
 }
 

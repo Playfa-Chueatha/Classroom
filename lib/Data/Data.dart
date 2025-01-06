@@ -1252,3 +1252,156 @@ class Studentdetailwork {
     };
   }
 }
+
+//--------------------------------------------------------------------------------------------------------
+
+class ScoreForStudents {
+  final List<ExamSet> examsets;
+  final List<Scoretostudents> scores;
+
+  ScoreForStudents({
+    required this.examsets,
+    required this.scores,
+  });
+
+  factory ScoreForStudents.fromJson(Map<String, dynamic> json) {
+    try {
+      return ScoreForStudents(
+        examsets: (json['examsets'] as List)
+            .map((exam) => ExamSet.fromJson(exam))
+            .toList(),
+        scores: (json['scores'] as List)
+            .map((score) => Scoretostudents.fromJson(score))
+            .toList(),
+      );
+    } catch (e) {
+      print("Error while parsing ScoreForStudents: $e");
+      return ScoreForStudents(examsets: [], scores: []);
+    }
+  }
+}
+
+class ExamSet {
+  final int examsetsAuto;
+  final String direction;
+  final double fullmark;
+  final String deadline;
+  final int classroomId;
+
+  ExamSet({
+    required this.examsetsAuto,
+    required this.direction,
+    required this.fullmark,
+    required this.deadline,
+    required this.classroomId,
+  });
+
+  factory ExamSet.fromJson(Map<String, dynamic> json) {
+    try {
+      return ExamSet(
+        examsetsAuto: json['examsets_auto'] is String 
+            ? int.tryParse(json['examsets_auto']) ?? 0 
+            : json['examsets_auto'],
+        direction: json['examsets_direction'] ?? 'N/A',
+        fullmark: json['examsets_fullmark'] is String 
+            ? double.tryParse(json['examsets_fullmark']) ?? 0.0 
+            : json['examsets_fullmark'],
+        deadline: json['examsets_deadline'] ?? 'N/A',
+        classroomId: json['classroom_id'] is String
+            ? int.tryParse(json['classroom_id']) ?? 0
+            : json['classroom_id'],
+      );
+    } catch (e) {
+      print("Error while parsing ExamSet: $e");
+      return ExamSet(
+        examsetsAuto: 0,
+        direction: 'N/A',
+        fullmark: 0.0,
+        deadline: 'N/A',
+        classroomId: 0,
+      );
+    }
+  }
+}
+
+class Scoretostudents {
+  final int scoreAuto;
+  final int examsetsId;
+  final double scoreTotal;
+  final String scoreType;
+  final String username;
+
+  Scoretostudents({
+    required this.scoreAuto,
+    required this.examsetsId,
+    required this.scoreTotal,
+    required this.scoreType,
+    required this.username,
+  });
+
+  factory Scoretostudents.fromJson(Map<String, dynamic> json) {
+    try {
+      return Scoretostudents(
+        scoreAuto: json['score_auto'] is String
+            ? int.tryParse(json['score_auto']) ?? 0
+            : json['score_auto'],
+        examsetsId: json['examsets_id'] is String
+            ? int.tryParse(json['examsets_id']) ?? 0
+            : json['examsets_id'],
+        scoreTotal: json['score_total'] is String
+            ? double.tryParse(json['score_total']) ?? 0.0
+            : json['score_total'],
+        scoreType: json['score_type'] ?? 'N/A',
+        username: json['users_username'] ?? 'N/A',
+      );
+    } catch (e) {
+      print("Error while parsing Scoretostudents: $e");
+      return Scoretostudents(
+        scoreAuto: 0,
+        examsetsId: 0,
+        scoreTotal: 0.0,
+        scoreType: 'N/A',
+        username: 'N/A',
+      );
+    }
+  }
+}
+
+//--------------------------------------------------------------------------
+class AffectiveForStudents {
+  final int checkinAuto;
+  final String checkinDate;
+  final String username;
+  final int classroomId;
+  final String checkinStatus;
+
+  AffectiveForStudents({
+    required this.checkinAuto,
+    required this.checkinDate,
+    required this.username,
+    required this.classroomId,
+    required this.checkinStatus,
+  });
+
+  // ฟังก์ชันแปลง JSON เป็น Object
+  factory AffectiveForStudents.fromJson(Map<String, dynamic> json) {
+    return AffectiveForStudents(
+      checkinAuto: int.parse(json['checkin_classroom_auto']),
+      checkinDate: json['checkin_classroom_date'],
+      username: json['users_username'],
+      classroomId: int.parse(json['checkin_classroom_classID']),
+      checkinStatus: json['checkin_classroom_status'],
+    );
+  }
+
+  // ฟังก์ชันแปลง Object เป็น JSON (ถ้าต้องการ)
+  Map<String, dynamic> toJson() {
+    return {
+      'checkin_classroom_auto': checkinAuto,
+      'checkin_classroom_date': checkinDate,
+      'users_username': username,
+      'checkin_classroom_classID': classroomId,
+      'checkin_classroom_status': checkinStatus,
+    };
+  }
+}
