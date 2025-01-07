@@ -44,7 +44,7 @@ class _Score_T_bodyState extends State<Score_T_body> {
   @override
   void initState() {
     super.initState();
-
+    fetchEvents();
     _getUnreadNotifications();
   }
 
@@ -75,14 +75,14 @@ class _Score_T_bodyState extends State<Score_T_body> {
               ));
             }
 
-            // Sort events: Today first, then future events
+           
             dataevent.sort((a, b) {
               final dateA = DateTime.parse(a.Date);
               final dateB = DateTime.parse(b.Date);
               return dateA.compareTo(dateB);
             });
 
-            // Check if today has any events
+            
             for (var event in dataevent) {
               if (isToday(event.Date)) {
                 hasTodayEvent = true;
@@ -112,10 +112,19 @@ class _Score_T_bodyState extends State<Score_T_body> {
 
   bool isToday(String eventDate) {
     final today = DateTime.now();
-    final eventDateTime = DateTime.parse(eventDate); // Assuming the date is in ISO 8601 format (yyyy-MM-dd)
+    final eventDateTime = DateTime.parse(eventDate); 
     return today.year == eventDateTime.year &&
            today.month == eventDateTime.month &&
            today.day == eventDateTime.day;
+  }
+
+ 
+  bool isFuture(String date) {
+    DateTime eventDate = DateTime.parse(date);
+    DateTime currentDate = DateTime.now();
+    
+    
+    return eventDate.isAfter(currentDate);
   }
 
 
@@ -149,7 +158,10 @@ class _Score_T_bodyState extends State<Score_T_body> {
       appBar: AppBar(
         backgroundColor: const Color.fromARGB(255, 152, 186, 218),
         title: Text(
-          'หน้าหลัก',
+          'คะแนน ${widget.classroomName.isNotEmpty ? widget.classroomName : ''} '
+          '${widget.classroomYear.isNotEmpty ? '${widget.classroomYear}/' : ''}'
+          '${widget.classroomNumRoom.isNotEmpty ? widget.classroomNumRoom : ''} '
+          '${widget.classroomMajor.isNotEmpty ? '(${widget.classroomMajor})' : ''}',
         ),
         actions: [
           appbarteacher(
@@ -261,27 +273,32 @@ class _Score_T_bodyState extends State<Score_T_body> {
                                       itemCount: dataevent.length,
                                       itemBuilder: (context, index) {
                                         final event = dataevent[index];
-                                        final isEventToday = isToday(event.Date); // Check if it's today
+                                        final isEventToday = isToday(event.Date); 
+                                        final isEventInFuture = isFuture(event.Date); 
 
-                                        return Container(
-                                          margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-                                          decoration: BoxDecoration(
-                                            color: isEventToday
-                                                ? Colors.blue // Blue for today
-                                                : const Color.fromARGB(255, 195, 238, 250), // Light color for other days
-                                            borderRadius: BorderRadius.circular(20),
-                                          ),
-                                          child: ListTile(
-                                            title: Text(event.Title),
-                                            subtitle: Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              children: [
-                                                Text('วันที่สุดท้ายของการส่งงาน: ${event.Date}'),
-                                                Text('วิชา: ${event.Class} (${event.Year}/${event.Room})'),
-                                              ],
-                                            ) 
-                                          ),
-                                        );
+                                        
+                                        if (isEventToday || isEventInFuture) {
+                                          return Container(
+                                            margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                                            decoration: BoxDecoration(
+                                              color: isEventToday
+                                                  ? Colors.blue 
+                                                  : const Color.fromARGB(255, 195, 238, 250), 
+                                              borderRadius: BorderRadius.circular(20),
+                                            ),
+                                            child: ListTile(
+                                              title: Text(event.Title),
+                                              subtitle: Column(
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                children: [
+                                                  Text('วันที่สุดท้ายของการส่งงาน: ${event.Date}'),
+                                                  Text('วิชา: ${event.Class} (${event.Year}/${event.Room})'),
+                                                ],
+                                              ),
+                                            ),
+                                          );
+                                        }
+                                        return SizedBox(); 
                                       },
                                     ),
                                   ),

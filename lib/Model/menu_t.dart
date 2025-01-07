@@ -17,7 +17,7 @@ class Menuu_class extends StatefulWidget {
 }
 
 class _MenuState extends State<Menuu_class> {
-  List<Even_teacher> dataevent = []; // เก็บข้อมูล Even_teacher
+  List<Even_teacher> dataevent = []; 
   bool isLoading = true; // สถานะโหลดข้อมูล
   bool hasTodayEvent = false; // เช็คว่ามีงานวันนี้หรือไม่
 
@@ -83,14 +83,24 @@ class _MenuState extends State<Menuu_class> {
     }
   }
 
-  // ฟังก์ชันสำหรับตรวจสอบว่าเป็นวันนี้หรือไม่
+  
   bool isToday(String eventDate) {
     final today = DateTime.now();
-    final eventDateTime = DateTime.parse(eventDate); // Assuming the date is in ISO 8601 format (yyyy-MM-dd)
+    final eventDateTime = DateTime.parse(eventDate); 
     return today.year == eventDateTime.year &&
            today.month == eventDateTime.month &&
            today.day == eventDateTime.day;
   }
+
+ 
+  bool isFuture(String date) {
+    DateTime eventDate = DateTime.parse(date);
+    DateTime currentDate = DateTime.now();
+    
+    
+    return eventDate.isAfter(currentDate);
+  }
+
 
   @override
   void initState() {
@@ -103,7 +113,7 @@ class _MenuState extends State<Menuu_class> {
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 195, 238, 250),
       body: isLoading
-          ? const Center(child: CircularProgressIndicator()) // แสดง Loading
+          ? const Center(child: CircularProgressIndicator()) 
           : Column(
               children: [
                 
@@ -156,70 +166,76 @@ class _MenuState extends State<Menuu_class> {
                 ),
                 const SizedBox(height: 20),
 
-                // ส่วนแสดงรายการกิจกรรมที่กำลังมาถึง
+                
                 Container(
-                  height: 530,
-                  width: 350,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: const BorderRadius.only(
-                      topRight: Radius.circular(20),
-                      bottomRight: Radius.circular(20),
-                    ),
+                height: 530,
+                width: 350,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: const BorderRadius.only(
+                    topRight: Radius.circular(20),
+                    bottomRight: Radius.circular(20),
                   ),
-                  child: Column(
-                    children: [
-                      const SizedBox(height: 20),
-                      const Text(
-                        'งานที่มอบหมาย',
-                        style: TextStyle(fontSize: 20),
-                      ),
+                ),
+                child: Column(
+                  children: [
+                    const SizedBox(height: 20),
+                    const Text(
+                      'งานที่มอบหมาย',
+                      style: TextStyle(fontSize: 20),
+                    ),
 
-                      // If there is no event today, show the message
-                      if (!hasTodayEvent) 
-                        Container(
-                          margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-                          decoration: BoxDecoration(
-                            color: Colors.blue,
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: const ListTile(
-                            title: Text('- ไม่มีงานที่ต้องส่งในวันนี้ -'),
-                          ),
+                    
+                    if (!hasTodayEvent) 
+                      Container(
+                        margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                        decoration: BoxDecoration(
+                          color: Colors.blue,
+                          borderRadius: BorderRadius.circular(20),
                         ),
-
+                        child: const ListTile(
+                          title: Text('- ไม่มีงานที่ต้องส่งในวันนี้ -'),
+                        ),
+                      ),
+      
+                      
                       Expanded(
                         child: ListView.builder(
                           itemCount: dataevent.length,
                           itemBuilder: (context, index) {
                             final event = dataevent[index];
-                            final isEventToday = isToday(event.Date); // Check if it's today
+                            final isEventToday = isToday(event.Date); 
+                            final isEventInFuture = isFuture(event.Date); 
 
-                            return Container(
-                              margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-                              decoration: BoxDecoration(
-                                color: isEventToday
-                                    ? Colors.blue // Blue for today
-                                    : const Color.fromARGB(255, 195, 238, 250), // Light color for other days
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              child: ListTile(
-                                title: Text(event.Title),
-                                subtitle: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text('วันที่สุดท้ายของการส่งงาน: ${event.Date}'),
-                                    Text('วิชา: ${event.Class} (${event.Year}/${event.Room})'),
-                                  ],
-                                ) 
-                              ),
-                            );
+                            
+                            if (isEventToday || isEventInFuture) {
+                              return Container(
+                                margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                                decoration: BoxDecoration(
+                                  color: isEventToday
+                                      ? Colors.blue 
+                                      : const Color.fromARGB(255, 195, 238, 250), 
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                child: ListTile(
+                                  title: Text(event.Title),
+                                  subtitle: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text('วันที่สุดท้ายของการส่งงาน: ${event.Date}'),
+                                      Text('วิชา: ${event.Class} (${event.Year}/${event.Room})'),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            }
+                            return SizedBox(); 
                           },
                         ),
                       ),
                     ],
                   ),
-                ),
+                )
               ],
             ),
     );

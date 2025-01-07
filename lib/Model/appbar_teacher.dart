@@ -161,7 +161,9 @@ Future<void> fetchUnreadNotifications() async {
           style: const TextStyle(fontSize: 20),
         ),
         IconButton(
-          onPressed: () => navigateTo(const Profile_T()),
+          onPressed: () => navigateTo(Profilet(
+                  username: widget.username,
+          )),
           icon: Image.asset("assets/images/ครู.png"),
           iconSize: 30,
         ),

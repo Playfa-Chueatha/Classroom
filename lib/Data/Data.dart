@@ -1405,3 +1405,136 @@ class AffectiveForStudents {
     };
   }
 }
+
+//-------------------------------------------------------------------
+class DataProfileT {
+  final int usertAuto;
+  final String usertUsername;
+  final String usertPassword;
+  final String usertPrefix;
+  final String usertThfname;
+  final String usertThlname;
+  final String usertEnfname;
+  final String usertEnlname;
+  final String usertClassroom;
+  final String usertNumroom;
+  final String usertPhone;
+  final String usertEmail;
+  final String usertSubjects;
+
+  DataProfileT({
+    required this.usertAuto,
+    required this.usertUsername,
+    required this.usertPassword,
+    required this.usertPrefix,
+    required this.usertThfname,
+    required this.usertThlname,
+    required this.usertEnfname,
+    required this.usertEnlname,
+    required this.usertClassroom,
+    required this.usertNumroom,
+    required this.usertPhone,
+    required this.usertEmail,
+    required this.usertSubjects,
+  });
+
+  // ฟังก์ชันจาก JSON มาเป็น object
+  factory DataProfileT.fromJson(Map<String, dynamic> json) {
+  return DataProfileT(
+    usertAuto: int.tryParse(json['usert_auto']?.toString() ?? '0') ?? 0,
+    usertUsername: json['usert_username'] ?? '',
+    usertPassword: json['usert_password'] ?? '',
+    usertPrefix: json['usert_prefix'] ?? '',
+    usertThfname: json['usert_thfname'] ?? '',
+    usertThlname: json['usert_thlname'] ?? '',
+    usertEnfname: json['usert_enfname'] ?? '',
+    usertEnlname: json['usert_enlname'] ?? '',
+    usertClassroom: json['usert_classroom'] ?? '',
+    usertNumroom: json['usert_numroom'] ?? '',
+    usertPhone: json['usert_phone'] ?? '',
+    usertEmail: json['usert_email'] ?? '',
+    usertSubjects: json['usert_subjects'] ?? '',
+  );
+}
+
+
+  // ฟังก์ชันแปลงเป็น JSON
+    Map<String, dynamic> toJson() {
+    return {
+      'usert_auto': usertAuto,
+      'usert_username': usertUsername,
+      'usert_password': usertPassword,
+      'usert_prefix': usertPrefix,
+      'usert_thfname': usertThfname,
+      'usert_thlname': usertThlname,
+      'usert_enfname': usertEnfname,
+      'usert_enlname': usertEnlname,
+      'usert_classroom': usertClassroom,
+      'usert_numroom': usertNumroom,
+      'usert_phone': usertPhone,
+      'usert_email': usertEmail,
+      'usert_subjects': usertSubjects,
+    }..removeWhere((key, value) => value == null || value == ''); 
+  }
+}
+
+//-------------------------------------------------------------------------------------
+
+class Studentclass {
+  final String usersAuto;
+  final String usersUsername;
+  final String usersId;
+  final String usersPrefix;
+  final String usersThfname;
+  final String usersThlname;
+  final String usersEnfname;
+  final String usersEnlname;
+  final String usersClassroom;
+  final String usersNumroom;
+  final String usersNumber;
+  final String usersMajor;
+  final String usersPhone;
+  final String usersParentphone;
+  final String usersEmail;
+  final String usertUsername;
+
+  Studentclass({
+    required this.usersAuto,
+    required this.usersUsername,
+    required this.usersId,
+    required this.usersPrefix,
+    required this.usersThfname,
+    required this.usersThlname,
+    required this.usersEnfname,
+    required this.usersEnlname,
+    required this.usersClassroom,
+    required this.usersNumroom,
+    required this.usersNumber,
+    required this.usersMajor,
+    required this.usersPhone,
+    required this.usersParentphone, 
+    required this.usersEmail,
+    required this.usertUsername,
+  });
+
+  factory Studentclass.fromJson(Map<String, dynamic> json) {
+  return Studentclass(
+    usersAuto: json['users_auto'] ?? '',
+    usersUsername: json['users_username'] ?? '',
+    usersId: json['users_id'] ?? '',
+    usersPrefix: json['users_prefix'] ?? '',
+    usersThfname: json['users_thfname'] ?? '',
+    usersThlname: json['users_thlname'] ?? '',
+    usersEnfname: json['users_enfname'] ?? '',
+    usersEnlname: json['users_enlname'] ?? '',
+    usersClassroom: json['users_classroom'] ?? '',
+    usersNumroom: json['users_numroom'] ?? '',
+    usersNumber: json['users_number'] ?? '',
+    usersMajor: json['users_major'] ?? '',
+    usersPhone: json['users_phone'] ?? '',
+    usersParentphone: json['users_parentphone'] ?? '',
+    usersEmail: json['users_email'] ?? '',
+    usertUsername: json['usert_username'] ?? '',
+  );
+}
+}

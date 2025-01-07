@@ -141,7 +141,7 @@ class _main_home_TState extends State<main_home_T> {
                                         child: SizedBox(
                                           height: 470,
                                           width: 1450,
-                                          child: CalendarHome_T(username: widget.username), // ส่ง username ไปที่ CalendarHome
+                                          child: CalendarHome_T(username: widget.username), 
                                         ),
                                       ),
                                       Container(

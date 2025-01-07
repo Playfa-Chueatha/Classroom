@@ -170,7 +170,7 @@ Future<void> fetchUnreadNotifications() async {
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => const Profile_S()),
+            MaterialPageRoute(builder: (context) => Profiles(username: widget.username,)),
           );
         },
         icon: Image.asset("assets/images/นักเรียน.png"),

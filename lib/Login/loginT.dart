@@ -61,11 +61,6 @@ class _Login_TState extends State<Login_T> {
             thlname = data['user']['usert_thlname'] ?? "ไม่ระบุ";
           });
 
-          // print('Username: $username');
-          // print('Thairfirstname: $thfname');
-          // print('Thailastname: $thlname');
-
-          // Check if username is not null
           if (username != null) {
             Navigator.push(
               context,
@@ -99,127 +94,135 @@ class _Login_TState extends State<Login_T> {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
+    final double width = size.width;
+    final double height = size.height;
 
     return Scaffold(
       body: Center(
-        child: SingleChildScrollView(
+        child: Container(
+          alignment: Alignment.center,
+          height: height * 0.9, 
+          width: width * 0.6, 
+          decoration: BoxDecoration(
+            color: Color.fromARGB(255, 147, 235, 241),
+            borderRadius: BorderRadius.circular(20),
+          ),
           child: Form(
             key: formKey,
-            child: Container(
-              alignment: Alignment.center,
-              height: size.height * 0.9,
-              width: size.width * 0.5,
-              decoration: BoxDecoration(
-                color: Color.fromARGB(255, 147, 235, 241),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  SizedBox(height: size.height * 0.05),
-                  Text("Login", style: TextStyle(fontSize: size.height * 0.05)),
-                  SizedBox(height: size.height * 0.03),
-                  Image.asset('assets/images/ครู.png', height: size.height * 0.3),
-                  SizedBox(height: size.height * 0.05),
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: size.width * 0.1),
-                    child: TextFormField(
-                      decoration: InputDecoration(
-                        prefixIcon: Icon(Icons.person_outline_outlined),
-                        labelText: "กรุณากรอกชื่อผู้ใช้",
-                        labelStyle: TextStyle(fontSize: size.height * 0.025),
-                      ),
-                      validator: (val) {
-                        if (val!.isEmpty) {
-                          return 'กรุณากรอกชื่อผู้ใช้';
-                        }
-                        return null;
-                      },
-                      controller: usert_username,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SizedBox(height: height * 0.05),
+                Text(
+                  "Login",
+                  style: TextStyle(fontSize: height * 0.05), 
+                ),
+                SizedBox(height: height * 0.03),
+                Image.asset(
+                  'assets/images/ครู.png',
+                  height: height * 0.2, // ความสูงของรูปภาพ 30% ของความสูงหน้าจอ
+                ),
+                SizedBox(height: height * 0.05),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: width * 0.1),
+                  child: TextFormField(
+                    decoration: InputDecoration(
+                      prefixIcon: Icon(Icons.person_outline_outlined),
+                      labelText: "กรุณากรอกชื่อผู้ใช้",
+                      labelStyle: TextStyle(fontSize: height * 0.025),
                     ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: size.width * 0.1, vertical: size.height * 0.01),
-                    child: TextFormField(
-                      obscureText: _isObscured,
-                      controller: usert_password,
-                      decoration: InputDecoration(
-                        prefixIcon: Icon(Icons.lock),
-                        labelText: "กรุณากรอกรหัสผ่าน",
-                        labelStyle: TextStyle(fontSize: size.height * 0.025),
-                        suffixIcon: IconButton(
-                          padding: const EdgeInsetsDirectional.all(10.0),
-                          icon: _isObscured
-                              ? const Icon(Icons.visibility)
-                              : const Icon(Icons.visibility_off),
-                          onPressed: () {
-                            setState(() {
-                              _isObscured = !_isObscured;
-                            });
-                          },
-                        ),
-                      ),
-                      validator: (val) {
-                        if (val!.isEmpty) {
-                          return 'กรุณากรอกรหัสผ่าน';
-                        }
-                        return null;
-                      },
-                    ),
-                  ),
-                  SizedBox(height: size.height * 0.05),
-                  FilledButton(
-                    onPressed: () async {
-                      bool pass = formKey.currentState!.validate();
-                      if (pass) {
-                        await signIn();
+                    validator: (val) {
+                      if (val!.isEmpty) {
+                        return 'กรุณากรอกชื่อผู้ใช้';
                       }
+                      return null;
                     },
-                    style: FilledButton.styleFrom(
-                      backgroundColor: Color.fromARGB(255, 10, 82, 104),
-                      padding: EdgeInsets.symmetric(vertical: size.height * 0.02, horizontal: size.width * 0.1),
-                    ),
-                    child: Text("เข้าสู่ระบบ", style: TextStyle(fontSize: size.height * 0.03)),
+                    controller: usert_username,
                   ),
-                  SizedBox(height: size.height * 0.05),
-                  
-                  FilledButton(
-                    onPressed: loginWithPredefinedCredentials,
-                    style: FilledButton.styleFrom(
-                      backgroundColor: Color.fromARGB(255, 82, 104, 10),
-                    ),
-                    child: Text("Login"),
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      TextButton(
-                        style: TextButton.styleFrom(
-                          foregroundColor: Color.fromARGB(255, 67, 132, 230),
-                        ),
+                ),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: width * 0.1, vertical: height * 0.01),
+                  child: TextFormField(
+                    obscureText: _isObscured,
+                    controller: usert_password,
+                    decoration: InputDecoration(
+                      prefixIcon: Icon(Icons.lock),
+                      labelText: "กรุณากรอกรหัสผ่าน",
+                      labelStyle: TextStyle(fontSize: height * 0.025),
+                      suffixIcon: IconButton(
+                        padding: const EdgeInsetsDirectional.all(10.0),
+                        icon: _isObscured
+                            ? const Icon(Icons.visibility)
+                            : const Icon(Icons.visibility_off),
                         onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => Registert_T()),
-                          );
+                          setState(() {
+                            _isObscured = !_isObscured;
+                          });
                         },
-                        child: Text("สมัครสมาชิก", style: TextStyle(fontSize: size.height * 0.025)),
                       ),
-                      Icon(Icons.linear_scale),
-                      TextButton(
-                        style: TextButton.styleFrom(
-                          foregroundColor: Color.fromARGB(255, 238, 108, 115),
-                        ),
-                        onPressed: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => Forgetpass_T()),
-                        ),
-                        child: Text("ลืมรหัสผ่าน", style: TextStyle(fontSize: size.height * 0.025)),
-                      ),
-                    ],
+                    ),
+                    validator: (val) {
+                      if (val!.isEmpty) {
+                        return 'กรุณากรอกรหัสผ่าน';
+                      }
+                      return null;
+                    },
                   ),
-                ],
-              ),
+                ),
+                SizedBox(height: height * 0.05),
+                FilledButton(
+                  onPressed: () async {
+                    bool pass = formKey.currentState!.validate();
+                    if (pass) {
+                      await signIn();
+                    }
+                  },
+                  style: FilledButton.styleFrom(
+                    backgroundColor: Color.fromARGB(255, 10, 82, 104),
+                    padding: EdgeInsets.symmetric(
+                      vertical: height * 0.02,
+                      horizontal: width * 0.1,
+                    ),
+                  ),
+                  child: Text("เข้าสู่ระบบ", style: TextStyle(fontSize: height * 0.03)),
+                ),
+                SizedBox(height: height * 0.08),
+                FilledButton(
+                  onPressed: loginWithPredefinedCredentials,
+                  style: FilledButton.styleFrom(
+                    backgroundColor: Color.fromARGB(255, 82, 104, 10),
+                  ),
+                  child: Text("Login"),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    TextButton(
+                      style: TextButton.styleFrom(
+                        foregroundColor: Color.fromARGB(255, 67, 132, 230),
+                      ),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => Registert_T()),
+                        );
+                      },
+                      child: Text("สมัครสมาชิก", style: TextStyle(fontSize: height * 0.025)),
+                    ),
+                    Icon(Icons.linear_scale),
+                    TextButton(
+                      style: TextButton.styleFrom(
+                        foregroundColor: Color.fromARGB(255, 238, 108, 115),
+                      ),
+                      onPressed: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => Forgetpass_T()),
+                      ),
+                      child: Text("ลืมรหัสผ่าน", style: TextStyle(fontSize: height * 0.025)),
+                    ),
+                  ],
+                ),
+              ],
             ),
           ),
         ),

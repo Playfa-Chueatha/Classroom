@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_esclass_2/Data/Data.dart';
 import 'package:flutter_esclass_2/Home/homeS.dart';
 import 'package:flutter_esclass_2/Login/login.dart';
-import 'package:flutter_esclass_2/Model/Chat.dart';
 import 'package:flutter_esclass_2/Model/appbar_students.dart';
 import 'package:flutter_esclass_2/Profile/ProfileS.dart';
 import 'package:flutter_esclass_2/Score/Menu_listclassroom_S_score.dart';
@@ -39,6 +38,7 @@ class _Score_SState extends State<Score_S> {
   int unreadCount = 0; 
   List<Even_teacher> dataevent = [];
   bool hasTodayEvent = false; 
+  bool isLoading = true; 
   
 
   Future<void> _getUnreadNotifications() async {
@@ -64,36 +64,22 @@ class _Score_SState extends State<Score_S> {
     }
   }
 
-  bool isToday(String eventDate) {
-    final today = DateTime.now();
-    final eventDateTime = DateTime.parse(eventDate); 
-    return today.year == eventDateTime.year &&
-           today.month == eventDateTime.month &&
-           today.day == eventDateTime.day;
-  }
+  
 
-  void fetchEvents() async {
-  final url = Uri.parse(
-      'https://www.edueliteroom.com/connect/event_assignment_students.php?usert_username=${widget.username}');
-  try {
-    final response = await http.get(url);
-    
+  Future<void> fetchEvents() async {
+    final url = Uri.parse('https://www.edueliteroom.com/connect/event_assignment_students.php?usert_username=${widget.username}');
+    try {
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
 
-    if (response.statusCode == 200) {
-      final responseData = jsonDecode(response.body);
-    
-      if (responseData['status'] == 'success') {
-        setState(() {
-          _events.clear();
-          dataevent.clear();
+        if (responseData['status'] == 'success') {
+          setState(() {
+            dataevent.clear();
+            isLoading = false;
+            hasTodayEvent = false;
 
-          for (var event in responseData['data_assignment']) {
-            try {
-              // แปลงวันที่กำหนดส่งให้เป็น DateTime object
-              DateTime eventDate = DateTime.parse(event['event_assignment_duedate']);
-              final eventDateKey = DateTime(eventDate.year, eventDate.month, eventDate.day);
-
-              // เพิ่มข้อมูลเหตุการณ์ทั้งหมดไปยัง dataevent
+            for (var event in responseData['data_assignment']) {
               dataevent.add(Even_teacher(
                 Title: event['event_assignment_title'] ?? '',
                 Date: event['event_assignment_duedate'] ?? '',
@@ -104,48 +90,61 @@ class _Score_SState extends State<Score_S> {
                 Room: event['classroom_numroom'] ?? '',
                 ClassID: event['event_assignment_classID'] ?? '',
               ));
-
-              // จัดเก็บข้อมูลทั้งหมดสำหรับ UI
-              if (_events[eventDateKey] == null) {
-                _events[eventDateKey] = [];
-              }
-              _events[eventDateKey]!.add({
-                'event': event['event_assignment_title'] ?? '',
-                'date': event['event_assignment_duedate'] ?? '',
-                'time': event['event_assignment_time'] ?? '',
-                'classroom_name': event['classroom_name'] ?? '',
-                'classroom_major': event['classroom_major'] ?? '',
-                'classroom_year': event['classroom_year'] ?? '',
-                'classroom_numroom': event['classroom_numroom'] ?? '',
-                'classID': event['event_assignment_classID'] ?? '',
-              });
-            } catch (e) {
-              print('Error parsing event date: $e');
             }
-          }
 
-          // อัปเดตเหตุการณ์ที่เลือกไว้สำหรับ UI
-        });
+            // Sort events: Today first, then future events
+            dataevent.sort((a, b) {
+              final dateA = DateTime.parse(a.Date);
+              final dateB = DateTime.parse(b.Date);
+              return dateA.compareTo(dateB);
+            });
+
+            // Check if today has any events
+            for (var event in dataevent) {
+              if (isToday(event.Date)) {
+                hasTodayEvent = true;
+                break;
+              }
+            }
+          });
+        } else {
+          setState(() {
+            isLoading = false;
+          });
+          print('Error: ${responseData['message']}');
+        }
       } else {
-        // ใช้ Snackbar เพื่อแจ้งข้อผิดพลาดให้ผู้ใช้
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text('Error: ${responseData['message']}'),
-        ));
+        setState(() {
+          isLoading = false;
+        });
+        print('Error: ${response.statusCode}');
       }
-    } else {
-      // แสดงข้อผิดพลาดเมื่อ HTTP status code ไม่ใช่ 200
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Failed to fetch data: ${response.statusCode}'),
-      ));
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+      });
+      print('Network error: $e');
     }
-  } catch (e) {
-    print('Network error: $e');
-    // แจ้งข้อผิดพลาดหากเกิดข้อผิดพลาดในการเชื่อมต่อ
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text('Network error: $e'),
-    ));
   }
-}
+
+
+
+
+  bool isToday(String eventDate) {
+    final today = DateTime.now();
+    final eventDateTime = DateTime.parse(eventDate); // Assuming the date is in ISO 8601 format (yyyy-MM-dd)
+    return today.year == eventDateTime.year &&
+           today.month == eventDateTime.month &&
+           today.day == eventDateTime.day;
+  }
+
+  bool isFuture(String date) {
+    DateTime eventDate = DateTime.parse(date);
+    DateTime currentDate = DateTime.now();
+    
+    
+    return eventDate.isAfter(currentDate);
+  }
 
 
   void showStatusConfirmationDialog(BuildContext context, String title, String message, 
@@ -319,7 +318,12 @@ Text _getStatusText(String status) {
       backgroundColor: Color.fromARGB(255, 195, 238, 250),
       appBar: AppBar(
         backgroundColor: const Color.fromARGB(255, 152, 186, 218),
-        title: Text('หน้าหลัก'),
+        title: Text(
+          'คะแนน ${widget.classroomName.isNotEmpty ? widget.classroomName : ''} '
+          '${widget.classroomYear.isNotEmpty ? '${widget.classroomYear}/' : ''}'
+          '${widget.classroomNumRoom.isNotEmpty ? widget.classroomNumRoom : ''} '
+          '${widget.classroomMajor.isNotEmpty ? '(${widget.classroomMajor})' : ''}',
+        ),
         actions: [
           appbarstudents(
             thfname: widget.thfname,
@@ -398,47 +402,51 @@ Text _getStatusText(String status) {
 
                                     
                                     if (!hasTodayEvent) 
-                                      Container(
-                                        margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-                                        decoration: BoxDecoration(
-                                          color: Colors.blue,
-                                          borderRadius: BorderRadius.circular(20),
-                                        ),
-                                        child: const ListTile(
-                                          title: Text('- ไม่มีงานที่ต้องส่งในวันนี้ -'),
-                                        ),
+                                    Container(
+                                      margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                                      decoration: BoxDecoration(
+                                        color: Colors.blue,
+                                        borderRadius: BorderRadius.circular(20),
                                       ),
+                                      child: const ListTile(
+                                        title: Text('- ไม่มีงานที่ต้องส่งในวันนี้ -'),
+                                      ),
+                                    ),
 
                                     Expanded(
                                       child: ListView.builder(
-                                        shrinkWrap: true,
                                         itemCount: dataevent.length,
                                         itemBuilder: (context, index) {
                                           final event = dataevent[index];
                                           final isEventToday = isToday(event.Date); 
+                                          final isEventInFuture = isFuture(event.Date); 
 
-                                          return Container(
-                                            margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-                                            decoration: BoxDecoration(
-                                              color: isEventToday
-                                                  ? Colors.blue 
-                                                  : const Color.fromARGB(255, 195, 238, 250), 
-                                              borderRadius: BorderRadius.circular(20),
-                                            ),
-                                            child: ListTile(
-                                              title: Text(event.Title),
-                                              subtitle: Column(
-                                                crossAxisAlignment: CrossAxisAlignment.start,
-                                                children: [
-                                                  Text('วันที่สุดท้ายของการส่งงาน: ${event.Date}'),
-                                                  Text('วิชา: ${event.Class} (${event.Year}/${event.Room})'),
-                                                ],
-                                              ) 
-                                            ),
-                                          );
+                                          
+                                          if (isEventToday || isEventInFuture) {
+                                            return Container(
+                                              margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                                              decoration: BoxDecoration(
+                                                color: isEventToday
+                                                    ? Colors.blue 
+                                                    : const Color.fromARGB(255, 195, 238, 250), 
+                                                borderRadius: BorderRadius.circular(20),
+                                              ),
+                                              child: ListTile(
+                                                title: Text(event.Title),
+                                                subtitle: Column(
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text('วันที่สุดท้ายของการส่งงาน: ${event.Date}'),
+                                                    Text('วิชา: ${event.Class} (${event.Year}/${event.Room})'),
+                                                  ],
+                                                ),
+                                              ),
+                                            );
+                                          }
+                                          return SizedBox(); 
                                         },
                                       ),
-                                    ),        
+                                    ),
                                   ],
                                 ), 
                               ),
@@ -462,16 +470,29 @@ Text _getStatusText(String status) {
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    Padding(
+                                    widget.classroomName.isEmpty ||
+                                            widget.classroomMajor.isEmpty ||
+                                            widget.classroomYear.isEmpty ||
+                                            widget.classroomNumRoom.isEmpty
+                                        ? Column(
+                                          children: [
+                                            SizedBox(height: 50),
+                                            Center(
+                                            child: Text(
+                                              ' ✿ กรุณาเลือกห้องเรียน ✿',
+                                              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                                            ),
+                                          )
+
+                                          ],
+                                        )
+                                           
+                                    : Padding(
                                       padding: EdgeInsets.all(20),
                                       child: Column(
                                         children: [
-                                          Text(
-                                            ' ${widget.classroomName} ${widget.classroomYear}/${widget.classroomNumRoom} (${widget.classroomMajor})',
-                                            style: TextStyle(fontSize: 20),
-                                          ),
-                                          SizedBox(height: 30),
-                                          FutureBuilder<ScoreForStudents>(
+                                          
+                                         FutureBuilder<ScoreForStudents>(
                                             future: fetchExamsetsAndScores(
                                               classroomName: widget.classroomName,
                                               classroomYear: widget.classroomYear,

@@ -44,9 +44,6 @@ class _TabScoreState extends State<TabScore> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('ห้องเรียน ${widget.classroomName} ${widget.classroomYear}/${widget.classroomNumRoom} (${widget.classroomMajor})', style: TextStyle(
-                fontSize: 20,
-              ),),
               TabBar(
                 tabs: [
                   Tab(

@@ -5,7 +5,6 @@ import 'package:flutter_esclass_2/Classroom/setting_calss.dart';
 import 'package:flutter_esclass_2/Data/Data.dart';
 import 'package:flutter_esclass_2/Home/homeT.dart';
 import 'package:flutter_esclass_2/Login/login.dart';
-import 'package:flutter_esclass_2/Model/Chat.dart';
 import 'package:flutter_esclass_2/Model/Menu_listclassroom_T_inclass.dart';
 import 'package:flutter_esclass_2/Model/appbar_teacher.dart';
 import 'package:flutter_esclass_2/Model/menu_t.dart';
@@ -149,10 +148,19 @@ class _AssignWork_class_TState extends State<AssignWork_class_T> {
 
   bool isToday(String eventDate) {
     final today = DateTime.now();
-    final eventDateTime = DateTime.parse(eventDate); // Assuming the date is in ISO 8601 format (yyyy-MM-dd)
+    final eventDateTime = DateTime.parse(eventDate); 
     return today.year == eventDateTime.year &&
            today.month == eventDateTime.month &&
            today.day == eventDateTime.day;
+  }
+
+ 
+  bool isFuture(String date) {
+    DateTime eventDate = DateTime.parse(date);
+    DateTime currentDate = DateTime.now();
+    
+    
+    return eventDate.isAfter(currentDate);
   }
 
   Future<void> loadExamsets() async {
@@ -312,7 +320,10 @@ void initState() {
       appBar: AppBar(
         backgroundColor: const Color.fromARGB(255, 152, 186, 218),
         title: Text(
-          'มอบหมายงาน ${widget.classroomName} ${widget.classroomYear}/${widget.classroomNumRoom} (${widget.classroomMajor})',
+          'งานที่มอบหมาย ${widget.classroomName.isNotEmpty ? widget.classroomName : ''} '
+          '${widget.classroomYear.isNotEmpty ? '${widget.classroomYear}/' : ''}'
+          '${widget.classroomNumRoom.isNotEmpty ? widget.classroomNumRoom : ''} '
+          '${widget.classroomMajor.isNotEmpty ? '(${widget.classroomMajor})' : ''}',
         ),
         actions: [
           appbarteacher(
@@ -417,32 +428,38 @@ void initState() {
                                       title: Text('- ไม่มีงานที่ต้องส่งในวันนี้ -'),
                                     ),
                                   ),
+      
                                    Expanded(
                                     child: ListView.builder(
                                       itemCount: dataevent.length,
                                       itemBuilder: (context, index) {
                                         final event = dataevent[index];
-                                        final isEventToday = isToday(event.Date); // Check if it's today
+                                        final isEventToday = isToday(event.Date); 
+                                        final isEventInFuture = isFuture(event.Date); 
 
-                                        return Container(
-                                          margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-                                          decoration: BoxDecoration(
-                                            color: isEventToday
-                                                ? Colors.blue // Blue for today
-                                                : const Color.fromARGB(255, 195, 238, 250), // Light color for other days
-                                            borderRadius: BorderRadius.circular(20),
-                                          ),
-                                          child: ListTile(
-                                            title: Text(event.Title),
-                                            subtitle: Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              children: [
-                                                Text('วันที่สุดท้ายของการส่งงาน: ${event.Date}'),
-                                                Text('วิชา: ${event.Class} (${event.Year}/${event.Room})'),
-                                              ],
-                                            ) 
-                                          ),
-                                        );
+                                        
+                                        if (isEventToday || isEventInFuture) {
+                                          return Container(
+                                            margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                                            decoration: BoxDecoration(
+                                              color: isEventToday
+                                                  ? Colors.blue 
+                                                  : const Color.fromARGB(255, 195, 238, 250), 
+                                              borderRadius: BorderRadius.circular(20),
+                                            ),
+                                            child: ListTile(
+                                              title: Text(event.Title),
+                                              subtitle: Column(
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                children: [
+                                                  Text('วันที่สุดท้ายของการส่งงาน: ${event.Date}'),
+                                                  Text('วิชา: ${event.Class} (${event.Year}/${event.Room})'),
+                                                ],
+                                              ),
+                                            ),
+                                          );
+                                        }
+                                        return SizedBox(); 
                                       },
                                     ),
                                   ),
@@ -501,7 +518,7 @@ void initState() {
 
 
                             //งานที่มอบหมาย
-                           Container(
+                            Container(
                               width: 500,
                               padding: EdgeInsets.all(20),
                               margin: EdgeInsets.fromLTRB(0, 0, 0, 20),

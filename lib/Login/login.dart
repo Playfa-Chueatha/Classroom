@@ -15,79 +15,98 @@ class Login_class extends StatefulWidget {
 class _Login_classState extends State<Login_class> {
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
+
     return Scaffold(
-      
-      body: Center(       
-        child:  SingleChildScrollView(
-          scrollDirection: Axis.vertical,
-          child: Container(
-            alignment: Alignment.center,            
-            decoration: BoxDecoration(color: Color.fromARGB(255, 147, 235, 241),borderRadius: BorderRadius.circular(20)),
-            height: 750,
-            width: 1000,
-            margin: EdgeInsets.all(40),
-            child: Column(
-              children: [
-                SizedBox(height: 50),
-                Image.asset("assets/images/Eduelite.png",height: 150,width: 150),
-                Text("Wellcome to Eduelite", style: TextStyle(fontSize: 30)),
-                SizedBox(height: 100),
-                Container (
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        child: Column(
-                          children: [
-                            Image.asset("assets/images/ครู.png",width: 200, height: 200,),
-                            const SizedBox(height: 30,),
-                            FilledButton(
-                              onPressed: (){
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(builder: (context) => const Login_T(),),
-                                );
-                              },
-                              style: FilledButton.styleFrom(
-                                backgroundColor: Color.fromARGB(255, 45, 124, 155)), 
-                              child: Text("Teacher", style: TextStyle(fontSize: 20),),)
-                          ],
+      body: Center(
+        child: Container(
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: Color.fromARGB(255, 147, 235, 241),
+            borderRadius: BorderRadius.circular(20),
+          ),
+          height: screenHeight * 0.8, // ใช้ 80% ของความสูงหน้าจอ
+          width: screenWidth * 0.7,  // ใช้ 90% ของความกว้างหน้าจอ
+          margin: EdgeInsets.all(screenWidth * 0.02), 
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Image.asset(
+                "assets/images/Eduelite.png",
+                height: screenHeight * 0.3, // ขนาดของรูปภาพเป็น 20% ของความสูงหน้าจอ
+                width: screenWidth * 0.4, // ขนาดของรูปภาพเป็น 30% ของความกว้างหน้าจอ
+              ),
+              Text(
+                "Wellcome to Eduelite",
+                style: TextStyle(fontSize: screenWidth * 0.02), // ขนาดตัวอักษร 8% ของความกว้างหน้าจอ
+              ),
+              SizedBox(height: screenHeight * 0.01), // ระยะห่างระหว่างข้อความกับปุ่ม
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  // Container สำหรับ Teacher
+                  Container(
+                    child: Column(
+                      children: [
+                        Image.asset(
+                          "assets/images/ครู.png",
+                          width: screenWidth * 0.2, // ขนาดรูปภาพเป็น 40% ของความกว้างหน้าจอ
+                          height: screenHeight * 0.2, // ขนาดรูปภาพเป็น 25% ของความสูงหน้าจอ
                         ),
-                      ),
-
-                      SizedBox(width: 200),
-                      Container(
-                        child: Column(
-                          children: [
-                            Image.asset("assets/images/นักเรียน.png",width: 200, height: 200,),
-                            const SizedBox(height: 30,),
-                            FilledButton(
-                              onPressed: (){
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(builder: (context) => const Login_S()),
-                                );
-                              },
-                              style: FilledButton.styleFrom(
-                              backgroundColor: Color.fromARGB(255, 45, 124, 155)
-                              ), 
-                              child: Text("Student", style: TextStyle(fontSize: 20),),),
-                          ],
+                        SizedBox(height: screenHeight * 0.03), // ระยะห่างจากรูปภาพ
+                        FilledButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => const Login_T()),
+                            );
+                          },
+                          style: FilledButton.styleFrom(
+                            backgroundColor: Color.fromARGB(255, 45, 124, 155),
+                          ),
+                          child: Text(
+                            "Teacher",
+                            style: TextStyle(fontSize: screenWidth * 0.01), // ขนาดตัวอักษร 5% ของความกว้างหน้าจอ
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-
-
-
-                
-              ],
-            )   
-          )
-          
-        )
-        
+                  SizedBox(width: screenWidth * 0.02), // ระยะห่างระหว่างปุ่ม
+                  // Container สำหรับ Student
+                  Container(
+                    child: Column(
+                      children: [
+                        Image.asset(
+                          "assets/images/นักเรียน.png",
+                          width: screenWidth * 0.2, // ขนาดรูปภาพเป็น 40% ของความกว้างหน้าจอ
+                          height: screenHeight * 0.2, // ขนาดรูปภาพเป็น 25% ของความสูงหน้าจอ
+                        ),
+                        SizedBox(height: screenHeight * 0.03), // ระยะห่างจากรูปภาพ
+                        FilledButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => const Login_S()),
+                            );
+                          },
+                          style: FilledButton.styleFrom(
+                            backgroundColor: Color.fromARGB(255, 45, 124, 155),
+                          ),
+                          child: Text(
+                            "Student",
+                            style: TextStyle(fontSize: screenWidth * 0.01), // ขนาดตัวอักษร 5% ของความกว้างหน้าจอ
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
