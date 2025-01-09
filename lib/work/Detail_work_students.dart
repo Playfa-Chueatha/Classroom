@@ -42,32 +42,47 @@ class _Detail_workState extends State<Detail_work_S> {
   bool isLoading = true;
   bool status = false;
   String submitTime = '';
+  List<UpfileLink> linkData = [];
 
   Future<void> _fetchData() async {
     final exam = widget.exam;
-    final response = await http.post(
-      Uri.parse('https://www.edueliteroom.com/connect/fetch_upfileindetail.php'),
-      body: {
-        'type': exam.type,
-        'autoId': exam.autoId.toString(),
-      },
-    );
+    try {
+      final response = await http.post(
+        Uri.parse('https://www.edueliteroom.com/connect/fetch_upfileindetail.php'),
+        body: {
+          'type': exam.type,
+          'autoId': exam.autoId.toString(),
+        },
+      );
+      print(response.body);
 
-    if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
-      setState(() {
-        if (exam.type == 'auswer') {
-          questionData = List<AuswerQuestion>.from(
-            data['auswer_question'].map((item) => AuswerQuestion.fromJson(item)),
-          ).cast<AuswerQuestion>();
-        } else if (exam.type == 'upfile') {
-          fileData = List<Upfile>.from(
-            data['upfile'].map((item) => Upfile.fromJson(item)),
-          ).cast<Upfile>();
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+
+        if (data.containsKey('error')) {
+          print('Error: ${data['error']}');
+          return;
         }
-      });
-    } else {
-      // Handle error
+
+        setState(() {
+          if (exam.type == 'upfile') {
+            fileData = List<Upfile>.from(
+              data['upfile'].map((item) => Upfile.fromJson(item)),
+            ).cast<Upfile>();
+
+            // Fetch upfile links (multiple links)
+            if (data.containsKey('upfile_links')) { // ใช้คีย์ที่ตรงกับ JSON
+              linkData = List<UpfileLink>.from(
+                data['upfile_links'].map((item) => UpfileLink.fromJson(item)),
+              ).cast<UpfileLink>();
+            }
+          }
+        });
+      } else {
+        print('Failed to load data. Status code: ${response.statusCode}');
+      }
+    } catch (error) {
+      print('Error fetching data: $error');
     }
   }
 
@@ -296,7 +311,7 @@ void didUpdateWidget(covariant Detail_work_S oldWidget) {
                         itemBuilder: (context, index) {
                           return ListTile(
                             title: Text(fileData[index].upfileName),
-                            leading: Icon(Icons.attach_file),
+                            leading: Icon(Icons.file_copy),
                             onTap: () {
                               _openFile(fileData[index]);
                             },
@@ -305,6 +320,34 @@ void didUpdateWidget(covariant Detail_work_S oldWidget) {
                       )
                     : Text('ไม่มีไฟล์แนบ', style: TextStyle(color: Colors.grey)),
                     SizedBox(height: 16),
+                    Text('ลิงค์ที่แนบมา:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+                  SizedBox(height: 8),
+                  linkData.isEmpty
+                  ? Text('ไม่มีลิงค์แนบ')
+                  : ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: linkData.length,
+                    itemBuilder: (context, index) {
+                      final link = linkData[index];
+                      return ListTile(
+                        leading: Icon(Icons.link),
+                        title: Text(link.upfileLinkUrl),
+                        onTap: () async {
+                          final url = Uri.parse(link.upfileLinkUrl);
+
+                          // เช็คว่าลิงก์สามารถเปิดได้
+                          if (await canLaunchUrl(url)) {
+                            await launchUrl(url, mode: LaunchMode.externalApplication);
+                          } else {
+                            // แจ้งเตือนเมื่อไม่สามารถเปิดลิงก์ได้
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('ไม่สามารถเปิดลิงก์ได้')),
+                            );
+                          }
+                        },
+                      );
+                    },
+                  ),
                     Text('สถานะการส่งงาาน:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
                     SizedBox(height: 8),
                             if (hasSubmitted) 

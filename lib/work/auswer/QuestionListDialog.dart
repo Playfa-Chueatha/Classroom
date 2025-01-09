@@ -18,6 +18,8 @@ class QuestionListDialog extends StatefulWidget {
 class _QuestionListDialogState extends State<QuestionListDialog> {
   late Future<List<AuswerQuestion>> futureQuestions;
 
+  bool isUpdating = false;  // ตัวแปรสำหรับเช็คสถานะการอัปเดต
+
   @override
   void initState() {
     super.initState();
@@ -26,27 +28,134 @@ class _QuestionListDialogState extends State<QuestionListDialog> {
   }
 
   Future<List<AuswerQuestion>> fetchQuestions(int examsetsId) async {
-    final url = Uri.parse('https://www.edueliteroom.com/connect/fetch_auswerforEdit.php');
+    try {
+      final url = Uri.parse('https://www.edueliteroom.com/connect/fetch_auswerforEdit.php');
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'examsets_id': examsetsId}),
+      );
 
-    final response = await http.post(
-      url,
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({'examsets_id': examsetsId}),
-    );
-
-    if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
-
-      if (data['success'] == true) {
-        return (data['data'] as List)
-            .map((item) => AuswerQuestion.fromJson(item))
-            .toList();
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        if (data['success'] == true) {
+          return (data['data'] as List)
+              .map((item) => AuswerQuestion.fromJson(item))
+              .toList();
+        } else {
+          throw Exception('Failed to fetch questions: ${data['error']}');
+        }
       } else {
-        throw Exception('Failed to fetch questions: ${data['error']}');
+        throw Exception('Failed to connect to API');
       }
-    } else {
-      throw Exception('Failed to connect to API');
+    } catch (e) {
+      throw Exception('Error fetching data: $e');
     }
+  }
+
+  Future<void> updateQuestion(int questionAuto, String questionDetail, int examsetsId) async {
+    setState(() {
+      isUpdating = true;  // ตั้งสถานะเป็นกำลังอัปเดต
+    });
+
+    try {
+      final url = Uri.parse('https://www.edueliteroom.com/connect/update_question_auswer.php');
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'question_auto': questionAuto,
+          'question_detail': questionDetail,
+          'examsets_id': examsetsId,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        if (data['success'] == true) {
+          print('Question updated successfully');
+        } else {
+          _showErrorDialog('เกิดข้อผิดพลาด: ${data['error']}');
+        }
+      } else {
+        _showErrorDialog('ไม่สามารถเชื่อมต่อกับ API');
+      }
+    } catch (e) {
+      _showErrorDialog('เกิดข้อผิดพลาดในการอัปเดตคำถาม');
+    } finally {
+      setState(() {
+        isUpdating = false;  // รีเซ็ตสถานะ
+      });
+    }
+  }
+
+  void _editQuestion(AuswerQuestion question) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        TextEditingController controller = TextEditingController(text: question.questionDetail);
+
+        return AlertDialog(
+          title: Text('แก้ไขคำถาม'),
+          content: TextField(
+            controller: controller,
+            decoration: InputDecoration(hintText: 'กรุณาแก้ไขคำถาม'),
+            maxLines: null,
+          ),
+          actions: [
+            TextButton(
+              onPressed: isUpdating
+                  ? null  // ถ้ากำลังอัปเดต จะไม่สามารถกดได้
+                  : () async {
+                      if (controller.text.trim().isEmpty) {
+                        _showErrorDialog('คำถามไม่สามารถว่างได้');
+                        return;
+                      }
+
+                      await updateQuestion(
+                        question.questionAuto,
+                        controller.text,
+                        question.examsetsId,
+                      );
+
+                      // ถ้าอัปเดตสำเร็จ ก็อัปเดตข้อมูลในรายการ
+                      setState(() {
+                        question.questionDetail = controller.text;
+                      });
+                      Navigator.of(context).pop(); // ปิด Dialog
+                    },
+              child: Text('บันทึก'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // ปิด Dialog โดยไม่ทำการแก้ไข
+              },
+              child: Text('ยกเลิก'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('เกิดข้อผิดพลาด'),
+          content: Text(message),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // ปิด Dialog
+              },
+              child: Text('ปิด'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -55,10 +164,8 @@ class _QuestionListDialogState extends State<QuestionListDialog> {
       future: futureQuestions,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          // แสดง Loading เมื่อกำลังดึงข้อมูล
           return Center(child: CircularProgressIndicator());
         } else if (snapshot.hasError) {
-          // แสดงข้อความเมื่อเกิดข้อผิดพลาด
           return AlertDialog(
             title: Text('เกิดข้อผิดพลาด'),
             content: Text(snapshot.error.toString()),
@@ -70,10 +177,9 @@ class _QuestionListDialogState extends State<QuestionListDialog> {
             ],
           );
         } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
-          // แสดงข้อมูลเมื่อโหลดสำเร็จ
           final questions = snapshot.data!;
           return AlertDialog(
-            title: Text('ตัวอย่างข้อสอบทั้งหมดจำนวน ${questions.length} ข้อ'),
+            title: Text('ตัวอย่างข้อสอบ: ${widget.exam.direction} ทั้งหมดจำนวน ${questions.length} ข้อ คะแนนเต็ม ${widget.exam.fullMark} คะแนน'),
             content: SizedBox(
               width: double.maxFinite,
               child: ListView.builder(
@@ -84,23 +190,27 @@ class _QuestionListDialogState extends State<QuestionListDialog> {
                     color: Color.fromARGB(255, 152, 186, 218),
                     elevation: 4,
                     child: ListTile(
-                      contentPadding: EdgeInsets.all(16),
-                      title: Row(
+                      contentPadding: EdgeInsets.all(10),
+                      title: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            'ข้อที่ ${index + 1}: ',
-                            style: TextStyle(fontWeight: FontWeight.bold),
+                          
+                          Row(
+                            children: [
+                              Text(
+                                'ข้อที่ ${index + 1}: ',
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                              Text(questions[index].questionDetail),
+                            ],                                            
                           ),
-                          Expanded(
-                            child: Text(questions[index].questionDetail),
-                          ),
+                          Text('คะแนน: ${questions[index].questionMark.toString()}', style: TextStyle(color: const Color.fromARGB(255, 11, 70, 119)),)
                         ],
                       ),
                       trailing: IconButton(
                         icon: Icon(Icons.settings),
                         onPressed: () {
-                          // Handle the settings button action here
-                          print('Settings for question ${questions[index].questionDetail}');
+                          _editQuestion(questions[index]);
                         },
                       ),
                     ),
@@ -118,7 +228,6 @@ class _QuestionListDialogState extends State<QuestionListDialog> {
             ],
           );
         } else {
-          // แสดงข้อความเมื่อไม่มีข้อมูล
           return AlertDialog(
             title: Text('ไม่มีข้อสอบ'),
             content: Text('ไม่พบข้อสอบในชุดนี้'),

@@ -28,7 +28,6 @@ class Detail_work extends StatefulWidget {
 }
 
 class _Detail_workState extends State<Detail_work> {
-  final List<String> links = [];
   List<Upfile> fileData = [];
   List<AuswerQuestion> questionData = [];
   List<dynamic> students = [];
@@ -39,6 +38,7 @@ class _Detail_workState extends State<Detail_work> {
   late Future<Map<String, dynamic>> futureData; 
   String errorMessage = '';  
   String? currentFileUrl;
+  List<UpfileLink> linkData = [];
 
   
 
@@ -146,7 +146,8 @@ Future<void> fetchStudentDataFORonechoiceandmanychoice() async {
 
 
 Future<void> _fetchData() async {
-    final exam = widget.exam;
+  final exam = widget.exam;
+  try {
     final response = await http.post(
       Uri.parse('https://www.edueliteroom.com/connect/fetch_upfileindetail.php'),
       body: {
@@ -154,24 +155,37 @@ Future<void> _fetchData() async {
         'autoId': exam.autoId.toString(),
       },
     );
+    print(response.body);
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
+
+      if (data.containsKey('error')) {
+        print('Error: ${data['error']}');
+        return;
+      }
+
       setState(() {
-        if (exam.type == 'auswer') {
-          questionData = List<AuswerQuestion>.from(
-            data['auswer_question'].map((item) => AuswerQuestion.fromJson(item)),
-          ).cast<AuswerQuestion>();
-        } else if (exam.type == 'upfile') {
+        if (exam.type == 'upfile') {
           fileData = List<Upfile>.from(
             data['upfile'].map((item) => Upfile.fromJson(item)),
           ).cast<Upfile>();
+
+          // Fetch upfile links (multiple links)
+          if (data.containsKey('upfile_links')) { // ใช้คีย์ที่ตรงกับ JSON
+            linkData = List<UpfileLink>.from(
+              data['upfile_links'].map((item) => UpfileLink.fromJson(item)),
+            ).cast<UpfileLink>();
+          }
         }
       });
     } else {
-      // Handle error
+      print('Failed to load data. Status code: ${response.statusCode}');
     }
+  } catch (error) {
+    print('Error fetching data: $error');
   }
+}
 
 
 
@@ -265,7 +279,7 @@ void didUpdateWidget(covariant Detail_work oldWidget) {
                       itemBuilder: (context, index) {
                         return ListTile(
                           title: Text(fileData[index].upfileName),
-                          leading: Icon(Icons.attach_file),
+                          leading: Icon(Icons.file_copy),
                           onTap: () {
                             
                             _openFile(fileData[index]);
@@ -275,6 +289,34 @@ void didUpdateWidget(covariant Detail_work oldWidget) {
                     )
                   : Text('ไม่มีไฟล์แนบ'),
                   SizedBox(height: 16),
+                  Text('ลิงค์ที่แนบมา:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+                  SizedBox(height: 8),
+                  linkData.isEmpty
+                  ? Text('ไม่มีลิงค์แนบ')
+                  : ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: linkData.length,
+                    itemBuilder: (context, index) {
+                      final link = linkData[index];
+                      return ListTile(
+                        leading: Icon(Icons.link),
+                        title: Text(link.upfileLinkUrl),
+                        onTap: () async {
+                          final url = Uri.parse(link.upfileLinkUrl);
+
+                          // เช็คว่าลิงก์สามารถเปิดได้
+                          if (await canLaunchUrl(url)) {
+                            await launchUrl(url, mode: LaunchMode.externalApplication);
+                          } else {
+                            // แจ้งเตือนเมื่อไม่สามารถเปิดลิงก์ได้
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('ไม่สามารถเปิดลิงก์ได้')),
+                            );
+                          }
+                        },
+                      );
+                    },
+                  ),
                   Text(
                   'สถานะการปิดรับงาน :',
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
@@ -367,18 +409,18 @@ void didUpdateWidget(covariant Detail_work oldWidget) {
                     );
                   }
 
-                  // กรณีส่งงานหลังวันกำหนด (แสดงจำนวนวันที่เลยกำหนด)
+                  
                   return Padding(
                     padding: const EdgeInsets.symmetric(vertical: 8.0),
                     child: ListTile(
                       title: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          // ข้อมูลนักเรียน
+                          
                           Text(
                             '${student['users_prefix']} ${student['users_thfname']} ${student['users_thlname']} เลขที่: ${student['users_number']} (เลยกำหนด ${difference.inDays} วัน)',
                           ),
-                          // ปุ่ม "ตรวจงาน"
+                         
                           Container(
                             decoration: BoxDecoration(
                               color: const Color.fromARGB(255, 102, 161, 209),
@@ -403,7 +445,7 @@ void didUpdateWidget(covariant Detail_work oldWidget) {
                                     ),
                                   ),
                                 ).then((_) {
-                                  // รีเซ็ตข้อมูลเมื่อกลับมาจากหน้า ChechWorkUpfile
+                                  
                                   setState(() {
                                     currentFileUrl = null;
                                   });
@@ -493,7 +535,7 @@ void didUpdateWidget(covariant Detail_work oldWidget) {
               ],
               SizedBox(height: 16),
               Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   OutlinedButton(
                     onPressed: () {

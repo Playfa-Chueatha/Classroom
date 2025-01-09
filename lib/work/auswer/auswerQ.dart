@@ -256,20 +256,20 @@ Future<void> _submitQuestions(int examsetsId) async {
   }
 
 void updateTotalMarks() {
-  double sum = 0.0;  // เปลี่ยนมาใช้ double เพื่อรองรับทศนิยม
+  double sum = 0.0;  
 
   if (isChecked) {
-    // ถ้าใช้ defaultMark เป็นคะแนนเต็ม
+   
     sum = (double.tryParse(defaultMark.text) ?? 0.0) * _questions.length;
   } else {
-    // ถ้าใช้คะแนนที่กรอกในแต่ละคำถาม
+    
     for (int i = 0; i < questionMarks.length; i++) {
       sum += questionMarks[i];
     }
   }
 
   setState(() {
-    totalMark = sum;  // เก็บคะแนนรวมเป็น double
+    totalMark = sum;  
   });
 }
 
@@ -299,46 +299,56 @@ void updateTotalMarks() {
 }
 
 
-  void _editQuestion(int index) {
-    questionController.text = _questions[index];
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('แก้ไขคำถาม'),
-          content: TextField(
-            controller: questionController,
-            decoration: const InputDecoration(labelText: 'แก้ไขคำถามของคุณ'),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                setState(() {
-                  _questions[index] = questionController.text.trim();
-                });
-                Navigator.of(context).pop();
-              },
-              child: const Text('บันทึก'),
-            ),
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('ยกเลิก'),
-            ),
-          ],
-        );
-      },
-    );
-  }
+  // void _editQuestion(int index) {
+  //   questionController.text = _questions[index];
+  //   showDialog(
+  //     context: context,
+  //     builder: (context) {
+  //       return AlertDialog(
+  //         title: const Text('แก้ไขคำถาม'),
+  //         content: TextField(
+  //           controller: questionController,
+  //           decoration: const InputDecoration(labelText: 'แก้ไขคำถามของคุณ'),
+  //         ),
+  //         actions: [
+  //           TextButton(
+  //             onPressed: () {
+  //               setState(() {
+  //                 _questions[index] = questionController.text.trim();
+  //               });
+  //               Navigator.of(context).pop();
+  //             },
+  //             child: const Text('บันทึก'),
+  //           ),
+  //           TextButton(
+  //             onPressed: () => Navigator.of(context).pop(),
+  //             child: const Text('ยกเลิก'),
+  //           ),
+  //         ],
+  //       );
+  //     },
+  //   );
+  // }
 
   void _removeQuestion(int index) {
-    setState(() {
-      _questions.removeAt(index);
-      questionControllers[index].dispose();
-      markControllers[index].dispose();
-      questionControllers.removeAt(index);
-      markControllers.removeAt(index);
-    });
-  }
+  setState(() {
+    // ลบคำถามและตัวควบคุมที่เกี่ยวข้อง
+    _questions.removeAt(index);
+    questionControllers[index].dispose();
+    markControllers[index].dispose();
+    questionControllers.removeAt(index);
+    markControllers.removeAt(index);
+
+    // ลบคะแนนของคำถามที่ลบออก
+    if (!isChecked) {
+      questionMarks.removeAt(index);
+    }
+
+    // คำนวณคะแนนรวมใหม่
+    updateTotalMarks();
+  });
+}
+
   
   @override
   void dispose() {
@@ -619,28 +629,12 @@ void updateTotalMarks() {
                               children: [
                                 SizedBox(
                                   width: 100,
-                                  child: TextFormField(
-                                    controller: markControllers[index],
-                                    inputFormatters: [
-                                      FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,2}')),
-                                    ],
-                                    decoration: const InputDecoration(labelText: 'คะแนน'),
-                                    keyboardType: TextInputType.number,
-                                    onChanged: (value) {
-                                      if (!isChecked) {
-                                        setState(() {
-                                          
-                                        });
-                                      }
-                                    },
+                                  child: Text(
+                                    markControllers[index].text, // แสดงคะแนน
+                                    style: const TextStyle(fontSize: 16), // กำหนดสไตล์ข้อความ
                                   ),
                                 ),
-                                IconButton(
-                                  icon: const Icon(Icons.edit),
-                                  onPressed: () {
-                                    _editQuestion(index);
-                                  },
-                                ),
+                                
                                 IconButton(
                                   icon: const Icon(Icons.delete),
                                   onPressed: () {

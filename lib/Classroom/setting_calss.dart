@@ -41,6 +41,12 @@ class _SettingCalssState extends State<SettingCalss> {
   void initState() {
     super.initState();
     fetchStudentsInClass();
+    fetchStudentsInClass().then((_) {
+    // เรียงข้อมูลหลังจากที่โหลดข้อมูลแล้ว
+    setState(() {
+      sortStudentsinclass(); // เรียกใช้ฟังก์ชันจัดเรียง
+    });
+  });
   }
 
  Future<void> fetchStudentsInClass() async {
@@ -123,8 +129,8 @@ class _SettingCalssState extends State<SettingCalss> {
   void sortStudentsinclass() {
   if (sortOption == 'users_number') {
     studentsInClass.sort((a, b) => sortAscending
-        ? a['users_number'].compareTo(b['users_number'])
-        : b['users_number'].compareTo(a['users_number']));
+        ? int.parse(a['users_number'].toString()).compareTo(int.parse(b['users_number'].toString()))
+        : int.parse(b['users_number'].toString()).compareTo(int.parse(a['users_number'].toString())));
   } else if (sortOption == 'users_id') {
     studentsInClass.sort((a, b) => sortAscending
         ? a['users_id'].compareTo(b['users_id'])
@@ -139,8 +145,8 @@ class _SettingCalssState extends State<SettingCalss> {
 void sortStudentsremove() {
   if (sortOption == 'users_number') {
     removedStudents.sort((a, b) => sortAscending
-        ? a['users_number'].compareTo(b['users_number'])
-        : b['users_number'].compareTo(a['users_number']));
+        ? int.parse(a['users_number'].toString()).compareTo(int.parse(b['users_number'].toString()))
+        : int.parse(b['users_number'].toString()).compareTo(int.parse(a['users_number'].toString())));
   } else if (sortOption == 'users_id') {
     removedStudents.sort((a, b) => sortAscending
         ? a['users_id'].compareTo(b['users_id'])
@@ -153,6 +159,7 @@ void sortStudentsremove() {
 }
 
 
+
   
 
   @override
@@ -162,7 +169,7 @@ void sortStudentsremove() {
       appBar: AppBar(
         backgroundColor: const Color.fromARGB(255, 152, 186, 218),
         title: Text(
-          'ตั้งค่าห้องเรียน ${widget.classroomName} ${widget.classroomYear}/${widget.classroomNumRoom} (${widget.classroomMajor})',
+          'ตังค่าห้องเรียน'
         ),
         actions: [
           appbarteacher(
@@ -202,12 +209,19 @@ void sortStudentsremove() {
                             Padding(
                               padding: const EdgeInsets.fromLTRB(170, 5, 5, 5),
                               child: ElevatedButton.icon(
-                                onPressed: () {
-                                  showDialog(
+                                onPressed: () async {
+                                  // แสดง dialog เพิ่มห้องเรียน
+                                  bool? result = await showDialog(
                                     context: context,
-                                    builder: (BuildContext context) =>
-                                        AddClassroom(username: widget.username),
+                                    builder: (BuildContext context) => AddClassroom(username: widget.username,thfname: widget.thfname,thlname: widget.thlname,),
                                   );
+
+                                  // ถ้า result เป็น true (บันทึกสำเร็จ), รีเฟรชหน้าหลัก
+                                  if (result == true) {
+                                    setState(() {
+                                      // ที่นี่คุณสามารถรีเฟรชข้อมูลที่แสดงในหน้าแรกได้
+                                    });
+                                  }
                                 },
                                 icon: const Icon(Icons.add),
                                 label: const Text(
@@ -244,48 +258,64 @@ void sortStudentsremove() {
                         child: SingleChildScrollView(
                           scrollDirection: Axis.vertical,
                           child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Container(
-                                height: 850,
-                                width: 1300,
-                                margin: const EdgeInsets.all(20),
-                                decoration: BoxDecoration(
-                                  color: Color.fromARGB(255, 195, 238, 250),
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Padding(
-                                      padding: EdgeInsets.all(26),
-                                      child: Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Text('รายชื่อนักเรียนในห้องเรียน ${widget.classroomName} ${widget.classroomYear}/${widget.classroomNumRoom} (${widget.classroomMajor})',
-                                              style: TextStyle(fontSize: 20)),
+                                          
                                           Container(
                                             child: Row(
+                                              mainAxisAlignment: MainAxisAlignment.end,
                                               children: [
 
+                                                Expanded(
+                                                child:  Padding(padding: EdgeInsets.all(30),child: 
+                                                Text(
+                                                  'รายชื่อนักเรียนในห้องเรียน ${widget.classroomName.isNotEmpty ? widget.classroomName : ''} '
+                                                  '${widget.classroomYear.isNotEmpty ? '${widget.classroomYear}/' : ''}'
+                                                  '${widget.classroomNumRoom.isNotEmpty ? widget.classroomNumRoom : ''} '
+                                                  '${widget.classroomMajor.isNotEmpty ? '(${widget.classroomMajor})' : ''}',
+                                                  style: TextStyle(fontSize: 20)))),
+
                                                 OutlinedButton(
-                                                  onPressed: () {
-                                                    showDialog(
-                                                      context: context,
-                                                      builder: (BuildContext context) {
-                                                        return DialogSearchstudents(
-                                                          classroomName: widget.classroomName,
-                                                          classroomMajor: widget.classroomMajor,
-                                                          classroomNumRoom: widget.classroomNumRoom,
-                                                          classroomYear: widget.classroomYear,
-                                                          thfname: widget.thfname,
-                                                          thlname: widget.thlname,
-                                                          username: widget.username,
-                                                        );
-                                                      },
-                                                    );
-                                                  },
+                                                  onPressed: (widget.classroomName.isNotEmpty &&
+                                                          widget.classroomMajor.isNotEmpty &&
+                                                          widget.classroomNumRoom.isNotEmpty &&
+                                                          widget.classroomYear.isNotEmpty)
+                                                      ? () {
+                                                          showDialog(
+                                                            context: context,
+                                                            builder: (BuildContext context) {
+                                                              return DialogSearchstudents(
+                                                                classroomName: widget.classroomName,
+                                                                classroomMajor: widget.classroomMajor,
+                                                                classroomNumRoom: widget.classroomNumRoom,
+                                                                classroomYear: widget.classroomYear,
+                                                                thfname: widget.thfname,
+                                                                thlname: widget.thlname,
+                                                                username: widget.username,
+                                                              );
+                                                            },
+                                                          );
+                                                        }
+                                                      : null,
+                                                  style: OutlinedButton.styleFrom(
+                                                    side: BorderSide(
+                                                      color: (widget.classroomName.isNotEmpty &&
+                                                              widget.classroomMajor.isNotEmpty &&
+                                                              widget.classroomNumRoom.isNotEmpty &&
+                                                              widget.classroomYear.isNotEmpty)
+                                                          ? Colors.blue
+                                                          : Colors.grey, // สีขอบปุ่ม
+                                                    ),
+                                                    foregroundColor: (widget.classroomName.isNotEmpty &&
+                                                            widget.classroomMajor.isNotEmpty &&
+                                                            widget.classroomNumRoom.isNotEmpty &&
+                                                            widget.classroomYear.isNotEmpty)
+                                                        ? Colors.blue
+                                                        : Colors.grey, // สีข้อความบนปุ่ม
+                                                  ), // ทำให้ปุ่มไม่ทำงานถ้าเงื่อนไขไม่ตรง
                                                   child: Text('เพิ่มนักเรียน'),
                                                 ),
+
                                                 SizedBox(width: 10),
 
                                               DropdownButton<String>(
@@ -294,7 +324,7 @@ void sortStudentsremove() {
                                                 onChanged: (String? newValue) {
                                                   setState(() {
                                                     sortOption = newValue!;
-                                                    sortStudentsinclass(); // เรียกใช้ฟังก์ชันในการเรียงข้อมูล
+                                                    sortStudentsinclass(); 
                                                   });
                                                 },
                                                 items: <String>['users_number', 'users_id']
@@ -309,11 +339,8 @@ void sortStudentsremove() {
                                         
                                               ],
                                             ),
-                                          )
-                                          
-                                        ],
-                                      ),
-                                    ),
+                                          ),
+                                                            
                                     studentsInClass.isEmpty
                                         ? Center(
                                             child: Text(
@@ -473,9 +500,10 @@ void sortStudentsremove() {
                                                     }).toList(),
                                                   ),
                                                 ),
-                                  ],
-                                ),
-                              ),
+                                                SizedBox(height: 50)
+                                  
+                                
+                              
                             ],
                           ),
                         ),

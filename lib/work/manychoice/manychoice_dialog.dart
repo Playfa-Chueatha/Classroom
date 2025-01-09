@@ -37,6 +37,26 @@ class _ManychoiceDialogState extends State<ManychoiceDialog> {
     manyChoiceData = fetchManyChoiceData(widget.exam.autoId.toString());
   }
 
+  final Map<String, String> answerMapping = {
+  'a': 'ก',
+  'b': 'ข',
+  'c': 'ค',
+  'd': 'ง',
+  'e': 'จ',
+  'f': 'ฉ',
+  'g': 'ช',
+  'h': 'ซ',
+};
+
+// แปลงค่าจาก manychoiceAnswer
+String transformManyChoiceAnswer(String manychoiceAnswer) {
+  return manychoiceAnswer
+      .split('') // แยกคำตอบออกเป็นตัวอักษร
+      .map((char) => answerMapping[char]) // แปลงค่าตาม Map
+      .where((value) => value != null) // กรองค่าที่ไม่ได้แมป (null)
+      .join(', '); // รวมกลับด้วยคอมมา
+}
+
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
@@ -75,15 +95,17 @@ class _ManychoiceDialogState extends State<ManychoiceDialog> {
                                 ),
                               ),
                               const SizedBox(height: 8),
-                              _buildChoiceText('A: ', item.manychoiceA),
-                              _buildChoiceText('B: ', item.manychoiceB),
-                              _buildChoiceText('C: ', item.manychoiceC),
-                              _buildChoiceText('D: ', item.manychoiceD),
-                              _buildChoiceText('E: ', item.manychoiceE),
-                              _buildChoiceText('F: ', item.manychoiceF),
+                              _buildChoiceText('ก: ', item.manychoiceA),
+                              _buildChoiceText('ข: ', item.manychoiceB),
+                              _buildChoiceText('ค: ', item.manychoiceC),
+                              _buildChoiceText('ง: ', item.manychoiceD),
+                              _buildChoiceText('จ: ', item.manychoiceE),
+                              _buildChoiceText('ฉ: ', item.manychoiceF),
+                              _buildChoiceText('ช: ', item.manychoiceG),
+                              _buildChoiceText('ซ: ', item.manychoiceH),
                               const SizedBox(height: 8),
                               Text(
-                                'คำตอบที่ถูกต้อง: ${item.manychoiceAnswer}',
+                                'คำตอบที่ถูกต้อง: ${transformManyChoiceAnswer(item.manychoiceAnswer)}',
                                 style: const TextStyle(color: Colors.green),
                               ),
                               const SizedBox(height: 8),

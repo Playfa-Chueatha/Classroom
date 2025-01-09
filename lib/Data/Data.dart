@@ -213,20 +213,47 @@ class Upfile {
   }
 }
 
+//---------------------------------------------------------------
+class UpfileLink {
+  final int upfileLinkAuto;
+  final int examsetsId;
+  final String upfileLinkUrl;
+
+  UpfileLink({
+    required this.upfileLinkAuto,
+    required this.examsetsId,
+    required this.upfileLinkUrl,
+  });
+
+  factory UpfileLink.fromJson(Map<String, dynamic> json) {
+    return UpfileLink(
+      upfileLinkAuto: _parseInt(json['upfile_link_auto']),
+      examsetsId: _parseInt(json['examsets_id']),
+      upfileLinkUrl: json['upfile_link_url'] ?? '',
+    );
+  }
+
+  static int _parseInt(dynamic value) {
+    if (value is int) return value;
+    if (value is String) return int.tryParse(value) ?? 0;
+    return 0; // Default value
+  }
+}
+
 
 //------------------------------------------------------------
 
 class AuswerQuestion {
   final int questionAuto;
   final int examsetsId;
-  final String questionDetail;
+  String questionDetail; // เปลี่ยนเป็น String ธรรมดา
   final double questionMark;
 
   AuswerQuestion({
     required this.questionAuto,
     required this.examsetsId,
     required this.questionDetail,
-    required this.questionMark
+    required this.questionMark,
   });
 
   factory AuswerQuestion.fromJson(Map<String, dynamic> json) {
@@ -235,10 +262,15 @@ class AuswerQuestion {
       examsetsId: int.parse(json['examsets_id']),
       questionDetail: json['question_detail'],
       questionMark: double.parse(json['auswer_question_score']),
-      
     );
   }
+
+  // Setter method สำหรับการปรับปรุงค่า questionDetail
+  set setQuestionDetail(String newDetail) {
+    questionDetail = newDetail;
+  }
 }
+
 
 //---------------------ตัวกรองห้องเรียนเพิ่มเพิ่มงาน----------------------------------------------
 class Classroom {

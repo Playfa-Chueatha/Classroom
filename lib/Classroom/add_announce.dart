@@ -32,12 +32,12 @@ class AnnounceClass extends StatefulWidget {
 
 class _AnnounceClassState extends State<AnnounceClass> {
   final formKey = GlobalKey<FormState>();
-  late String annoncetext ;
-  String? link;
+  late String annoncetext;
+  List<String> links = [];  // เปลี่ยนจาก link เป็น list ของลิงค์
   List<PlatformFile> selectedFiles = []; // เปลี่ยนจาก single file เป็น list
   TextEditingController linkController = TextEditingController();
 
-Future<void> _sendDataToPHP(String title, List<PlatformFile> files, String? link) async {
+  Future<void> _sendDataToPHP(String title, List<PlatformFile> files, List<String> links) async {
   String classroomName = widget.classroomName;
   String classroomMajor = widget.classroomMajor;
   String classroomYear = widget.classroomYear;
@@ -53,7 +53,7 @@ Future<void> _sendDataToPHP(String title, List<PlatformFile> files, String? link
     // เพิ่มข้อมูลฟอร์ม
     request.fields.addAll({
       'posts_title': title,
-      'posts_link': link ?? 'ไม่มี',
+      'posts_link': links.join(','), // เชื่อมลิงค์เป็นสตริง
       'classroom_name': classroomName,
       'classroom_major': classroomMajor,
       'classroom_year': classroomYear,
@@ -63,22 +63,26 @@ Future<void> _sendDataToPHP(String title, List<PlatformFile> files, String? link
 
     // ส่งคำขอไปที่เซิร์ฟเวอร์
     final response = await request.send();
-    
-    // ตรวจสอบผลลัพธ์จากการตอบกลับ
+
     if (response.statusCode == 200) {
       String responseBody = await response.stream.bytesToString();
-      
+
       // แปลงข้อมูล JSON ที่ได้รับจากเซิร์ฟเวอร์
       var jsonResponse = json.decode(responseBody);
-      int postId = int.parse(jsonResponse['post_id']); 
+      int postId = int.parse(jsonResponse['post_id']);
 
-      print('Post saved successfully, Post ID: $postId');
+      // print('Post saved successfully, Post ID: $postId');
 
       // อัปโหลดไฟล์ที่เกี่ยวข้องกับโพสต์
       for (var file in files) {
-        await _saveFileToPost(postId, file);  // ส่งไฟล์ไปยังเซิร์ฟเวอร์
+        await _saveFileToPost(postId, file); 
       }
 
+      // ส่งลิงค์ไปยัง PHP API
+      for (var link in links) {
+        await _sendLinkToAPI(postId, link);
+      }
+      
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('บันทึกข้อมูลสำเร็จ')));
     } else {
       throw 'Server error: ${response.statusCode}';
@@ -87,37 +91,65 @@ Future<void> _sendDataToPHP(String title, List<PlatformFile> files, String? link
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text('เกิดข้อผิดพลาด: $e')),
     );
-    print('Error: $e');
+    print('ErrorPHP: $e');
   }
 }
 
-Future<void> _saveFileToPost(int postId, PlatformFile file) async {
+  Future<void> _saveFileToPost(int postId, PlatformFile file) async {
+    try {
+      var request = http.MultipartRequest(
+        'POST',
+        Uri.parse('https://www.edueliteroom.com/connect/save_file.php'),
+      );
+
+      request.fields['post_id'] = postId.toString();
+
+      request.files.add(http.MultipartFile.fromBytes(
+        'file',
+        file.bytes!,
+        filename: file.name,
+      ));
+
+      
+      final response = await request.send();
+      print('ลิงค์: $links');
+
+      if (response.statusCode == 200) {
+        print('File uploaded successfully');
+      } else {
+        throw 'Error uploading file: ${response.statusCode}';
+      }
+    } catch (e) {
+      print('Errorfile: $e');
+    }
+  }
+
+  Future<void> _sendLinkToAPI(int postId, String link) async {
   try {
-    var request = http.MultipartRequest(
-      'POST',
-      Uri.parse('https://www.edueliteroom.com/connect/save_file.php'),
+    var response = await http.post(
+      Uri.parse('https://www.edueliteroom.com/connect/save_linkpost.php'),
+      headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+      body: {
+        'posts_id': postId.toString(),
+        'link': link,
+      },
     );
 
+    print('Response status: ${response.statusCode}');
+    print('Response body: ${response.body}');
 
-    request.fields['post_id'] = postId.toString();
-
-
-    request.files.add(http.MultipartFile.fromBytes(
-      'file',
-      file.bytes!,
-      filename: file.name,
-    ));
-
-    // ส่งคำขอไปที่เซิร์ฟเวอร์
-    final response = await request.send();
-    
     if (response.statusCode == 200) {
-      print('File uploaded successfully');
+      var jsonResponse = json.decode(response.body);
+      if (jsonResponse['success']) {
+        print('Link uploaded successfully');
+      } else {
+        print('Error uploading link: ${jsonResponse['message']}');
+      }
     } else {
-      throw 'Error uploading file: ${response.statusCode}';
+      throw 'Error uploading link: ${response.statusCode}';
     }
   } catch (e) {
-    print('Error: $e');
+    print('Errorlink: $e');
   }
 }
 
@@ -127,7 +159,12 @@ Future<void> _saveFileToPost(int postId, PlatformFile file) async {
   Widget build(BuildContext context) {
     return AlertDialog(
       backgroundColor: Color.fromARGB(255, 152, 186, 218),
-      title: Center(child: Text("สร้างประกาศใหม่ใน วิชา ${widget.classroomName} ${widget.classroomYear}/${widget.classroomNumRoom} (${widget.classroomMajor}) ")),
+      title: Center(child: Text(
+        'สร้างประกาศใหม่ในวิชา ${widget.classroomName.isNotEmpty ? widget.classroomName : ''} '
+          '${widget.classroomYear.isNotEmpty ? '${widget.classroomYear}/' : ''}'
+          '${widget.classroomNumRoom.isNotEmpty ? widget.classroomNumRoom : ''} '
+          '${widget.classroomMajor.isNotEmpty ? '(${widget.classroomMajor})' : ''}',
+      )),
       content: SizedBox(
         width: MediaQuery.of(context).size.width * 0.8,
         child: Form(
@@ -175,10 +212,10 @@ Future<void> _saveFileToPost(int postId, PlatformFile file) async {
                   ),
                   IconButton(
                     onPressed: () async {
-                      FilePickerResult? result = await FilePicker.platform.pickFiles(allowMultiple: true); // allowMultiple: true เพื่อเลือกหลายไฟล์
+                      FilePickerResult? result = await FilePicker.platform.pickFiles(allowMultiple: true);
                       if (result != null) {
                         setState(() {
-                          selectedFiles = result.files; 
+                          selectedFiles = result.files;
                         });
                       }
                     },
@@ -187,7 +224,38 @@ Future<void> _saveFileToPost(int postId, PlatformFile file) async {
                 ],
               ),
               SizedBox(height: 10),
-              // แสดงชื่อไฟล์ที่เลือก
+
+              if (links.isNotEmpty)
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    ...links.map((link) {
+                      return Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Icon(Icons.link, size: 20),
+                          SizedBox(width: 10),
+                          Expanded(
+                            child: Text(
+                              'ลิงค์ที่กรอก: $link',
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                            ),
+                          ),
+                          IconButton(
+                            icon: Icon(Icons.delete, size: 20),
+                            onPressed: () {
+                              setState(() {
+                                links.remove(link);
+                              });
+                            },
+                          ),
+                        ],
+                      );
+                    }),
+                  ],
+                ),
+              
               if (selectedFiles.isNotEmpty)
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -201,7 +269,7 @@ Future<void> _saveFileToPost(int postId, PlatformFile file) async {
                             icon: Icon(Icons.delete, size: 20),
                             onPressed: () {
                               setState(() {
-                                selectedFiles.remove(file); 
+                                selectedFiles.remove(file);
                               });
                             },
                           ),
@@ -224,7 +292,7 @@ Future<void> _saveFileToPost(int postId, PlatformFile file) async {
                       onPressed: () async {
                         if (formKey.currentState!.validate()) {
                           formKey.currentState!.save();
-                          await _sendDataToPHP(annoncetext, selectedFiles, link);
+                          await _sendDataToPHP(annoncetext, selectedFiles, links);
                           formKey.currentState!.reset();
                           Navigator.pop(context);
                         } else {
@@ -273,8 +341,9 @@ Future<void> _saveFileToPost(int postId, PlatformFile file) async {
             TextButton(
               onPressed: () {
                 setState(() {
-                  link = linkController.text;
+                  links.add(linkController.text); 
                 });
+                linkController.clear();
                 Navigator.of(context).pop();
               },
               child: Text("ตกลง"),

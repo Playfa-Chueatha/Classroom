@@ -69,7 +69,7 @@ class _DoonechoicestudentsState extends State<Doonechoicestudents> {
 
     // ตรวจสอบว่าเลือกคำตอบครบทุกข้อหรือไม่
     if (selectedAnswers.length != data.length) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('กรุณาตอบทุกข้อก่อนส่งคำตอบ')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('กรุณาตอบทุกข้อก่อนส่งคำตอบ'),backgroundColor: Colors.red,  ));
       return; // ไม่ทำการบันทึกคำตอบ
     }
 

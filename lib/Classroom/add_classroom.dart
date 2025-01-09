@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_esclass_2/Classroom/setting_calss.dart';
 import 'package:flutter_esclass_2/Data/Data.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
@@ -8,7 +9,14 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 
 class AddClassroom extends StatefulWidget {
   final String username;
-  const AddClassroom({super.key, required this.username});
+  final String thfname;
+  final String thlname;
+  const AddClassroom({
+    super.key, 
+    required this.username,
+    required this.thfname,
+    required this.thlname,
+  });
 
   @override
   State<AddClassroom> createState() => _AddClassroomState();
@@ -18,6 +26,7 @@ class _AddClassroomState extends State<AddClassroom> {
   final formKey = GlobalKey<FormState>();
   String? selectedclassroom;
   late String Name_class;
+  late String SubjectsID;
   late String Section_class;
   late String Room_year;
   late int Room_No;
@@ -29,6 +38,7 @@ class _AddClassroomState extends State<AddClassroom> {
   Future<void> addClassroom() async {
     var data = {
       'classroom_name': Name_class,
+      'classroom_subjectsID': SubjectsID,
       'classroom_major': Section_class,
       'classroom_year': Room_year,
       'classroom_numroom': Room_No,
@@ -119,6 +129,23 @@ class _AddClassroomState extends State<AddClassroom> {
                   height: screenSize.height * 0.08,
                   width: screenSize.width * 0.3,
                   margin: EdgeInsets.all(10),
+                  child: TextFormField(
+                    decoration: InputDecoration(label: Text("รหัสวิชา", style: TextStyle(fontSize: 20))),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return "กรุณากรอกรหัสวิชา";
+                      }
+                      return null;
+                    },
+                    onSaved: (value) {
+                      SubjectsID = value ?? '';
+                    },
+                  ),
+                ),
+                Container(
+                  height: screenSize.height * 0.08,
+                  width: screenSize.width * 0.3,
+                  margin: EdgeInsets.all(10),
                   child: DropdownButtonFormField<String>(
                     decoration: InputDecoration(label: Text("แผนการเรียน", style: TextStyle(fontSize: 20))),
                     items: sectionOptions.map((String section) {
@@ -172,21 +199,28 @@ class _AddClassroomState extends State<AddClassroom> {
                   height: screenSize.height * 0.08,
                   width: screenSize.width * 0.3,
                   margin: EdgeInsets.all(10),
-                  child: TextFormField(
-                    decoration: InputDecoration(label: Text("ห้อง", style: TextStyle(fontSize: 20))),
-                    keyboardType: TextInputType.number,
-                    inputFormatters: [
-                      FilteringTextInputFormatter.digitsOnly,
-                      LengthLimitingTextInputFormatter(2),
-                    ],
+                  child: DropdownButtonFormField<int>(
+                    decoration: InputDecoration(label: Text("เลือกห้อง", style: TextStyle(fontSize: 20))),
+                    items: List.generate(30, (index) {
+                      int roomNumber = index + 1;
+                      return DropdownMenuItem<int>(
+                        value: roomNumber,
+                        child: Text(roomNumber.toString()),
+                      );
+                    }),
+                    onChanged: (value) {
+                      setState(() {
+                        Room_No = value!;
+                      });
+                    },
                     validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return "กรุณากรอกหมายเลขห้อง";
+                      if (value == null) {
+                        return "กรุณาเลือกหมายเลขห้อง";
                       }
                       return null;
                     },
                     onSaved: (value) {
-                      Room_No = int.parse(value!);
+                      Room_No = value!;
                     },
                   ),
                 ),
@@ -194,21 +228,28 @@ class _AddClassroomState extends State<AddClassroom> {
                   height: screenSize.height * 0.08,
                   width: screenSize.width * 0.3,
                   margin: EdgeInsets.all(10),
-                  child: TextFormField(
+                  child: DropdownButtonFormField<int>(
                     decoration: InputDecoration(label: Text("ปีการศึกษา", style: TextStyle(fontSize: 20))),
-                    keyboardType: TextInputType.number,
-                    inputFormatters: [
-                      FilteringTextInputFormatter.digitsOnly,
-                      LengthLimitingTextInputFormatter(4),
-                    ],
+                    items: List.generate(6, (index) {
+                      int year = 2565 + index; // สร้างปีการศึกษา 2565 ถึง 2570
+                      return DropdownMenuItem<int>(
+                        value: year,
+                        child: Text(year.toString()),
+                      );
+                    }),
+                    onChanged: (value) {
+                      setState(() {
+                        School_year = value!;
+                      });
+                    },
                     validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return "กรุณากรอกปีการศึกษา";
+                      if (value == null) {
+                        return "กรุณาเลือกปีการศึกษา";
                       }
                       return null;
                     },
                     onSaved: (value) {
-                      School_year = int.parse(value!);
+                      School_year = value!;
                     },
                   ),
                 ),
@@ -242,6 +283,19 @@ class _AddClassroomState extends State<AddClassroom> {
                       if (formKey.currentState!.validate()) {
                         formKey.currentState!.save();
                         await addClassroom();
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(builder: (context) => SettingCalss(
+                            username: widget.username,
+                            classroomMajor: '',
+                            classroomName: '',
+                            classroomNumRoom: '',
+                            classroomYear: '',
+                            thfname: widget.thfname,
+                            thlname: widget.thlname,
+                            
+                            )),
+                        );
                       }
                     },
                     child: Text("สร้างห้องเรียน", style: TextStyle(fontSize: 20)),
@@ -252,6 +306,14 @@ class _AddClassroomState extends State<AddClassroom> {
           ),
         ),
       ),
+      actions: [
+        TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text('ปิด'),
+              ),
+      ],
     );
   }
 }

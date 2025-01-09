@@ -54,6 +54,7 @@ class _ProfiletState extends State<Profiles> {
     final response = await http.get(Uri.parse('https://www.edueliteroom.com/connect/User_students.php?username=${widget.username}'));
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
+      print(response.body);
       if (data['error'] == null) {
         setState(() {
           Student = Studentclass.fromJson(data); 
@@ -113,7 +114,7 @@ class _ProfiletState extends State<Profiles> {
         'users_classroom': classroomController.text,
         'users_numroom': numroomController.text,
         'users_parentphone': parentPhoneController.text,
-        'usert_major': majorController.text,
+        'users_major': majorController.text,
         'users_number': numroomController.text,
       },
     );
@@ -281,11 +282,38 @@ class _ProfiletState extends State<Profiles> {
 
         
         _buildTextField('ห้อง:', numroomController),
-        _buildTextField('แผนการเรียน:', majorController),
+       DropdownButtonFormField<String>(
+      decoration: const InputDecoration(
+        label: Text(
+          "กรุณาเลือกแผนการเรียน",
+        ),
+      ),
+      value: sectionOptions.contains(majorController.text)
+          ? majorController.text 
+          : null, // ใช้ค่าใน majorController แทน
+      items: sectionOptions.map((section) {
+        return DropdownMenuItem(
+          value: section,
+          child: Text(section),
+        );
+      }).toList(),
+      onChanged: (value) {
+        setState(() {
+          majorController.text = value ?? ""; // อัปเดตค่าที่เลือกใน majorController
+        });
+      },
+      validator: (value) => value == null ? 'กรุณาเลือกแผนการเรียน' : null,
+    ),
+
+    SizedBox(height: 20),
+        Padding(
+          padding: EdgeInsets.all(20),
+          child: 
+        
         ElevatedButton(
           onPressed: saveChanges,
           child: Text('บันทึกการเปลี่ยนแปลง'),
-        ),
+        )),
       ],
     ),
   );

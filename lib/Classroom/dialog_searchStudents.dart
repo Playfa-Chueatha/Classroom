@@ -31,6 +31,9 @@ class _DialogSearchstudentsState extends State<DialogSearchstudents> {
   List<dynamic> studentlist = [];
   List<dynamic> filteredStudents = [];
   bool isLoading = true;
+  List<String> usersAuto = [];
+  List<String> addedStudentIds = [];
+  
 
   String? selectedSection;
   String? sectionClass;
@@ -43,41 +46,88 @@ class _DialogSearchstudentsState extends State<DialogSearchstudents> {
   void initState() {
     super.initState();
     fetchStudents();
+    fetchClassroomData();
   }
-
+  //เพิ่มนักเรียนเข้าห้องเรียน
   Future<void> addStudentToClass(Map<String, dynamic> student) async {
-    final response = await http.get(
-      Uri.parse(
-        'https://www.edueliteroom.com/connect/add_student_toclass.php?' 
-        'classroomName=${widget.classroomName}&classroomMajor=${widget.classroomMajor}'
-        '&classroomYear=${widget.classroomYear}&classroomNumRoom=${widget.classroomNumRoom}'
-        '&usersId=${student['users_id']}',
-      ),
-    );
+  final response = await http.get(
+    Uri.parse(
+      'https://www.edueliteroom.com/connect/add_student_toclass.php?' 
+      'classroomName=${widget.classroomName}&classroomMajor=${widget.classroomMajor}'
+      '&classroomYear=${widget.classroomYear}&classroomNumRoom=${widget.classroomNumRoom}'
+      '&usersId=${student['users_id']}',
+    ),
+  );
 
-    if (response.statusCode == 200) {
-      final data = json.decode(response.body);
-      if (data['status'] == 'success') {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('เพิ่มนักเรียนลงในห้องเรียนสำเร็จ')),
-        );
-        // อัพเดทข้อมูล UI หรือทำสิ่งที่ต้องการเมื่อเพิ่มสำเร็จ
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('ไม่สามารถเพิ่มนักเรียนได้')),
-        );
-      }
+  if (response.statusCode == 200) {
+    final data = json.decode(response.body);
+    if (data['status'] == 'success') {
+      
+      setState(() {
+        // เพิ่ม users_id ของนักเรียนที่เพิ่มลงในห้องเรียน
+        usersAuto.add(student['users_auto']);
+      });
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('เกิดข้อผิดพลาดในการเพิ่มนักเรียน')),
+        const SnackBar(content: Text('ไม่สามารถเพิ่มนักเรียนได้')),
       );
     }
+  } else {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('เกิดข้อผิดพลาดในการเพิ่มนักเรียน')),
+    );
   }
+}
+
+
   
 
 
+  Future<void> fetchClassroomData() async {
+    final uri = Uri.parse(
+        'https://www.edueliteroom.com/connect/fetch_classroom_data.php?classroomName=${widget.classroomName}&classroomMajor=${widget.classroomMajor}&classroomYear=${widget.classroomYear}&classroomNumRoom=${widget.classroomNumRoom}');
+    
+    final response = await http.get(uri);
+    print(response.body);
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      if (data['status'] == 'success') {
+        setState(() {
+          isLoading = false;
+          usersAuto = List<String>.from(data['users_auto']);
+          
+        });
+      } else {
+        setState(() {
+          isLoading = false;
+        });
+        _showErrorAlert('ไม่พบข้อมูลห้องเรียน');
+      }
+    } else {
+      setState(() {
+        isLoading = false;
+      });
+      _showErrorAlert('เกิดข้อผิดพลาดในการเชื่อมต่อกับเซิร์ฟเวอร์');
+    }
+  }
 
-
+  void _showErrorAlert(String message) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => AlertDialog(
+        title: const Text('เกิดข้อผิดพลาด'),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('ปิด'),
+          ),
+        ],
+      ),
+    );
+  }
+  
   Future<void> fetchStudents() async {
     final response = await http.get(
       Uri.parse(
@@ -99,6 +149,8 @@ class _DialogSearchstudentsState extends State<DialogSearchstudents> {
     }
   }
 
+
+  //แสดงนักเรียนค้นหาจากตัวกรอก
   Future<void> searchStudents() async {
     final queryParams = {
       if (idController.text.isNotEmpty) 'id': idController.text,
@@ -115,6 +167,7 @@ class _DialogSearchstudentsState extends State<DialogSearchstudents> {
 
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
+      // print(response.body);
       setState(() {
         filteredStudents = data['students'] ?? [];
         if (filteredStudents.isEmpty) _showNoDataAlert();
@@ -275,21 +328,37 @@ class _DialogSearchstudentsState extends State<DialogSearchstudents> {
   }
 
   DataRow _buildDataRow(Map<String, dynamic> student) {
-    return DataRow(
-      cells: [
-        DataCell(Text(student['users_id'])),
-        DataCell(Text(student['users_thfname'])),
-        DataCell(Text(student['users_thlname'])),
-        DataCell(Text(student['users_classroom'])),
-        DataCell(Text(student['users_numroom'])),
-        DataCell(Text(student['users_major'])),
-        DataCell(IconButton(
-          onPressed: (){addStudentToClass(student);},
-          icon: const Icon(Icons.add),
-        )),
-      ],
-    );
-  }
+  // ตรวจสอบว่า users_auto ของนักเรียนตรงกับค่าที่ได้จาก fetchClassroomData หรือ searchStudents หรือไม่
+  bool isStudentAlreadyInClass = usersAuto.contains(student['users_auto']);
+
+  return DataRow(
+    cells: [
+      DataCell(Text(student['users_id'])),
+      DataCell(Text(student['users_thfname'])),
+      DataCell(Text(student['users_thlname'])),
+      DataCell(Text(student['users_classroom'])),
+      DataCell(Text(student['users_numroom'])),
+      DataCell(Text(student['users_major'])),
+      DataCell(
+        isStudentAlreadyInClass
+            ? Icon(Icons.check, color: Colors.green) // แสดงเครื่องหมายเช็คถูก
+            : IconButton(
+                onPressed: () {
+                  // เปลี่ยนสถานะเป็น true ทันทีเพื่อแสดงเครื่องหมายเช็คถูก
+                  setState(() {
+                    isStudentAlreadyInClass = true; // เปลี่ยนค่าทันที
+                  });
+                  addStudentToClass(student); // เมื่อไม่ตรงให้เพิ่มนักเรียน
+                },
+                icon: const Icon(Icons.add),
+              ),
+      )
+
+    ],
+  );
+}
+
+
 
   Widget _buildTextField({required TextEditingController controller, required String label}) {
     return Container(

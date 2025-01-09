@@ -61,14 +61,6 @@ class _List_classroomState extends State<List_classroom> {
         title: Text('ห้องเรียนของฉัน'),
         automaticallyImplyLeading: false,
         backgroundColor: Colors.white,
-        actions: [
-          IconButton(
-            icon: Icon(Icons.refresh),
-            onPressed: () {
-              fetchClassrooms();  
-            },
-          ),
-        ],
       ),
       body: ListView.builder(
         itemCount: classrooms.length,

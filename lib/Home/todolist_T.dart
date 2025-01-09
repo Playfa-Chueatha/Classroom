@@ -44,12 +44,7 @@ class _TodocalssState extends State<Todocalss_T> {
       );
 
       if (response.statusCode == 200) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('เพิ่ม To-Do สำเร็จ!'),
-            backgroundColor: Colors.green,
-          ),
-        );
+      
         fetchTodosFromDatabase(); 
       } else {
         final responseData = json.decode(response.body);
@@ -260,7 +255,7 @@ class _TodocalssState extends State<Todocalss_T> {
                             onPressed: () {
                               _updateTodoStatus(datatodolist_t.indexOf(filteredTodos[index]), 'Inactive');
                               setState(() {
-                                 datatodolist_t.remove(filteredTodos[index]);
+                                fetchTodosFromDatabase();
                               });
                             },
                             icon: Icon(Icons.cancel_outlined),

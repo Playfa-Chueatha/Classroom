@@ -250,20 +250,42 @@ class _CheckworkTeacherState extends State<CheckworkTeacher> {
                 onPressed: () async {
                   try {
                     final submissions = await userSubmissionFuture;
+                    bool allScoresEntered = true;  // ตัวแปรตรวจสอบการกรอกคะแนน
+
                     for (final submission in submissions.submissions) {
                       final controller = controllers[submission.questionId];
-                      if (controller == null || (controller.text.isEmpty && controller.text != '0')) {
-                        continue;
-                      }
 
-                      await submitScore(
-                        questionId: submission.questionId,
-                        questionDetail: submission.questionDetail,
-                        checkworkScore: controller.text,
-                        usersUsername: submissions.usersUsername,
-                        examAutoId: widget.exam.autoId.toString(),
-                        total: total,
+                      // ตรวจสอบว่า controller.text ว่างหรือไม่
+                      if (controller == null || controller.text.isEmpty) {
+                        allScoresEntered = false;
+                        break; // ออกจากลูปหากพบคำถามที่ไม่มีการกรอกคะแนน
+                      }
+                    }
+
+                    // หากไม่มีการกรอกคะแนนในคำถามใดๆ แสดง SnackBar แจ้งเตือน
+                    if (!allScoresEntered) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('กรุณากรอกคะแนนให้ครบทุกคำถาม'),
+                          backgroundColor: Colors.red,
+                        ),
                       );
+                      return;  // หยุดการดำเนินการหากไม่มีการกรอกคะแนน
+                    }
+
+                    // หากทุกคำถามกรอกคะแนนแล้ว, ทำการบันทึกข้อมูล
+                    for (final submission in submissions.submissions) {
+                      final controller = controllers[submission.questionId];
+                      if (controller != null && controller.text.isNotEmpty) {
+                        await submitScore(
+                          questionId: submission.questionId,
+                          questionDetail: submission.questionDetail,
+                          checkworkScore: controller.text,
+                          usersUsername: submissions.usersUsername,
+                          examAutoId: widget.exam.autoId.toString(),
+                          total: total,
+                        );
+                      }
                     }
 
                     ScaffoldMessenger.of(context).showSnackBar(
@@ -295,7 +317,7 @@ class _CheckworkTeacherState extends State<CheckworkTeacher> {
                   }
                 },
                 child: Text('บันทึกคะแนนทั้งหมด'),
-              ),
+              )
             ),
           ],
         ),

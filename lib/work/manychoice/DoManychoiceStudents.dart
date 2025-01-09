@@ -32,6 +32,7 @@ class _DomanychoicestudentsState extends State<Domanychoicestudents> {
       Uri.parse('https://www.edueliteroom.com/connect/fetch_manychoiceforEdit.php'),
       body: {'examsets_id': examId},
     );
+    print(response.body);
 
     if (response.statusCode == 200) {
       final List<dynamic> data = json.decode(response.body);
@@ -49,7 +50,7 @@ class _DomanychoicestudentsState extends State<Domanychoicestudents> {
 
     // ตรวจสอบว่าเลือกคำตอบครบทุกข้อหรือไม่
     if (selectedAnswers.length != data.length) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('กรุณาตอบทุกข้อก่อนส่งคำตอบ')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('กรุณาตอบทุกข้อก่อนส่งคำตอบ'),backgroundColor: Colors.red,  ));
       return;
     }
 
@@ -184,6 +185,8 @@ class _DomanychoicestudentsState extends State<Domanychoicestudents> {
                         if (manyChoice.manychoiceD.isNotEmpty) options.add(buildCheckboxOption(manyChoice, 'D', manyChoice.manychoiceD, manyChoice.manychoiceAuto));
                         if (manyChoice.manychoiceE.isNotEmpty) options.add(buildCheckboxOption(manyChoice, 'E', manyChoice.manychoiceE, manyChoice.manychoiceAuto));
                         if (manyChoice.manychoiceF.isNotEmpty) options.add(buildCheckboxOption(manyChoice, 'F', manyChoice.manychoiceF, manyChoice.manychoiceAuto));
+                        if (manyChoice.manychoiceF.isNotEmpty) options.add(buildCheckboxOption(manyChoice, 'G', manyChoice.manychoiceF, manyChoice.manychoiceAuto));
+                        if (manyChoice.manychoiceF.isNotEmpty) options.add(buildCheckboxOption(manyChoice, 'H', manyChoice.manychoiceF, manyChoice.manychoiceAuto));
 
                         return Card(
                           margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
@@ -242,6 +245,8 @@ class _DomanychoicestudentsState extends State<Domanychoicestudents> {
       'D': 'ง',
       'E': 'จ',
       'F': 'ฉ',
+      'G': 'ช',
+      'H': 'ซ'
     };
 
     String displayOption = optionMapping[option] ?? option; // แสดงผลตามที่กำหนดใน optionMapping

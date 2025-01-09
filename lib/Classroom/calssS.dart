@@ -201,114 +201,121 @@ Future<void> _getUnreadNotifications() async {
                                             borderRadius: BorderRadius.circular(12.0),
                                           ),
                                           elevation: 8,
-                                          child: Row(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                          child: Stack(                                          
                                             children: [
                                               Padding(
-                                                padding: const EdgeInsets.all(20),
-                                                child: Image.asset(
-                                                  "assets/images/ครู.png",
-                                                  height: 50,
-                                                  width: 50,
-                                                ),
-                                              ),
-                                              Expanded(
+                                                padding: const EdgeInsets.all(20.0),
                                                 child: Column(
                                                   crossAxisAlignment: CrossAxisAlignment.start,
                                                   children: [
-                                                    Padding(padding: EdgeInsets.all(10),
-                                                    child: 
-                                                    Text(
-                                                      "โดย ${post['usert_thfname']} ${post['usert_thlname']}",
-                                                      style: const TextStyle(
-                                                        fontSize: 14,
-                                                        color: Color.fromARGB(255, 66, 65, 65),
-                                                      ),
-                                                    )),
-                                                    const SizedBox(height: 10),
-                                                    Container(
-                                                      width: double.infinity,
-                                                      padding: const EdgeInsets.all(20),
-                                                      decoration: BoxDecoration(
-                                                        borderRadius: BorderRadius.circular(20),
-                                                        color: Colors.white,
-                                                      ),
-                                                      child: Text(
-                                                        post['posts_title'],
-                                                        style: const TextStyle(fontSize: 20),
-                                                      ),
-                                                    ),
-                                                    const SizedBox(height: 16),
-                                                    const Text("ลิงค์ที่แนบมา:", style: TextStyle(fontSize: 18)),
-                                                    const SizedBox(height: 10),
-                                                    InkWell(
-                                                      onTap: post['posts_link'] != null
-                                                          ? () => _launchURL(post['posts_link'])  
-                                                          : null,  
-                                                      child: post['posts_link'] != null
-                                                          ? ListTile(
-                                                              leading: const Icon(Icons.link, color: Colors.blue),  
-                                                              title: Text(
-                                                                post['posts_link'],  
-                                                                style: TextStyle(
-                                                                  color: Colors.blue,  
-                                                                  fontSize: 16,
+                                                    Row(
+                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                      children: [
+                                                        Image.asset(
+                                                          "assets/images/ครู.png",
+                                                          height: 50,
+                                                          width: 50,
+                                                        ),
+                                                        Expanded(
+                                                          child: Padding(
+                                                            padding: const EdgeInsets.only(left: 10.0),
+                                                            child: Column(
+                                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                                              children: [
+                                                                Text(
+                                                                  "โดย ${post['usert_thfname']} ${post['usert_thlname']}",
+                                                                  style: const TextStyle(
+                                                                    fontSize: 14,
+                                                                    color: Color.fromARGB(255, 66, 65, 65),
+                                                                  ),
                                                                 ),
-                                                              ),
-                                                            )
-                                                          : const Text(
-                                                              'ไม่มีลิงค์แนบ',  
-                                                              style: TextStyle(
-                                                                fontSize: 14,
-                                                                color: Color.fromARGB(255, 80, 79, 79),  
-                                                              ),
-                                                            ),
-                                                    ),
-                                                    const SizedBox(height: 16),
-                                                    const Text("ไฟล์ที่แนบมา:", style: TextStyle(fontSize: 18)),
-                                                    const SizedBox(height: 10),
-                                                    post['files'] != null && post['files'].isNotEmpty
-                                                        ? ListView.builder(
-                                                            shrinkWrap: true,
-                                                            itemCount: post['files'].length,
-                                                            physics: NeverScrollableScrollPhysics(), // เพื่อไม่ให้ ListView ภายในเลื่อนเอง
-                                                            itemBuilder: (context, index) {
-                                                              final file = post['files'][index];
-                                                              final fileName = file['file_name'] ?? 'Unknown';
-                                                              final fileSize = file['file_size'] ?? ' ';
-                                                              final fileUrl = file['file_url'] ?? '';
+                                                                const SizedBox(height: 10),
+                                                                Container(
+                                                                  width: double.infinity,
+                                                                  padding: const EdgeInsets.all(20),
+                                                                  decoration: BoxDecoration(
+                                                                    borderRadius: BorderRadius.circular(20),
+                                                                    color: Colors.white,
+                                                                  ),
+                                                                  child: Text(
+                                                                    post['posts_title'],
+                                                                    style: const TextStyle(fontSize: 20),
+                                                                  ),
+                                                                ),
+                                                                const SizedBox(height: 16),
+                                                                const Text("ลิงค์ที่แนบมา:", style: TextStyle(fontSize: 18)),
+                                                                const SizedBox(height: 10),
+                                                                InkWell(
+                                                                  onTap: post['posts_link'] != null ? () => _launchURL(post['posts_link']) : null,
+                                                                  child: post['posts_link'] != null
+                                                                      ? ListTile(
+                                                                          leading: const Icon(Icons.link, color: Colors.blue),
+                                                                          title: Text(
+                                                                            post['posts_link'],
+                                                                            style: TextStyle(
+                                                                              color: Colors.blue,
+                                                                              fontSize: 16,
+                                                                            ),
+                                                                          ),
+                                                                        )
+                                                                      : const Text(
+                                                                          'ไม่มีลิงค์แนบ',
+                                                                          style: TextStyle(fontSize: 14, color: Color.fromARGB(255, 80, 79, 79)),
+                                                                        ),
+                                                                ),
+                                                                const SizedBox(height: 16),
+                                                                const Text("ไฟล์ที่แนบมา:", style: TextStyle(fontSize: 18)),
+                                                                const SizedBox(height: 10),
+                                                                post['files'] != null && post['files'].isNotEmpty
+                                                                    ? ListView.builder(
+                                                                        shrinkWrap: true,
+                                                                        itemCount: post['files'].length,
+                                                                        physics: const NeverScrollableScrollPhysics(),
+                                                                        itemBuilder: (context, index) {
+                                                                          final file = post['files'][index];
+                                                                          final fileName = file['file_name'] ?? 'Unknown';
+                                                                          final fileSize = file['file_size'] ?? '';
+                                                                          final fileUrl = file['file_url'] ?? '';
 
-                                                              return ListTile(
-                                                                leading: const Icon(Icons.attach_file),
-                                                                title: Text(
-                                                                  "$fileName ($fileSize)",
-                                                                  style: const TextStyle(color: Colors.blue, fontSize: 16),
-                                                                ),
-                                                                onTap: () => _openFile(fileUrl),
-                                                              );
-                                                            },
-                                                          )
-                                                        : const Text(
-                                                            'ไม่มีไฟล์แนบ',
-                                                            style: TextStyle(fontSize: 14, color: Color.fromARGB(255, 80, 79, 79)),
+                                                                          return ListTile(
+                                                                            leading: const Icon(Icons.attach_file),
+                                                                            title: Text(
+                                                                              "$fileName ($fileSize)",
+                                                                              style: const TextStyle(color: Colors.blue, fontSize: 16),
+                                                                            ),
+                                                                            onTap: () => _openFile(fileUrl),
+                                                                          );
+                                                                        },
+                                                                      )
+                                                                    : const Text(
+                                                                        'ไม่มีไฟล์แนบ',
+                                                                        style: TextStyle(fontSize: 14, color: Color.fromARGB(255, 80, 79, 79)),
+                                                                      ),
+                                                              ],
+                                                            ),
                                                           ),
-                                                        
-                                                        SizedBox(height: 20)
+                                                        ),
+                                                      ],
+                                                    ),
                                                   ],
                                                 ),
                                               ),
-                                              IconButton(
-                                                onPressed: () {
-                                                  showDialog(
-                                                    context: context,
-                                                    builder: (BuildContext context) => Comment_inclass(
-                                                      username: widget.username,
-                                                      postId: post['posts_auto'],
-                                                      ClassroomID: post['classroom_id'],
-                                                    ),
-                                                  );
-                                                },
-                                                icon: const Icon(Icons.comment, size: 25),
+                                              Positioned(
+                                                bottom: 8,
+                                                right: 16,
+                                                child: IconButton(
+                                                  icon: const Icon(Icons.comment, size: 25),
+                                                  onPressed: () {
+                                                    showDialog(
+                                                      context: context,
+                                                      builder: (BuildContext context) => Comment_inclass(
+                                                        username: widget.username,
+                                                        postId: post['posts_auto'],
+                                                        ClassroomID: post['classroom_id'],
+                                                      ),
+                                                    );
+                                                  },
+                                                ),
                                               ),
                                             ],
                                           ),

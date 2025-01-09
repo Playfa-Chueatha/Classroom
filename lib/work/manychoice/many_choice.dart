@@ -438,10 +438,12 @@ bool _isQuestionFilled(int index) {
   }
 
   void _addChoice(int index) {
-    setState(() {
+  setState(() {
+    if (_questions[index].choices.length < 8) {  // ตรวจสอบจำนวนตัวเลือก
       _questions[index].choices.add(Choice(_questions[index]._nextChoiceLabel()));
-    });
-  }
+    }
+  });
+}
 
   
 
@@ -456,6 +458,7 @@ bool _isQuestionFilled(int index) {
       setState(() {
         _savedQuestions.removeAt(index); 
       });
+       _calculateTotalMarks();
     }
 
 
@@ -744,6 +747,7 @@ bool _isQuestionFilled(int index) {
                           );
                         } else {
                           _submitAssignment();
+                          
                         }
                       },
                       child: Text('มอบหมายงาน'),
@@ -870,7 +874,10 @@ bool _isQuestionFilled(int index) {
               ),
             SizedBox(height: 10),
             ElevatedButton(
-              onPressed: () => _addChoice(index),
+              onPressed: _questions[index].choices.length < 8 ? () => _addChoice(index) : null,  // ปุ่มจะถูก disabled เมื่อมี 8 ตัวเลือก
+              style: ElevatedButton.styleFrom(
+                backgroundColor: _questions[index].choices.length < 8 ? const Color.fromARGB(255, 255, 255, 255) : Colors.grey,  // เปลี่ยนสีปุ่ม
+              ),
               child: Text('เพิ่มตัวเลือก'),
             ),
             SizedBox(height: 20),
@@ -921,11 +928,38 @@ bool _isQuestionFilled(int index) {
           ),
            ElevatedButton(
               onPressed: () {
-                
+                // ตรวจสอบว่ามีการเลือก Checkbox อย่างน้อยหนึ่งข้อหรือไม่
+                if (question.selectedAnswers.isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('กรุณาเลือกคำตอบที่ถูกต้องอย่างน้อย 1 ข้อ'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                  return;
+                }
+
+                // ตรวจสอบสถานะ isChecked และตั้งค่าคะแนน
                 if (isChecked) {
                   question.fullMarkinchoiceController.text = defaultMark.text;
                 }
+
+                // ตรวจสอบว่ากรอกคะแนนหรือไม่
+                if (question.fullMarkinchoiceController.text.isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('กรุณากรอกคะแนนก่อนบันทึกคำถาม ${question.fullMarkinchoiceController.text}'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                  return;
+                }
+
+                
+
+                // บันทึกคำถาม
                 _saveQuestion(index);
+                print(question.fullMarkinchoiceController.text);
               },
               child: Text('บันทึกคำถาม'),
             ),

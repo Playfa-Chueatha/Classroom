@@ -68,6 +68,7 @@ class _CommentState extends State<Comment_inclass> {
       setState(() {
         isLoading = false;
       });
+      print(response.body);
 
       if (response.statusCode == 200) {
         try {
@@ -94,6 +95,41 @@ class _CommentState extends State<Comment_inclass> {
     }
   }
 
+  Future<Map<String, dynamic>> deleteComment(String username, int commentAuto) async {
+  final response = await http.post(
+    Uri.parse('https://www.edueliteroom.com/connect/delete_comment.php'),
+    body: {
+      'username': username,
+      'comment_auto': commentAuto.toString(),
+    },
+  );
+  print(response.body);
+
+  if (response.statusCode == 200) {
+    // ตรวจสอบว่าตอบกลับเป็น JSON หรือไม่
+    try {
+      final data = json.decode(response.body);
+      if (data['success'] == true) {
+        setState(() {
+          _fetchComments();  // ดึงข้อมูลคอมเมนต์ใหม่
+        });
+        return data;
+      } else {
+        return {'success': false, 'error': data['error'] ?? 'Unknown error'};
+      }
+    } catch (e) {
+      print('Error decoding JSON: $e');
+      // ตรวจสอบ response.body ว่าเป็น HTML หรือไม่
+      print('Response body: ${response.body}');
+      return {'success': false, 'error': 'Invalid JSON format'};
+    }
+  } else {
+    return {'success': false, 'error': 'Failed to connect to API'};
+  }
+}
+
+
+
   @override
   void initState() {
     super.initState();
@@ -106,8 +142,7 @@ class _CommentState extends State<Comment_inclass> {
     final screenHeight = MediaQuery.of(context).size.height;
 
     return AlertDialog(
-      actions: [
-        SingleChildScrollView(
+      content: SingleChildScrollView(
           scrollDirection: Axis.vertical,
           child: Form(
             key: formKey,
@@ -130,6 +165,9 @@ class _CommentState extends State<Comment_inclass> {
                       : ListView.builder(
                           itemCount: comments.length,
                           itemBuilder: (context, index) {
+
+                            bool canDelete = comments[index]["comment_username"] == widget.username;
+
                             return Card(
                               margin: EdgeInsets.all(10),
                               color: Color.fromARGB(255, 156, 204, 219),
@@ -137,23 +175,52 @@ class _CommentState extends State<Comment_inclass> {
                                 borderRadius: BorderRadius.circular(12.0),
                               ),
                               elevation: 8,
-                              child: Column(
+                              child: Stack(
                                 children: [
-                                  Row(
+                                  // ส่วนของ Row ที่มีข้อมูลของคอมเมนต์
+                                  Column(
                                     children: [
-                                      Padding(
-                                        padding: EdgeInsets.fromLTRB(20, 5, 0, 5),
-                                        child: Image.asset("assets/images/นักเรียน.png", height: 50, width: 50),
-                                      ),
-                                      Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                      Row(
                                         children: [
-                                          Text('By: ${comments[index]["thfname"]} ${comments[index]["thlname"]}', style: TextStyle(fontSize: 14, fontStyle: FontStyle.italic)),
-                                          Text(comments[index]["comment_title"], style: TextStyle(fontSize: 20)),
+                                          Padding(
+                                            padding: EdgeInsets.fromLTRB(20, 5, 0, 5),
+                                            child: Image.asset("assets/images/นักเรียน.png", height: 50, width: 50),
+                                          ),
+                                          Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Text('By: ${comments[index]["thfname"]} ${comments[index]["thlname"]}', style: TextStyle(fontSize: 14, fontStyle: FontStyle.italic)),
+                                              Text(comments[index]["comment_title"], style: TextStyle(fontSize: 20)),
+                                            ],
+                                          ),
                                         ],
                                       ),
                                     ],
                                   ),
+                                  
+                                  // ปุ่มลบที่มุมขวาล่าง
+                                  if (canDelete)
+                                    Positioned(
+                                      bottom: 8,
+                                      right: 8,
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(8.0), 
+                                        child: IconButton(
+                                          icon: Icon(Icons.delete, color: Colors.red),
+                                          onPressed: () async {
+                                            var response = await deleteComment(widget.username, comments[index]["comment_auto"]);
+                                            
+                                            if (response['success']) {
+                                              // หากลบสำเร็จ ให้ทำการอัปเดต UI
+                                              print('Comment deleted successfully');
+                                            } else {
+                                              // หากลบไม่สำเร็จ แสดงข้อความผิดพลาด
+                                              print('Failed to delete comment');
+                                            }
+                                          },
+                                        ),
+                                      ),
+                                    ),
                                 ],
                               ),
                             );
@@ -191,8 +258,17 @@ class _CommentState extends State<Comment_inclass> {
               ),
             ),
           ),
-        )
-      ],
+        ),
+        actions: [
+          ElevatedButton(
+            onPressed: () {
+              Navigator.of(context).pop(); 
+            },
+            child: Text('ปิด'),
+          ),
+          
+        ],
+      
     );
   }
 }

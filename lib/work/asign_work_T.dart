@@ -488,34 +488,44 @@ void initState() {
                           Column(
                           children: [
                             Padding(
-                              padding: EdgeInsets.fromLTRB(550,5,5,5),
-                              child:  IconButton(
-                                onPressed: (){
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(builder: (context) =>  Type_work(
-                                        username: widget.username, 
-                                        thfname: widget.thfname,
-                                        thlname: widget.thlname,
-                                        classroomName: widget.classroomName,
-                                        classroomMajor: widget.classroomMajor,
-                                        classroomNumRoom: widget.classroomNumRoom,
-                                        classroomYear: widget.classroomYear,
-                                      )),); //add_work.dart
-                                },
+                              padding: EdgeInsets.fromLTRB(550, 5, 5, 5),
+                              child: IconButton(
+                                onPressed: (widget.classroomName.isNotEmpty &&
+                                        widget.classroomMajor.isNotEmpty &&
+                                        widget.classroomYear.isNotEmpty &&
+                                        widget.classroomNumRoom.isNotEmpty)
+                                    ? () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => Type_work(
+                                              username: widget.username,
+                                              thfname: widget.thfname,
+                                              thlname: widget.thlname,
+                                              classroomName: widget.classroomName,
+                                              classroomMajor: widget.classroomMajor,
+                                              classroomNumRoom: widget.classroomNumRoom,
+                                              classroomYear: widget.classroomYear,
+                                            ),
+                                          ),
+                                        );
+                                      }
+                                    : null, // Disable the button if any value is empty
                                 style: IconButton.styleFrom(
-                                      backgroundColor: Color.fromARGB(255, 147, 185, 221),
-                                      highlightColor: Color.fromARGB(255, 56, 105, 151),
-                                    ),
-                                    tooltip: 'มอบหมายงาน', 
-                                icon: const Icon(Icons.add),iconSize: 30,color: Colors.black,
-                              )                
+                                  backgroundColor: (widget.classroomName.isNotEmpty &&
+                                          widget.classroomMajor.isNotEmpty &&
+                                          widget.classroomYear.isNotEmpty &&
+                                          widget.classroomNumRoom.isNotEmpty)
+                                      ? Color.fromARGB(255, 147, 185, 221) // Original color
+                                      : Colors.grey, // Grey color when disabled
+                                  highlightColor: Color.fromARGB(255, 56, 105, 151),
+                                ),
+                                tooltip: 'มอบหมายงาน',
+                                icon: const Icon(Icons.add),
+                                iconSize: 30,
+                                color: Colors.black,
+                              ),
                             ),
-                           
-
-                          
-                            
-
 
                             //งานที่มอบหมาย
                             Container(

@@ -42,11 +42,18 @@ class _DoauswerstudentsState extends State<Doauswerstudents> {
     return;
   }
 
-  // เตรียมข้อมูลคำตอบ
+  // ตรวจสอบการกรอกข้อมูล
   for (int i = 0; i < widget.questions.length; i++) {
+    final answerText = _controllers[i]?.text.trim() ?? '';
+    if (answerText.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('กรุณากรอกคำตอบสำหรับคำถามที่ ${i + 1}'), backgroundColor: Colors.red),
+      );
+      return; // หยุดการทำงานหากพบช่องว่าง
+    }
     answers.add({
       'question_id': widget.questions[i].questionAuto,
-      'submit_auswer_reply': _controllers[i]?.text ?? '',
+      'submit_auswer_reply': answerText,
     });
   }
 
@@ -68,25 +75,39 @@ class _DoauswerstudentsState extends State<Doauswerstudents> {
       final result = jsonDecode(response.body);
       if (result['success']) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('ส่งคำตอบสำเร็จ')),
+          const SnackBar(content: Text('ส่งคำตอบสำเร็จ'), backgroundColor: Colors.green),
+        );
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => work_body_S(
+              classroomMajor: '',
+              classroomName: '',
+              thfname: widget.thfname,
+              thlname: widget.thlname,
+              classroomNumRoom: '',
+              classroomYear: '',
+              username: widget.username,
+            ),
+          ),
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('เกิดข้อผิดพลาดในการส่งคำตอบ')),
+          const SnackBar(content: Text('เกิดข้อผิดพลาดในการส่งคำตอบ'), backgroundColor: Colors.red),
         );
       }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้')),
+        const SnackBar(content: Text('ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้'), backgroundColor: Colors.red),
       );
     }
   } catch (e) {
-    // จัดการข้อผิดพลาดเมื่อเกิดปัญหาการเชื่อมต่อ
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('เกิดข้อผิดพลาด: $e')),
+      SnackBar(content: Text('เกิดข้อผิดพลาด: $e'), backgroundColor: Colors.red),
     );
   }
 }
+
 
 
 
@@ -180,12 +201,7 @@ class _DoauswerstudentsState extends State<Doauswerstudents> {
                   onPressed: (){
                     _submitAnswers();
 
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => work_body_S( classroomMajor: '', classroomName: '',thfname: widget.thfname,thlname: widget.thlname, classroomNumRoom: '', classroomYear: '',username: widget.username,), // เปลี่ยนให้เป็นหน้า WorkBody_S ที่คุณต้องการไป
-                      ),
-                    );
+                    
 
                   },
                   child: const Text('ส่งคำตอบ'),

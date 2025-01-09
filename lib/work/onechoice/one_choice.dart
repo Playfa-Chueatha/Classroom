@@ -368,7 +368,9 @@ void _editQuestion(int index) {
 void _deleteQuestion(int index) {
   setState(() {
     _savedQuestions.removeAt(index); 
+    
   });
+  _calculateTotalMarks();
 }
 
  @override
@@ -858,10 +860,26 @@ void _deleteQuestion(int index) {
               ),
             ElevatedButton(
               onPressed: () {
-                
+
+                // ตรวจสอบสถานะ isChecked และตั้งค่าคะแนน
                 if (isChecked) {
                   question.fullMarkinchoiceController.text = defaultMark.text;
                 }
+                // ตรวจสอบว่ามีการป้อนคะแนนหรือไม่
+                if (question.fullMarkinchoiceController.text.isEmpty) {
+                  // แสดงข้อความแจ้งเตือน
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('กรุณาป้อนคะแนนก่อนบันทึกคำถาม'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                  return;
+                }
+
+                
+
+                // บันทึกคำถาม
                 _saveQuestion(index);
               },
               child: Text('บันทึกคำถาม'),

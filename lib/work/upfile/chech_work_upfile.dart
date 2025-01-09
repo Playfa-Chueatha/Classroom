@@ -31,7 +31,7 @@ class _ChechWorkUpfileState extends State<ChechWorkUpfile> {
   List<Upfile_submit> fileData = [];
   String? currentFileUrl;
   late IFrameElement _iFrameElement;
-
+  final _formKey = GlobalKey<FormState>();
   TextEditingController fullMark = TextEditingController();
   TextEditingController comment = TextEditingController();
 
@@ -39,6 +39,7 @@ class _ChechWorkUpfileState extends State<ChechWorkUpfile> {
   Future<void> fetchDatasubmit_upfile() async {
     final exam = widget.exam;
     final studentData = widget.studentData;
+    
 
     if (studentData['users_thfname'] == '' || exam.autoId == 0) {
       print('Error: Missing parameters');
@@ -108,7 +109,7 @@ class _ChechWorkUpfileState extends State<ChechWorkUpfile> {
     // ตรวจสอบว่ามีข้อมูลครบถ้วนหรือไม่
     if (exam.autoId == 0 || fullMark.text.isEmpty || comment.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('กรุณากรอกข้อมูลให้ครบถ้วน')),
+        SnackBar(content: Text('กรุณากรอกข้อมูลให้ครบถ้วน'),backgroundColor: Colors.red,),
       );
       return;
     }
@@ -145,8 +146,27 @@ class _ChechWorkUpfileState extends State<ChechWorkUpfile> {
           );
 
           if (saveResponse.statusCode == 200) {
+            Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => AssignWork_class_T( 
+                            thfname: widget.thfname,
+                            thlname: widget.thlname,
+                            username: widget.username, 
+                            classroomMajor: '',
+                            classroomName: '',
+                            classroomNumRoom: '',     
+                            classroomYear: '',                               
+                          ),        
+                        ),
+                      ).then((_) {
+                        // รีเซ็ตข้อมูลเมื่อกลับมาจากหน้า CheckWorkUpfile
+                        setState(() {
+                          currentFileUrl = null;  // รีเซ็ต URL ของไฟล์
+                        });
+                      });
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('บันทึกข้อมูลสำเร็จ')),
+              SnackBar(content: Text('บันทึกข้อมูลสำเร็จ'),backgroundColor: Colors.green,),
             );
           } else {
             throw Exception('ไม่สามารถบันทึกข้อมูลได้');
@@ -202,7 +222,9 @@ class _ChechWorkUpfileState extends State<ChechWorkUpfile> {
             ),
           ],
         ),
-        body: SingleChildScrollView(
+        body: Form(
+           key: _formKey, 
+          child: SingleChildScrollView(
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
@@ -263,6 +285,12 @@ class _ChechWorkUpfileState extends State<ChechWorkUpfile> {
                                 filled: true,
                                 border: OutlineInputBorder(),
                               ),
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'กรุณากรอกคะแนน';
+                                }
+                                return null;
+                              },
                             ),
                           ),
                           SizedBox(width: 8),
@@ -286,40 +314,28 @@ class _ChechWorkUpfileState extends State<ChechWorkUpfile> {
                           filled: true,
                           border: OutlineInputBorder(),
                         ),
+
                       ),
                     ),
                     Center(
                       child: Padding(padding: EdgeInsets.all(20),
-                        child:  OutlinedButton(
-                          onPressed: (){
-                              saveCheckWorkUpfile();
-                               Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => AssignWork_class_T( 
-                                          thfname: widget.thfname,
-                                          thlname: widget.thlname,
-                                          username: widget.username, 
-                                          classroomMajor: '',
-                                          classroomName: '',
-                                          classroomNumRoom: '',     
-                                          classroomYear: '',                               
-                                          
-                                        ),        
-                                      ),
-                                    ).then((_) {
-                                      // รีเซ็ตข้อมูลเมื่อกลับมาจากหน้า ChechWorkUpfile
-                                      setState(() {
-                                        currentFileUrl = null;  // รีเซ็ต URL ของไฟล์
-                                      });
-                                    });
-
-                          }, 
-                           style: ButtonStyle(
-                                    side: MaterialStateProperty.all(BorderSide(color: const Color.fromARGB(255, 0, 0, 0))),
-                                  ),
-                          child: Text('ตรวจงานเสร็จสิ้น', style: TextStyle(color: Colors.black))
-                        ),
+                        child: OutlinedButton(
+                  onPressed: () {
+                    // ตรวจสอบฟอร์มก่อนบันทึก
+                    if (_formKey.currentState?.validate() ?? false) {
+                      if (comment.text.isEmpty) {
+                        comment.text = '-';
+                      }
+                      saveCheckWorkUpfile();
+                      
+                    }
+                  },
+                  style: ButtonStyle(
+                    side: MaterialStateProperty.all(BorderSide(color: const Color.fromARGB(255, 0, 0, 0))),
+                  ),
+                  child: Text('ตรวจงานเสร็จสิ้น', style: TextStyle(color: Colors.black)),
+                ),
+            
                       )
                     ),
                   ],
@@ -337,7 +353,7 @@ class _ChechWorkUpfileState extends State<ChechWorkUpfile> {
               ),
             ],
           ),
-        ),
+        )),
       ),
     );
   }

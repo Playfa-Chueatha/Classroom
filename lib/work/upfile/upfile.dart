@@ -8,6 +8,8 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:url_launcher/url_launcher.dart';
+
 class upfilework extends StatefulWidget {
   final String username;
   final String thfname;
@@ -43,6 +45,7 @@ class _Answer_QuestionState extends State<upfilework> {
   bool isCheckeddueDate = false;
   final List<Map<String, dynamic>> _selectedClassrooms = [];
   final TextEditingController fullMarksController = TextEditingController();
+  final TextEditingController _linkController = TextEditingController();
 
   Future<int?> saveAssignment({
   required String direction,
@@ -141,6 +144,36 @@ class _Answer_QuestionState extends State<upfilework> {
   }
 }
 
+Future<void> saveLinks(int examsetsId, List<String> links) async {
+  const String apiUrl = "https://www.edueliteroom.com/connect/upfile_link.php";
+
+  try {
+    for (var link in links) {
+      final response = await http.post(
+        Uri.parse(apiUrl),
+        body: {
+          "examsets_id": examsetsId.toString(),
+          "link": link,
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        if (data['success']) {
+          print('Link uploaded successfully: $link');
+        } else {
+          print('Failed to upload link: ${data['message']}');
+        }
+      } else {
+        throw Exception("Failed to upload link. Server error.");
+      }
+    }
+  } catch (error) {
+    print("Error uploading links: $error");
+  }
+}
+
+
   @override
   void initState() {
     super.initState();
@@ -194,7 +227,9 @@ class _Answer_QuestionState extends State<upfilework> {
           );
 
           if (examsetsId != null) {
-            // บันทึกไฟล์ที่เลือกในแต่ละห้องเรียน
+            // บันทึกลิงค์ที่เลือก
+            await saveLinks(examsetsId, _links);
+            // บันทึกไฟล์ที่เลือก
             await _saveFileToPost(examsetsId, selectedFiles.cast<PlatformFile>());
           } else {
             // ถ้าไม่สามารถบันทึกการบ้านได้ ให้แสดงข้อความ
@@ -234,30 +269,37 @@ class _Answer_QuestionState extends State<upfilework> {
 }
 
 
-  void _showLinkDialog() {
+  void _showAddLinkDialog() {
     showDialog(
       context: context,
-      builder: (context) {
-        String link = '';
+      builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('ใส่ลิงค์'),
+          title: Text('เพิ่มลิงค์ของคุณ'),
           content: TextField(
-            onChanged: (value) => link = value,
-            decoration: InputDecoration(hintText: 'กรุณาใส่ลิงค์'),
+            controller: _linkController,
+            decoration: InputDecoration(
+              labelText: 'ใส่ลิงค์ของคุณ',
+              border: OutlineInputBorder(),
+            ),
           ),
           actions: [
             TextButton(
               onPressed: () {
-                setState(() {
-                  if (link.isNotEmpty) _links.add(link);
-                });
-                Navigator.of(context).pop();
+                Navigator.of(context).pop();  // ปิด AlertDialog
               },
-              child: Text('ตกลง'),
+              child: Text('ยกเลิก'),
             ),
             TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text('ยกเลิก'),
+              onPressed: () {
+                if (_linkController.text.isNotEmpty) {
+                  setState(() {
+                    _links.add(_linkController.text);  // เพิ่มลิงค์ลงใน list
+                  });
+                  _linkController.clear();  // เคลียร์ฟอร์ม
+                  Navigator.of(context).pop();  // ปิด AlertDialog
+                }
+              },
+              child: Text('เพิ่ม'),
             ),
           ],
         );
@@ -298,6 +340,9 @@ class _Answer_QuestionState extends State<upfilework> {
                           final number = double.tryParse(value);
                           if (number == null) {
                             return 'กรุณากรอกตัวเลขที่ถูกต้อง';
+                          }
+                          if (number == 0.00) {
+                            return 'คะแนนเต็มต้องมากกว่าศูนย์';
                           }
                           return null;
                         },
@@ -360,7 +405,7 @@ class _Answer_QuestionState extends State<upfilework> {
                       icon: Icon(Icons.upload, size: 30),
                     ),
                     IconButton(
-                      onPressed: _showLinkDialog,
+                      onPressed: _showAddLinkDialog,
                       icon: Icon(Icons.link, size: 30),
                     ),
                   ],
@@ -372,6 +417,66 @@ class _Answer_QuestionState extends State<upfilework> {
                         onPressed: () => setState(() => selectedFiles.remove(file)),
                       ),
                     )),
+
+                  Padding(
+                  padding: EdgeInsets.all(20),
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    physics: NeverScrollableScrollPhysics(),
+                    itemCount: _links.length,
+                    itemBuilder: (context, index) {
+                      return ListTile(
+                        title: Text(_links[index]),
+                        trailing: IconButton(
+                          icon: Icon(Icons.delete, color: Colors.red),
+                          onPressed: () {
+                            // ยืนยันการลบ
+                            showDialog(
+                              context: context,
+                              builder: (context) {
+                                return AlertDialog(
+                                  title: Text('ยืนยันการลบ'),
+                                  content: Text('คุณต้องการลบลิงก์นี้หรือไม่?'),
+                                  actions: [
+                                    TextButton(
+                                      child: Text('ยกเลิก'),
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                      },
+                                    ),
+                                    TextButton(
+                                      child: Text('ลบ', style: TextStyle(color: Colors.red)),
+                                      onPressed: () {
+                                        // ลบลิงก์ออกจากรายการ
+                                        setState(() {
+                                          _links.removeAt(index);
+                                        });
+                                        Navigator.of(context).pop();
+                                      },
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                          },
+                        ),
+                        onTap: () {
+                          // เปิดลิงก์เมื่อกด
+                          final url = Uri.parse(_links[index]);
+                          canLaunchUrl(url).then((canLaunch) {
+                            if (canLaunch) {
+                              launchUrl(url, mode: LaunchMode.externalApplication);
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text('ไม่สามารถเปิดลิงก์ได้')),
+                              );
+                            }
+                          });
+                        },
+                      );
+                    },
+                  ),
+                ),
 
                 Padding(
                   padding: const EdgeInsets.all(10),
