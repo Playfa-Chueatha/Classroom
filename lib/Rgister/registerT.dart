@@ -173,165 +173,185 @@ Future<void> saveProfileT(context) async {
 
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Color.fromARGB(255, 147, 235, 241),
-        body: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(500, 150, 500, 100),
-          child: Form(
-            key: formKey,
-            child: Column(
-              children: [
-                Text(
-                  "สมัครสมาชิก",
-                  style: TextStyle(fontSize: 30),
+Widget build(BuildContext context) {
+  final screenWidth = MediaQuery.of(context).size.width;
+
+  return Scaffold(
+    backgroundColor: Color.fromARGB(255, 147, 235, 241),
+    body: SingleChildScrollView(
+      padding: EdgeInsets.fromLTRB(
+        screenWidth * 0.1, // ใช้เปอร์เซ็นต์ของความกว้างหน้าจอ
+        150,
+        screenWidth * 0.1,
+        100,
+      ),
+      child: Form(
+        key: formKey,
+        child: Column(
+          children: [
+            Text(
+              "สมัครสมาชิก",
+              style: TextStyle(fontSize: screenWidth * 0.03), // ปรับขนาดฟอนต์ตามหน้าจอ
+            ),
+            SizedBox(height: 10),
+            Image.asset(
+              'assets/images/ครู2.png',
+              height: screenWidth * 0.4, // ปรับขนาดภาพตามหน้าจอ
+            ),
+            SizedBox(height: 50),
+            DropdownButtonFormField<String>(
+              decoration: const InputDecoration(
+                label: Text(
+                  "กรุณาเลือกคำนำหน้าชื่อ",
+                  style: TextStyle(fontSize: 20),
                 ),
-                SizedBox(height: 10),
-                Image.asset('assets/images/ครู2.png',height: 300),
-                SizedBox(height: 50),
-                DropdownButtonFormField<String>(
-                  decoration: const InputDecoration(
-                    label: Text(
-                      "กรุณาเลือกคำนำหน้าชื่อ",
-                      style: TextStyle(fontSize: 20),
-                    ),
-                  ),
-                  value: selectedPrefix,
-                  items: ["นาย", "นาง", "นางสาว"].map((prefix) {
-                    return DropdownMenuItem(
-                      value: prefix,
-                      child: Text(prefix),
-                    );
-                  }).toList(),
-                  onChanged: (value) {
+              ),
+              value: selectedPrefix,
+              items: ["นาย", "นาง", "นางสาว"].map((prefix) {
+                return DropdownMenuItem(
+                  value: prefix,
+                  child: Text(prefix),
+                );
+              }).toList(),
+              onChanged: (value) {
+                setState(() {
+                  selectedPrefix = value;
+                  prefix.text = value!;
+                });
+              },
+              validator: (value) =>
+                  value == null ? 'กรุณาเลือกคำนำหน้าชื่อ' : null,
+            ),
+            SizedBox(height: 10),
+            TextFormField(
+              maxLength: 20,
+              decoration: const InputDecoration(
+                counterText: "",
+                label: Text(
+                  "กรุณาระบุชื่อจริง",
+                  style: TextStyle(fontSize: 20),
+                ),
+              ),
+              validator: (val) =>
+                  validateThaiCharacters(val, 'กรุณากรอกระบุชื่อจริง'),
+              controller: thaifirstname,
+            ),
+            const SizedBox(height: 10),
+            TextFormField(
+              maxLength: 20,
+              decoration: const InputDecoration(
+                counterText: "",
+                label: Text(
+                  "กรุณาระบุนามสกุล",
+                  style: TextStyle(fontSize: 20),
+                ),
+              ),
+              validator: (val) =>
+                  validateThaiCharacters(val, 'กรุณากรอกระบุนามสกุล'),
+              controller: thailastname,
+            ),
+            SizedBox(height: 10),
+            TextFormField(
+              maxLength: 40,
+              decoration: const InputDecoration(
+                counterText: "",
+                label: Text(
+                  "กรุณากรอก E-mail",
+                  style: TextStyle(fontSize: 20),
+                ),
+              ),
+              validator: validateEmail,
+              controller: email,
+            ),
+            TextFormField(
+              maxLength: 20,
+              decoration: const InputDecoration(
+                counterText: "",
+                label: Text(
+                  "กรุณาระบุชื่อผู้ใช้ของคุณ",
+                  style: TextStyle(fontSize: 20),
+                ),
+              ),
+              validator: (val) =>
+                  validateEnglishAndNumbers(val, 'กรุณากรอกชื่อผู้ใช้ของคุณ'),
+              controller: username,
+            ),
+            TextFormField(
+              maxLength: 20,
+              obscureText: _isObscurd,
+              decoration: InputDecoration(
+                suffixIcon: IconButton(
+                  padding: const EdgeInsetsDirectional.all(10.0),
+                  icon: _isObscurd
+                      ? const Icon(Icons.visibility)
+                      : const Icon(Icons.visibility_off),
+                  onPressed: () {
                     setState(() {
-                      selectedPrefix = value;
-                      prefix.text = value!;
+                      _isObscurd = !_isObscurd;
                     });
                   },
-                  validator: (value) => value == null ? 'กรุณาเลือกคำนำหน้าชื่อ' : null,
                 ),
-                SizedBox(height: 10),
-                TextFormField(
-                  maxLength: 20,
-                  decoration: const InputDecoration(
-                    counterText: "",
-                    label: Text(
-                      "กรุณาระบุชื่อจริง",
-                      style: TextStyle(fontSize: 20),
-                    ),
-                  ),
-                  validator: (val) => validateThaiCharacters(val, 'กรุณากรอกระบุชื่อจริง'),
-                  controller: thaifirstname,
+                counterText: "",
+                label: const Text(
+                  "กรุณากรอกรหัสผ่าน",
+                  style: TextStyle(fontSize: 20),
                 ),
-                const SizedBox(height: 10),
-                TextFormField(
-                  maxLength: 20,
-                  decoration: const InputDecoration(
-                    counterText: "",
-                    label: Text(
-                      "กรุณาระบุนามสกุล",
-                      style: TextStyle(fontSize: 20),
-                    ),
-                  ),
-                  validator: (val) => validateThaiCharacters(val, 'กรุณากรอกระบุนามสกุล'),
-                  controller: thailastname,
+              ),
+              validator: (val) {
+                if (val == null || val.isEmpty) {
+                  return 'กรุณากรอกรหัสผ่าน';
+                }
+                return null;
+              },
+              controller: password,
+            ),
+            TextFormField(
+              maxLength: 20,
+              obscureText: _isObscurd2,
+              decoration: InputDecoration(
+                suffixIcon: IconButton(
+                  padding: const EdgeInsetsDirectional.all(10.0),
+                  icon: _isObscurd2
+                      ? const Icon(Icons.visibility)
+                      : const Icon(Icons.visibility_off),
+                  onPressed: () {
+                    setState(() {
+                      _isObscurd2 = !_isObscurd2;
+                    });
+                  },
                 ),
-                SizedBox(height: 10),
-                TextFormField(
-                  maxLength: 40,
-                  decoration: const InputDecoration(
-                    counterText: "",
-                    label: Text(
-                      "กรุณากรอก E-mail",
-                      style: TextStyle(fontSize: 20),
-                    ),
-                  ),
-                  validator: validateEmail,
-                  controller: email,
-                  ),
-                  TextFormField(
-                  maxLength: 20,
-                  decoration: const InputDecoration(
-                    counterText: "",
-                    label: Text(
-                      "กรุณาระบุชื่อผู้ใช้ของคุณ",
-                      style: TextStyle(fontSize: 20),
-                    ),
-                  ),
-                  validator: (val) => validateEnglishAndNumbers(val, 'กรุณากรอกชื่อผู้ใช้ของคุณ'),
-                  controller: username,
-                  ),
-                  TextFormField(
-                    maxLength: 20,
-                    obscureText: _isObscurd,
-                    decoration: InputDecoration(
-                      suffixIcon: IconButton(
-                          padding: const EdgeInsetsDirectional.all(10.0),
-                          icon: _isObscurd ? const Icon(Icons.visibility) : const Icon(Icons.visibility_off),
-                          onPressed: (){
-                            setState(() {
-                            _isObscurd =!_isObscurd;
-                          });
-                          }, 
-                      ),
-                      counterText: "",
-                      label: const Text(
-                        "กรุณากรอกรหัสผ่าน",
-                        style: TextStyle(fontSize: 20),
-                      ),
-                    ),
-                    validator: (val) {
-                    if (val == null || val.isEmpty) {
-                      return 'กรุณากรอกรหัสผ่าน';
-                    }
-                      return null;
-                    },
-                    controller: password,
-                  ),
-                  TextFormField(
-                    maxLength: 20,
-                    obscureText: _isObscurd2,
-                    decoration: InputDecoration(
-                      suffixIcon: IconButton(
-                          padding: const EdgeInsetsDirectional.all(10.0),
-                          icon: _isObscurd2 ? const Icon(Icons.visibility) : const Icon(Icons.visibility_off),
-                          onPressed: (){
-                            setState(() {
-                            _isObscurd2 =!_isObscurd2;
-                          });
-                          }, 
-                      ),
-                      counterText: "",
-                      label: const Text(
-                        "กรุณายืนยันรหัสผ่าน",
-                        style: TextStyle(fontSize: 20),
-                      ),
-                    ),
-                    validator: (val) {
-                      if (val!.isEmpty) {
-                        return 'กรุณากรอกยืนยันรหัสผ่าน';
-                      } else if (val != password.text) {
-                        return 'รหัสผ่านไม่ตรงกัน';
-                      }
-                      return null;
-                    },
-                  ),
-
-              SizedBox(height: 30),
-              ElevatedButton(
-                onPressed: () {
-                  checkUser();
-                  if (formKey.currentState!.validate()) {
-                    saveProfileT(context);
-                  }
-                },
-                child: const Text("สมัครสมาชิก",style: TextStyle(fontSize: 20),),
-              )
-            ],
-          )
-          )
+                counterText: "",
+                label: const Text(
+                  "กรุณายืนยันรหัสผ่าน",
+                  style: TextStyle(fontSize: 20),
+                ),
+              ),
+              validator: (val) {
+                if (val!.isEmpty) {
+                  return 'กรุณากรอกยืนยันรหัสผ่าน';
+                } else if (val != password.text) {
+                  return 'รหัสผ่านไม่ตรงกัน';
+                }
+                return null;
+              },
+            ),
+            SizedBox(height: 30),
+            ElevatedButton(
+              onPressed: () {
+                checkUser();
+                if (formKey.currentState!.validate()) {
+                  saveProfileT(context);
+                }
+              },
+              child: const Text(
+                "สมัครสมาชิก",
+                style: TextStyle(fontSize: 20),
+              ),
+            ),
+          ],
+        ),
       ),
-    );
-  }
+    ),
+  );
+}
 }

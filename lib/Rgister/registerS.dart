@@ -185,89 +185,100 @@ Future<void> saveProfileS(context) async {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return  Scaffold(
-      backgroundColor: Color.fromARGB(255, 147, 235, 241),
-        body: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(500, 150, 500, 100),
-          child: Form(
-            key: formKey,
-            child: Column(
-              children: [
-                Text(
-                  "สมัครสมาชิก",
-                  style: TextStyle(fontSize: 30),
-                ),
-                SizedBox(height: 10),
-                Image.asset('assets/images/นักเรียน2.png',height: 300),
-                SizedBox(height: 50),
-                
+Widget build(BuildContext context) {
+  // คำนวณขนาดหน้าจอ
+  final screenWidth = MediaQuery.of(context).size.width;
+  final screenHeight = MediaQuery.of(context).size.height;
 
-                //รหัสนักเรียน
-                TextFormField(
-                  maxLength: 20,
-                  decoration: const InputDecoration(
-                    counterText: "",
-                    label: Text(
-                      "กรุณากรอกรหัสนักเรียน",
-                      style: TextStyle(fontSize: 20),
-                    ),
-                  ),
-                  validator: (val) => val == null || val.isEmpty ? 'กรุณากรอกรหัสนักเรียน' : null,
-                  controller: studentid,
-                ),
-                SizedBox(height: 10),
+  return Scaffold(
+    backgroundColor: Color.fromARGB(255, 147, 235, 241),
+    body: SingleChildScrollView(
+       padding: EdgeInsets.fromLTRB(
+        screenWidth * 0.1, // ใช้เปอร์เซ็นต์ของความกว้างหน้าจอ
+        150,
+        screenWidth * 0.1,
+        100,
+      ),
+      child: Form(
+        key: formKey,
+        child: Column(
+          children: [
+            Text(
+              "สมัครสมาชิก",
+              style: TextStyle(fontSize: screenWidth * 0.03), // ปรับขนาดฟอนต์
+            ),
+            SizedBox(height: screenHeight * 0.02),
+            Image.asset(
+              'assets/images/นักเรียน2.png',
+              height: screenHeight * 0.4, // ปรับขนาดรูปภาพ
+            ),
+            SizedBox(height: 50),
 
-                //คำนำหน้าชื่อ
-                DropdownButtonFormField<String>(
-                  decoration: const InputDecoration(
-                    label: Text(
-                      "กรุณาเลือกคำนำหน้าชื่อ",
-                      style: TextStyle(fontSize: 20),
-                    ),
-                  ),
-                  value: selectedPrefix,
-                  items: ["นาย", "นาง", "นางสาว"].map((prefix) {
-                    return DropdownMenuItem(
-                      value: prefix,
-                      child: Text(prefix),
-                    );
-                  }).toList(),
-                  onChanged: (value) {
-                    setState(() {
-                      selectedPrefix = value;
-                      prefix.text = value!;
-                    });
-                  },
-                  validator: (value) => value == null ? 'กรุณาเลือกคำนำหน้าชื่อ' : null,
+            // รหัสนักเรียน
+            TextFormField(
+              maxLength: 20,
+              decoration: InputDecoration(
+                counterText: "",
+                label: Text(
+                  "กรุณากรอกรหัสนักเรียน",
+                  style: TextStyle(fontSize: 20),
                 ),
-                SizedBox(height: 10),
+              ),
+              validator: (val) => val == null || val.isEmpty ? 'กรุณากรอกรหัสนักเรียน' : null,
+              controller: studentid,
+            ),
+            SizedBox(height: screenHeight * 0.02),
 
-                //ชื่อจริง
-                TextFormField(
-                  maxLength: 20,
-                  decoration: const InputDecoration(
-                    counterText: "",
-                    label: Text(
-                      "กรุณาระบุชื่อจริง",
-                      style: TextStyle(fontSize: 20),
-                    ),
-                  ),
-                  validator: (val) {
-                    if (val == null || val.isEmpty) {
-                      return 'กรุณากรอกระบุชื่อจริง';
-                    }
-                    return null;
-                  },
-                  controller: name,
+            // คำนำหน้าชื่อ
+            DropdownButtonFormField<String>(
+              decoration: InputDecoration(
+                label: Text(
+                  "กรุณาเลือกคำนำหน้าชื่อ",
+                  style: TextStyle(fontSize: 20),
                 ),
-                SizedBox(height: 10),
+              ),
+              value: selectedPrefix,
+              items: ["นาย", "นาง", "นางสาว"].map((prefix) {
+                return DropdownMenuItem(
+                  value: prefix,
+                  child: Text(prefix),
+                );
+              }).toList(),
+              onChanged: (value) {
+                setState(() {
+                  selectedPrefix = value;
+                  prefix.text = value!;
+                });
+              },
+              validator: (value) => value == null ? 'กรุณาเลือกคำนำหน้าชื่อ' : null,
+            ),
+            SizedBox(height: screenHeight * 0.02),
+
+            // ชื่อจริง
+            TextFormField(
+              maxLength: 20,
+              decoration: InputDecoration(
+                counterText: "",
+                label: Text(
+                  "กรุณาระบุชื่อจริง",
+                  style: TextStyle(fontSize: 20),
+                ),
+              ),
+              validator: (val) {
+                if (val == null || val.isEmpty) {
+                  return 'กรุณากรอกระบุชื่อจริง';
+                }
+                return null;
+              },
+              controller: name,
+            ),
+            SizedBox(height: screenHeight * 0.02),
 
 
                 //นามสกุล
                 TextFormField(
                   maxLength: 20,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     counterText: "",
                     label: Text(
                       "กรุณาระบุนามสกุล",
@@ -282,12 +293,12 @@ Future<void> saveProfileS(context) async {
                   },
                   controller: surname,
                 ),
-                SizedBox(height: 10),
+                SizedBox(height:  screenHeight * 0.02),
 
                
                 //ชั้นปีการศึกษา
                 DropdownButtonFormField<String>(
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     label: Text(
                       "กรุณาเลือกชั้นปีการศึกษา",
                       style: TextStyle(fontSize: 20),
@@ -308,12 +319,12 @@ Future<void> saveProfileS(context) async {
                   },
                   validator: (value) => value == null ? 'กรุณาเลือกชั้นปีการศึกษา' : null,
                 ),
-                SizedBox(height: 10),
+                SizedBox(height:  screenHeight * 0.02),
 
                 //ห้อง
                 TextFormField(
                   maxLength: 2,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     counterText: "",
                     label: Text(
                       "กรุณาระบุห้องของคุณ",
@@ -328,13 +339,13 @@ Future<void> saveProfileS(context) async {
                   },
                   controller: numroom,
                 ),
-                SizedBox(height: 10),
+                SizedBox(height:  screenHeight * 0.02),
 
 
                 //เลขที่
                 TextFormField(
                   maxLength: 2,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     counterText: "",
                     label: Text(
                       "กรุณาระบุเลขที่ของคุณ",
@@ -349,13 +360,13 @@ Future<void> saveProfileS(context) async {
                   },
                   controller: number,
                 ),
-                SizedBox(height: 10),
+                SizedBox(height:  screenHeight * 0.02),
 
 
 
                 //แผนการเรียน
                 DropdownButtonFormField<String>(
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     label: Text(
                       "กรุณาเลือกแผนการเรียน",
                       style: TextStyle(fontSize: 20),
@@ -376,13 +387,13 @@ Future<void> saveProfileS(context) async {
                   },
                   validator: (value) => value == null ? 'กรุณาเลือกแผนการเรียน' : null,
                 ),
-                SizedBox(height: 10),
+                SizedBox(height:  screenHeight * 0.02),
 
 
                 //EMAIL
                 TextFormField(
                   maxLength: 40,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     counterText: "",
                     label: Text(
                       "กรุณากรอก E-mail",
@@ -398,7 +409,7 @@ Future<void> saveProfileS(context) async {
                 //ชื่อผู้ใช้
                 TextFormField(
                   maxLength: 40,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     counterText: "",
                     label: Text(
                       "กรุณากรอกชื่อผู้ใช้",
@@ -424,7 +435,7 @@ Future<void> saveProfileS(context) async {
                         }, 
                     ),
                     counterText: "",
-                    label: const Text(
+                    label: Text(
                       "กรุณากรอกรหัสผ่าน",
                       style: TextStyle(fontSize: 20),
                     ),
@@ -451,7 +462,7 @@ Future<void> saveProfileS(context) async {
                         }, 
                     ),
                     counterText: "",
-                    label: const Text(
+                    label: Text(
                       "กรุณายืนยันรหัสผ่าน",
                       style: TextStyle(fontSize: 20),
                     ),
@@ -466,29 +477,36 @@ Future<void> saveProfileS(context) async {
                   },
                 ),
                 const SizedBox(
-                  height: 30,
-                ),
-                ElevatedButton(
-                onPressed: () {
-                  checkUser();
-                  if (formKey.currentState!.validate()) {
-                    saveProfileS(context);
-
-                    print('Selected Prefix: ${prefix.text}');
-                    print('Thai First Name: ${name.text}');
-                    print('Thai Last Name: ${surname.text}');
-                    print('Email: ${email.text}');
-                    print('Username: ${username.text}');
-                    print('Password: ${pass.text}');
-                    
-                  }
-                },
-                child: const Text("สมัครสมาชิก",style: TextStyle(fontSize: 20),),
-              )
-              ],
+              height: 30,
             ),
+            ElevatedButton(
+              onPressed: () {
+                checkUser();
+                if (formKey.currentState!.validate()) {
+                  saveProfileS(context);
+
+                  print('Selected Prefix: ${prefix.text}');
+                  print('Thai First Name: ${name.text}');
+                  print('Thai Last Name: ${surname.text}');
+                  print('Email: ${email.text}');
+                  print('Username: ${username.text}');
+                  print('Password: ${pass.text}');
+                }
+              },
+              child: Text(
+                "สมัครสมาชิก",
+                style: TextStyle(fontSize: 20),
+              ),
+            ),
+          ],
         ),
       ),
-    );
-  }
+    ),
+  );
 }
+
+              
+          
+      
+ 
+  }

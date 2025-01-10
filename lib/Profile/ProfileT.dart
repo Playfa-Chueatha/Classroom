@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_esclass_2/Data/Data.dart';
 import 'package:http/http.dart' as http;
 
@@ -269,8 +270,8 @@ class _ProfiletState extends State<Profilet> {
             1: FixedColumnWidth(250),
           },
           children: [
-            _buildTableRow('ชื่อ(ภาษาไทย):', '${userData!.usertThfname} ${userData!.usertThlname}'),
-            _buildTableRow('ชื่อ(ภาษาอังกฤษ):', '${userData!.usertEnfname} ${userData!.usertEnlname}'),
+            _buildTableRowThai('ชื่อ(ภาษาไทย):', '${userData!.usertThfname} ${userData!.usertThlname}'),
+            _buildTableRowThai('ชื่อ(ภาษาอังกฤษ):', '${userData!.usertEnfname} ${userData!.usertEnlname}'),
             _buildTableRow('อีเมล:', userData!.usertEmail),
             _buildTableRow('โทรศัพท์:', userData!.usertPhone),
             _buildTableRow('ครูประจำชั้น:', userData!.usertClassroom),
@@ -298,4 +299,34 @@ class _ProfiletState extends State<Profilet> {
       ],
     );
   }
+}
+
+
+TableRow _buildTableRowThai(String title, String value, {bool isThaiOnly = false}) {
+  final isValueEmpty = value.isEmpty || value == "-" || value == "0" || value == " - ";
+  return TableRow(
+    children: [
+      Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+      isValueEmpty
+          ? TextField(
+              decoration: InputDecoration(
+                hintText: '*กรอกข้อมูล',
+                hintStyle: const TextStyle(color: Colors.red),
+                border: const OutlineInputBorder(),
+              ),
+              inputFormatters: isThaiOnly
+                  ? [
+                      FilteringTextInputFormatter(
+                        RegExp(r'[ก-๙\s]'), // อนุญาตเฉพาะตัวอักษรภาษาไทย
+                        allow: true,
+                      ),
+                    ]
+                  : null,
+            )
+          : Text(
+              value,
+              style: const TextStyle(fontSize: 18, color: Colors.black),
+            ),
+    ],
+  );
 }

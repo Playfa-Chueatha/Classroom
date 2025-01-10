@@ -68,6 +68,9 @@ class _main_home_TState extends State<main_home_T> {
 
   @override
   Widget build(BuildContext context) {
+
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color.fromARGB(255, 152, 186, 218),
@@ -99,16 +102,13 @@ class _main_home_TState extends State<main_home_T> {
             }
             return Scaffold(
               backgroundColor: Color.fromARGB(255, 195, 238, 250),
-              body: SingleChildScrollView(
-                scrollDirection: Axis.vertical,
-                child: Column(
+              body: Column(
                   children: [
-                    SizedBox(height: 10),
+                    SizedBox(height: screenHeight * 0.003),
                     Column(
                       children: [
-                        SizedBox(height: 30),
+                        SizedBox(height: screenHeight * 0.03),
                         SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
@@ -163,7 +163,6 @@ class _main_home_TState extends State<main_home_T> {
                     ),
                   ],
                 ),
-              ),
             );
           }
         },
