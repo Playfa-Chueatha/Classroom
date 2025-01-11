@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_esclass_2/Data/Data.dart';
 import 'package:flutter_esclass_2/Login/loginS.dart';
 import 'package:flutter_esclass_2/Login/loginT.dart';
 import 'dart:async';
@@ -321,62 +322,90 @@ Widget build(BuildContext context) {
                 ),
                 SizedBox(height:  screenHeight * 0.02),
 
+                
+
                 //ห้อง
-                TextFormField(
-                  maxLength: 2,
+                DropdownButtonFormField<int>(
                   decoration: InputDecoration(
-                    counterText: "",
                     label: Text(
                       "กรุณาระบุห้องของคุณ",
                       style: TextStyle(fontSize: 20),
                     ),
+                    
                   ),
+                  value: null, // ค่าเริ่มต้น (เป็น null เพื่อบังคับให้ผู้ใช้เลือก)
+                  items: List.generate(
+                    30,
+                    (index) => DropdownMenuItem(
+                      value: index + 1, // เริ่มต้นที่ 1
+                      child: Text('${index + 1}'), // แสดงค่าเป็นตัวเลข
+                    ),
+                  ),
+                  onChanged: (val) {
+                    if (val != null) {
+                      numroom.text = val.toString(); // เก็บค่าที่เลือกใน TextEditingController
+                    }
+                  },
                   validator: (val) {
-                    if (val == null || val.isEmpty) {
-                      return 'กรุณาระบุห้องของคุณ';
+                    if (val == null) {
+                      return 'กรุณาเลือกห้องของคุณ';
                     }
                     return null;
                   },
-                  controller: numroom,
                 ),
                 SizedBox(height:  screenHeight * 0.02),
 
 
                 //เลขที่
-                TextFormField(
-                  maxLength: 2,
+
+                DropdownButtonFormField<int>(
                   decoration: InputDecoration(
-                    counterText: "",
                     label: Text(
                       "กรุณาระบุเลขที่ของคุณ",
                       style: TextStyle(fontSize: 20),
                     ),
+                    
                   ),
+                  value: null, // ค่าเริ่มต้น (เป็น null เพื่อบังคับให้ผู้ใช้เลือก)
+                  items: List.generate(
+                    30,
+                    (index) => DropdownMenuItem(
+                      value: index + 1, // เริ่มต้นที่ 1
+                      child: Text('${index + 1}'), // แสดงค่าเป็นตัวเลข
+                    ),
+                  ),
+                  onChanged: (val) {
+                    if (val != null) {
+                      number.text = val.toString(); // เก็บค่าที่เลือกใน TextEditingController
+                    }
+                  },
                   validator: (val) {
-                    if (val == null || val.isEmpty) {
+                    if (val == null) {
                       return 'กรุณาระบุเลขที่ของคุณ';
                     }
                     return null;
                   },
-                  controller: number,
                 ),
+
+                
                 SizedBox(height:  screenHeight * 0.02),
 
 
 
                 //แผนการเรียน
-                DropdownButtonFormField<String>(
-                  decoration: InputDecoration(
+                 DropdownButtonFormField<String>(
+                  decoration: const InputDecoration(
                     label: Text(
-                      "กรุณาเลือกแผนการเรียน",
-                      style: TextStyle(fontSize: 20),
+                      "กรุณาเลือกแผนการเรียน",style: TextStyle(fontSize: 20),
                     ),
                   ),
-                  value: selectedmajor,
-                  items: ["วิทยาศาสตร์-คณิตศาสตร์", "ภาษาอังกฤษ-ภาษาจีน", "ภาษาอังกฤษ-ญี่ปุ่น"].map((major) {
+                  value: sectionOptions.contains(clasroom_major.text)
+                      ? clasroom_major.text 
+                      : null, // ใช้ค่าใน majorController แทน
+                  items: sectionOptions.map((section) {
                     return DropdownMenuItem(
-                      value: major,
-                      child: Text(major),
+                      value: section,
+                      child: Text(section),
                     );
                   }).toList(),
                   onChanged: (value) {

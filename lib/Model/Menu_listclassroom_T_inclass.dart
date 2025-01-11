@@ -56,6 +56,10 @@ class _List_classroomState extends State<List_classroom_inclass> {
 
   @override
   Widget build(BuildContext context) {
+
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -64,11 +68,25 @@ class _List_classroomState extends State<List_classroom_inclass> {
         backgroundColor: Colors.white,
         actions: [
           IconButton(
-            icon: Icon(Icons.refresh),
-            onPressed: () {
-              fetchClassrooms();  
-            },
-          ),
+                          tooltip: 'ตั้งค่าห้องเรียน',
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => SettingCalss(
+                                  thfname: widget.thfname,
+                                  thlname: widget.thlname,
+                                  username: widget.username,
+                                  classroomMajor: '',
+                                  classroomName: '',
+                                  classroomNumRoom: '',
+                                  classroomYear: '',
+                                ),
+                              ),
+                            );
+                          },
+                          icon: const Icon(Icons.settings),
+                        ),
         ],
       ),
       body: ListView.builder(
@@ -80,8 +98,8 @@ class _List_classroomState extends State<List_classroom_inclass> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
-                  height: 50,
-                  width: 300,
+                  height: screenHeight * 0.05,
+                  width: screenWidth * 0.2,
                   decoration: BoxDecoration(
                     color: Color.fromARGB(255, 195, 238, 250),
                     borderRadius: BorderRadius.circular(20),
@@ -109,13 +127,14 @@ class _List_classroomState extends State<List_classroom_inclass> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            Text("${classrooms[index]['classroom_name']}", style: TextStyle(fontSize: 16)),
-                            SizedBox(width: 8),
-                            Text("${classrooms[index]['classroom_major']}", style: TextStyle(fontSize: 14, color: Color.fromARGB(255, 77, 77, 77))),
+                            Text("${classrooms[index]['classroom_name']}", style: TextStyle(fontSize: MediaQuery.of(context).size.width * 0.009,)),
+                            SizedBox(width:  screenWidth * 0.008,),
+                            // Text("${classrooms[index]['classroom_subjectsID']}", style: TextStyle(fontSize: 14, color: Color.fromARGB(255, 77, 77, 77))),
                           ],
                         ),
-                        Text("ม.${classrooms[index]['classroom_year']} ห้อง ${classrooms[index]['classroom_numroom']}", style: TextStyle(fontSize: 14, color: const Color.fromARGB(255, 77, 77, 77))),
+                        Text("${classrooms[index]['classroom_year']}/${classrooms[index]['classroom_numroom']}", style: TextStyle(fontSize: MediaQuery.of(context).size.width * 0.007, color: const Color.fromARGB(255, 77, 77, 77))),
                       ],
                     ),
                   ),

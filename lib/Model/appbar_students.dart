@@ -59,21 +59,45 @@ class _appbarstudentsState extends State<appbarstudents> {
               itemCount: notifications.length,
               itemBuilder: (BuildContext context, int index) {
                 final notification = notifications[index];
-                return ListTile(
-                  leading: Icon(
-                    Icons.notifications,
-                    color: Colors.grey,
+                return Container(
+                  decoration: BoxDecoration(
+                    color: notification.readStatus
+                        ? Colors.white // สีพื้นหลังสำหรับ Alreadyread
+                        : Colors.blue[50], // สีพื้นหลังสำหรับ notread
+                    border: Border.all(
+                      color: notification.readStatus
+                          ? Colors.grey
+                          : Colors.blue, // กรอบสีน้ำเงินสำหรับ notread
+                      width: 1,
+                    ),
+                    borderRadius: BorderRadius.circular(8),
                   ),
-                  title: Text(notification.title),
-                  subtitle: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('เวลา: ${notification.time}'),
-                      Text('วิชา: ${notification.classroomName} (${notification.classroomYear}/${notification.classroomNumRoom})'),                    
-                      Text('กำหนดส่ง: ${notification.dueDate}'),
-                    ],
+                  margin: const EdgeInsets.symmetric(vertical: 4),
+                  child: ListTile(
+                    leading: Icon(
+                      Icons.notifications,
+                      color: notification.readStatus
+                          ? Colors.grey
+                          : Colors.blue, // ไอคอนสีน้ำเงินสำหรับ notread
+                    ),
+                    title: Text(
+                      'มีการมอบหมายงานใหม่จาก วิชา: ${notification.classroomName} (${notification.classroomYear}/${notification.classroomNumRoom})',
+                      style: TextStyle(
+                        fontWeight: notification.readStatus
+                            ? FontWeight.normal
+                            : FontWeight.bold, // ตัวหนาสำหรับ notread
+                      ),
+                    ),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('เวลา: ${notification.time}'),                 
+                        Text('กำหนดส่ง: ${notification.dueDate}'),
+                      ],
+                    ),
                   ),
                 );
+              
               },
             ),
           ),

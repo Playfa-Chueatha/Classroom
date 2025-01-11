@@ -29,8 +29,8 @@ class _LogintState extends State<Login_S> {
   }
 
   void loginWithPredefinedCredentials() {
-    users_username.text = "Marisa";  
-    users_password.text = "test_student06";  
+    users_username.text = "Pasika";  
+    users_password.text = "test_students02";  
     signIn();  
   }
 

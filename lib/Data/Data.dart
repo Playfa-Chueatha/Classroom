@@ -437,17 +437,17 @@ class OneChoice {
 class Manychoice {
   final String manychoiceAuto;
   final String examsetsId;
-  final String manychoiceQuestion;
-  final String manychoiceA;
-  final String manychoiceB;
-  final String manychoiceC;
-  final String manychoiceD;
-  final String manychoiceE;
-  final String manychoiceF;
-  final String manychoiceG;
-  final String manychoiceH;
+  String manychoiceQuestion;  // เปลี่ยนจาก final เป็น String
+  String manychoiceA;
+  String manychoiceB;
+  String manychoiceC;
+  String manychoiceD;
+  String manychoiceE;
+  String manychoiceF;
+  String manychoiceG;
+  String manychoiceH;
   final String manychoiceAnswer;
-  final double manychoiceQuestionScore;
+  double manychoiceQuestionScore;
 
   Manychoice({
     required this.manychoiceAuto,
@@ -479,8 +479,46 @@ class Manychoice {
       manychoiceG: json['manychoice_g'],
       manychoiceH: json['manychoice_h'],
       manychoiceAnswer: json['manychoice_answer'],
-      manychoiceQuestionScore: double.parse(json['manychoice_question_score']),
+      manychoiceQuestionScore: double.tryParse(json['manychoice_question_score'].toString()) ?? 0.0,
     );
+  }
+
+   void updateQuestion(String newQuestion) {
+    manychoiceQuestion = newQuestion;
+  }
+
+  void updateScore(double newScore) {
+    manychoiceQuestionScore = newScore;
+  }
+
+  // เพิ่มฟังก์ชัน update สำหรับตัวเลือก
+  void updateChoice(String choiceKey, String choiceValue) {
+    switch (choiceKey) {
+      case 'ก':
+        manychoiceA = choiceValue;
+        break;
+      case 'ข':
+        manychoiceB = choiceValue;
+        break;
+      case 'ค':
+        manychoiceC = choiceValue;
+        break;
+      case 'ง':
+        manychoiceD = choiceValue;
+        break;
+      case 'จ':
+        manychoiceE = choiceValue;
+        break;
+      case 'ฉ':
+        manychoiceF = choiceValue;
+        break;
+      case 'ช':
+        manychoiceG = choiceValue;
+        break;
+      case 'ซ':
+        manychoiceH = choiceValue;
+        break;
+    }
   }
 }
 

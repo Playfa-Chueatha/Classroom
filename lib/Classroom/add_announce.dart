@@ -70,10 +70,6 @@ class _AnnounceClassState extends State<AnnounceClass> {
       // แปลงข้อมูล JSON ที่ได้รับจากเซิร์ฟเวอร์
       var jsonResponse = json.decode(responseBody);
       int postId = int.parse(jsonResponse['post_id']);
-
-      // print('Post saved successfully, Post ID: $postId');
-
-      // อัปโหลดไฟล์ที่เกี่ยวข้องกับโพสต์
       for (var file in files) {
         await _saveFileToPost(postId, file); 
       }
@@ -82,14 +78,15 @@ class _AnnounceClassState extends State<AnnounceClass> {
       for (var link in links) {
         await _sendLinkToAPI(postId, link);
       }
+      Navigator.of(context).pop(true);
       
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('บันทึกข้อมูลสำเร็จ')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('บันทึกข้อมูลสำเร็จ'),backgroundColor: Colors.green,));
     } else {
       throw 'Server error: ${response.statusCode}';
     }
   } catch (e) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('เกิดข้อผิดพลาด: $e')),
+      SnackBar(content: Text('เกิดข้อผิดพลาด: $e'),backgroundColor: Colors.red,),
     );
     print('ErrorPHP: $e');
   }
@@ -294,10 +291,10 @@ class _AnnounceClassState extends State<AnnounceClass> {
                           formKey.currentState!.save();
                           await _sendDataToPHP(annoncetext, selectedFiles, links);
                           formKey.currentState!.reset();
-                          Navigator.pop(context);
+                          
                         } else {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('กรุณากรอกข้อมูลให้ครบถ้วน')),
+                            SnackBar(content: Text('กรุณากรอกข้อมูลให้ครบถ้วน'),backgroundColor: Colors.red,),
                           );
                         }
                       },

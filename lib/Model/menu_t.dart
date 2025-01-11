@@ -110,6 +110,10 @@ class _MenuState extends State<Menuu_class> {
 
   @override
   Widget build(BuildContext context) {
+
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 195, 238, 250),
       body: isLoading
@@ -118,8 +122,9 @@ class _MenuState extends State<Menuu_class> {
               children: [
                 
                 Container(
-                  height: 450,
-                  width: 350,
+                  height: screenHeight * 0.4,
+                  width: screenWidth * 0.35,
+                  padding: EdgeInsets.all(10),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: const BorderRadius.only(
@@ -127,49 +132,23 @@ class _MenuState extends State<Menuu_class> {
                       bottomRight: Radius.circular(20),
                     ),
                   ),
-                  child: Column(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(300, 10, 10, 0),
-                        child: IconButton(
-                          tooltip: 'ตั้งค่าห้องเรียน',
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => SettingCalss(
-                                  thfname: widget.thfname,
-                                  thlname: widget.thlname,
-                                  username: widget.username,
-                                  classroomMajor: '',
-                                  classroomName: '',
-                                  classroomNumRoom: '',
-                                  classroomYear: '',
-                                ),
-                              ),
-                            );
-                          },
-                          icon: const Icon(Icons.settings),
-                        ),
-                      ),
-                      SizedBox(
-                        height: 350,
-                        width: 300,
+                  child: SizedBox(
+                        height: screenHeight * 0.39,
+                        width: screenWidth * 0.3,
                         child: List_classroom_inclass(
                           thfname: widget.thfname,
                           thlname: widget.thlname,
                           username: widget.username,
                         ),
                       ),
-                    ],
-                  ),
                 ),
-                const SizedBox(height: 20),
+                 SizedBox(height: screenHeight * 0.02,),
+
 
                 
                 Container(
-                height: 530,
-                width: 350,
+                height: screenHeight * 0.475,
+                width: screenWidth * 0.35,
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: const BorderRadius.only(

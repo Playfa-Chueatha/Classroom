@@ -154,9 +154,12 @@ class _TodocalssState extends State<Todocalss_S> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
     return Container(
-      height: 350,
-      width: 1000,
+      height: screenHeight * 0.3,
+      width: screenWidth * 1,
       decoration: BoxDecoration(
         color: Color.fromARGB(255, 170, 205, 238),
         borderRadius: BorderRadius.circular(20),
@@ -164,17 +167,19 @@ class _TodocalssState extends State<Todocalss_S> {
       child: Column(
         children: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
+              Padding(padding: EdgeInsets.all(10),
+              child: 
               Text(
                 'สิ่งที่ต้องทำ',
                 style: TextStyle(
                   fontSize: 20,
                   color: Colors.black,
                 ),
-              ),
+              )),
               Padding(
-                padding: EdgeInsets.fromLTRB(1150, 15, 0, 10),
+                padding: EdgeInsets.fromLTRB(10, 15, 5, 10),
                 child: IconButton(
                   color: Color.fromARGB(255, 0, 0, 0),
                   icon: const Icon(Icons.add),
@@ -200,8 +205,8 @@ class _TodocalssState extends State<Todocalss_S> {
           SingleChildScrollView(
             scrollDirection: Axis.vertical,
             child: SizedBox(
-              height: 400,
-              width: 1350,
+              height: screenHeight * 0.2,
+              width: screenWidth * 1.35,
               child: ListView.builder(
                 itemCount: datatodolist_t.where((todo) => todo.status != 'Inactive').toList().length,
                 itemBuilder: (context, index) {
@@ -240,7 +245,7 @@ class _TodocalssState extends State<Todocalss_S> {
                                 decoration: filteredTodos[index].status == 'Completed' ? TextDecoration.lineThrough : TextDecoration.none,
                               ),
                             ),
-                            SizedBox(height: 4), // เว้นระยะระหว่าง title และ detail
+                            SizedBox(height:screenHeight * 0.01,),
                             Text(
                               filteredTodos[index].detail, // แสดง detail
                               style: TextStyle(
@@ -251,8 +256,8 @@ class _TodocalssState extends State<Todocalss_S> {
                           ],
                         ),
                         trailing: Container(
-                          height: 35,
-                          width: 35,
+                          height: screenHeight * 0.035,
+                          width: screenWidth * 0.035,
                           decoration: BoxDecoration(borderRadius: BorderRadius.circular(5)),
                           child: IconButton(
                             color: Colors.red,

@@ -10,6 +10,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class Score_T_body extends StatefulWidget {
+  final Examset exam;
   final String username;
   final String thfname;
   final String thlname;
@@ -27,6 +28,7 @@ class Score_T_body extends StatefulWidget {
     required this.classroomMajor, 
     required this.classroomYear, 
     required this.classroomNumRoom, 
+    required this.exam,
   });
 
 
@@ -153,6 +155,9 @@ class _Score_T_bodyState extends State<Score_T_body> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
     return Scaffold(
       backgroundColor: Color.fromARGB(255, 195, 238, 250),
       appBar: AppBar(
@@ -168,27 +173,24 @@ class _Score_T_bodyState extends State<Score_T_body> {
             thfname: widget.thfname,
             thlname: widget.thlname,
             username: widget.username,
+            classroomMajor: widget.classroomMajor,
+            classroomName: widget.classroomName,
+            classroomNumRoom: widget.classroomNumRoom,
+            classroomYear: widget.classroomYear,
           ),
         ],
       ),
        body: SingleChildScrollView(
-        scrollDirection: Axis.vertical,
         child: Column(
           children: [
-            SizedBox(height: 10),
-            Column(
-              children: [
-                SizedBox(height: 30),
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
+           SizedBox(height: screenHeight * 0.01),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-
-
                       //menu
                        Container(
-                      height: 1000,
-                      width: 400,
+                      height: screenHeight * 0.9,
+                      width: screenWidth * 0.18,
                       alignment: Alignment.topCenter,
                       decoration: BoxDecoration(
                         color: Color.fromARGB(255, 195, 238, 250),
@@ -204,44 +206,44 @@ class _Score_T_bodyState extends State<Score_T_body> {
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
                             Container(
-                              height: 550,
-                              width: 350,
+                              height: screenHeight * 0.4,
+                              width: screenWidth * 0.35,
+                              padding: EdgeInsets.all(10),
                               decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(20),
+                                borderRadius: BorderRadius.only(
+                                  topRight: Radius.circular(20),
+                                  bottomRight: Radius.circular(20),
+                                ),
                                 color: Colors.white
                               ),
                               child: Column(
                                 children: [
-                                  Padding(
-                                    padding: EdgeInsets.fromLTRB(300, 10, 10, 0),
-                                    child: IconButton(
-                                      tooltip: 'ตั้งค่าห้องเรียน',
-                                      onPressed: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) => SettingCalss(thfname: widget.thfname, thlname: widget.thlname, username: widget.username,classroomMajor: '',classroomName: '',classroomNumRoom: '',classroomYear: '',),
-                                          ),
-                                        );
-                                      },
-                                      icon: Icon(Icons.settings),
-                                    ),
-                                  ),
                                   
-                                  SizedBox(
-                                    height: 500,
-                                    width: 350,
-                                    child: List_classroom_Score(thfname: widget.thfname, thlname: widget.thlname, username: widget.username,), // Menu_listclassroom.dart
+                                  Container(
+                                    height: screenHeight * 0.37,
+                                    width: screenWidth * 0.3,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.only(
+                                        topRight: Radius.circular(20),
+                                        bottomRight: Radius.circular(20)
+                                      )
+                                    ),
+                                    child: List_classroom_Score(
+                                      thfname: widget.thfname, 
+                                      thlname: widget.thlname, 
+                                      username: widget.username,
+                                      exam: widget.exam, 
+                                    ), // Menu_listclassroom.dart
                                   ),
 
                                 ],
                               ),
                             ),
-                            SizedBox(height: 20),
+                            SizedBox(height: screenHeight * 0.02,),
                           
                             Container(
-                              height: 420,
-                              width: 350,
+                              height: screenHeight * 0.475,
+                              width: screenWidth * 0.35,
                               decoration: BoxDecoration(
                                 color: Colors.white,
                                 borderRadius: BorderRadius.only(
@@ -312,14 +314,10 @@ class _Score_T_bodyState extends State<Score_T_body> {
                       )
                       ),
 
-
-
-
-                      SizedBox(width: 50,),
-
                       Container(
-                        height: 1000,
-                        width: 1440,
+                        height: screenHeight * 0.9,
+                        width: screenWidth * 0.8,
+                        margin: EdgeInsets.all(5),
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(20)
@@ -335,16 +333,14 @@ class _Score_T_bodyState extends State<Score_T_body> {
                         ),  
                                          
                       ),
-                      SizedBox(width: 30)
                       
                     ],
                   ),
-                )
-              ],
-            )
-          ],
-        ),
-       ),
+                
+              ]
+            ))
+      
+    
     );
   }
 }

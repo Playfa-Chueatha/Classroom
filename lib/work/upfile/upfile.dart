@@ -11,6 +11,7 @@ import 'dart:io';
 import 'package:url_launcher/url_launcher.dart';
 
 class upfilework extends StatefulWidget {
+  final Examset exam;
   final String username;
   final String thfname;
   final String thlname;
@@ -21,6 +22,7 @@ class upfilework extends StatefulWidget {
 
   const upfilework({
     super.key,
+    required this.exam,
     required this.username,
     required this.thfname,
     required this.thlname,
@@ -250,6 +252,7 @@ Future<void> saveLinks(int examsetsId, List<String> links) async {
             classroomName: widget.classroomName,
             classroomNumRoom: widget.classroomNumRoom,
             classroomYear: widget.classroomYear,
+            exam: widget.exam,
           )),
         );
       } catch (e) {

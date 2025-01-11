@@ -15,12 +15,20 @@ class Detail_work extends StatefulWidget {
   final String username;
   final String thfname;
   final String thlname;
+  final String classroomName;
+  final String classroomMajor;
+  final String classroomYear;
+  final String classroomNumRoom;
   const Detail_work({
     super.key, 
     required this.exam,
     required this.username, 
     required this.thfname, 
     required this.thlname, 
+    required this.classroomName, 
+    required this.classroomMajor, 
+    required this.classroomYear, 
+    required this.classroomNumRoom, 
   });
 
   @override
@@ -378,6 +386,10 @@ void didUpdateWidget(covariant Detail_work oldWidget) {
                                         thfname: widget.thfname,
                                         thlname: widget.thlname,
                                         username: widget.username,
+                                        classroomMajor: widget.classroomMajor,
+                                        classroomName: widget.classroomName,
+                                        classroomNumRoom: widget.classroomNumRoom,
+                                        classroomYear: widget.classroomYear,
                                         studentData: {
                                           'users_prefix': student['users_prefix'],
                                           'users_thfname': student['users_thfname'],
@@ -388,11 +400,14 @@ void didUpdateWidget(covariant Detail_work oldWidget) {
                                         
                                       ),
                                     ),
-                                  ).then((_) {
-                                    // รีเซ็ตข้อมูลเมื่อกลับมาจากหน้า ChechWorkUpfile
-                                    setState(() {
-                                      currentFileUrl = null;
-                                    });
+                                  ).then((result) {
+                                    
+                                    if (result == 'refresh') {
+                                      setState(() {
+                                        // รีเฟรชข้อมูลที่หน้าแรก
+                                        currentFileUrl = fetchStudentData() as String?;  // รีเซ็ตข้อมูลที่ต้องการให้รีเฟรช
+                                      });
+                                    }
                                   });
                                 },
                                 style: ButtonStyle(
@@ -435,6 +450,10 @@ void didUpdateWidget(covariant Detail_work oldWidget) {
                                       thfname: widget.thfname,
                                       thlname: widget.thlname,
                                       username: widget.username,
+                                      classroomMajor: widget.classroomMajor,
+                                      classroomName: widget.classroomName,
+                                      classroomNumRoom: widget.classroomNumRoom,
+                                      classroomYear: widget.classroomYear,
                                       studentData: {
                                         'users_prefix': student['users_prefix'],
                                         'users_thfname': student['users_thfname'],
@@ -444,12 +463,15 @@ void didUpdateWidget(covariant Detail_work oldWidget) {
                                       exam: widget.exam,
                                     ),
                                   ),
-                                ).then((_) {
-                                  
-                                  setState(() {
-                                    currentFileUrl = null;
+                                ).then((result) {
+                                    
+                                    if (result == 'refresh') {
+                                      setState(() {
+                                        // รีเฟรชข้อมูลที่หน้าแรก
+                                        currentFileUrl = fetchStudentData() as String?;  
+                                      });
+                                    }
                                   });
-                                });
                               },
                               style: ButtonStyle(
                                 side: MaterialStateProperty.all(
@@ -595,6 +617,10 @@ void didUpdateWidget(covariant Detail_work oldWidget) {
                                               thfname: widget.thfname,
                                               thlname: widget.thlname,
                                               username: widget.username,
+                                              classroomMajor: widget.classroomMajor, 
+                                              classroomName: widget.classroomName, 
+                                              classroomYear: widget.classroomYear, 
+                                              classroomNumRoom: widget.classroomNumRoom,
                                               studentData: {
                                                 'users_prefix': student['users_prefix'],
                                                 'users_thfname': student['users_thfname'],
@@ -604,12 +630,15 @@ void didUpdateWidget(covariant Detail_work oldWidget) {
                                               exam: widget.exam,
                                             ),
                                           ),
-                                        ).then((_) {
-                                          // รีเซ็ตข้อมูลเมื่อกลับมาจากหน้า ChechWorkUpfile
-                                          setState(() {
-                                            currentFileUrl = null;
-                                          });
-                                        });
+                                        ).then((result) {
+                                    
+                                    if (result == 'refresh') {
+                                      setState(() {
+                                        // รีเฟรชข้อมูลที่หน้าแรก
+                                        currentFileUrl = fetchStudentData() as String?;  // รีเซ็ตข้อมูลที่ต้องการให้รีเฟรช
+                                      });
+                                    }
+                                  });
                                       },
                                       style: ButtonStyle(
                                         side: MaterialStateProperty.all(
@@ -650,6 +679,10 @@ void didUpdateWidget(covariant Detail_work oldWidget) {
                                       thfname: widget.thfname,
                                       thlname: widget.thlname,
                                       username: widget.username,
+                                      classroomMajor: widget.classroomMajor, 
+                                      classroomName: widget.classroomName, 
+                                      classroomYear: widget.classroomYear, 
+                                      classroomNumRoom: widget.classroomNumRoom,
                                       studentData: {
                                         'users_prefix': student['users_prefix'],
                                         'users_thfname': student['users_thfname'],
@@ -659,12 +692,15 @@ void didUpdateWidget(covariant Detail_work oldWidget) {
                                       exam: widget.exam,
                                     ),
                                   ),
-                                ).then((_) {
-                                  // รีเซ็ตข้อมูลเมื่อกลับมาจากหน้า ChechWorkUpfile
-                                  setState(() {
-                                    currentFileUrl = null;
+                                ).then((result) {
+                                    
+                                    if (result == 'refresh') {
+                                      setState(() {
+                                        // รีเฟรชข้อมูลที่หน้าแรก
+                                        currentFileUrl = fetchStudentData() as String?;  // รีเซ็ตข้อมูลที่ต้องการให้รีเฟรช
+                                      });
+                                    }
                                   });
-                                });
                               },
                               style: ButtonStyle(
                                 side: MaterialStateProperty.all(
@@ -843,7 +879,7 @@ void didUpdateWidget(covariant Detail_work oldWidget) {
               ],
               SizedBox(height: 16),
               Row(
-                mainAxisAlignment: MainAxisAlignment.center, 
+                mainAxisAlignment: MainAxisAlignment.end, 
                 children: [
                   OutlinedButton(
                     onPressed: () {

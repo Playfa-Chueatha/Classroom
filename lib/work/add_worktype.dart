@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_esclass_2/Data/Data.dart';
 import 'package:flutter_esclass_2/test.dart';
 import 'package:flutter_esclass_2/work/auswer/auswerQ.dart';
 import 'package:flutter_esclass_2/work/manychoice/many_choice.dart';
@@ -6,6 +7,7 @@ import 'package:flutter_esclass_2/work/onechoice/one_choice.dart';
 import 'package:flutter_esclass_2/work/upfile/upfile.dart';
 
 class Type_work extends StatefulWidget {
+  final Examset exam;
   final String username;
   final String thfname;
   final String thlname;
@@ -15,6 +17,7 @@ class Type_work extends StatefulWidget {
   final String classroomNumRoom;
   const Type_work({
     super.key, 
+    required this.exam,
     required this.username,
     required this.thfname, 
     required this.thlname, 
@@ -77,6 +80,7 @@ class _Type_workState extends State<Type_work> {
                     username: widget.username, 
                     thfname: widget.thfname,
                     thlname: widget.thlname,
+                    exam: widget.exam, 
                     classroomName: widget.classroomName,
                     classroomMajor: widget.classroomMajor,
                     classroomNumRoom: widget.classroomNumRoom,
@@ -87,6 +91,7 @@ class _Type_workState extends State<Type_work> {
                     username: widget.username, 
                     thfname: widget.thfname,
                     thlname: widget.thlname,
+                    exam: widget.exam, 
                     classroomName: widget.classroomName,
                     classroomMajor: widget.classroomMajor,
                     classroomNumRoom: widget.classroomNumRoom,
@@ -96,6 +101,7 @@ class _Type_workState extends State<Type_work> {
                     username: widget.username, 
                     thfname: widget.thfname,
                     thlname: widget.thlname,
+                    exam: widget.exam, 
                     classroomName: widget.classroomName,
                     classroomMajor: widget.classroomMajor,
                     classroomNumRoom: widget.classroomNumRoom,
@@ -105,6 +111,7 @@ class _Type_workState extends State<Type_work> {
                     username: widget.username, 
                     thfname: widget.thfname,
                     thlname: widget.thlname,
+                    exam: widget.exam,
                     classroomName: widget.classroomName,
                     classroomMajor: widget.classroomMajor,
                     classroomNumRoom: widget.classroomNumRoom,

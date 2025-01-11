@@ -75,6 +75,9 @@ class _homeState extends State<main_home_S> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
     return Scaffold(
       backgroundColor: Color.fromARGB(255, 195, 238, 250),
       appBar: AppBar(
@@ -90,22 +93,16 @@ class _homeState extends State<main_home_S> {
         ],
       ),
       body: SingleChildScrollView(
-        scrollDirection: Axis.vertical,
-        child: Column(
-          children: [
-            SizedBox(height: 10,),
-            Column(
+        child:  Column(
               children: [
-                SizedBox(height: 30),
-                SingleChildScrollView(
-                  scrollDirection:Axis.horizontal,
-                  child: Row(
+                SizedBox(height: screenHeight * 0.01),
+                  Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       //menu
                       Container(
-                        height: 1000,
-                        width: 400,
+                        height: screenHeight * 0.9,
+                        width: screenWidth * 0.18,
                         alignment: Alignment.topCenter,
                         decoration: BoxDecoration(
                           color: Color.fromARGB(255, 195, 238, 250),
@@ -119,9 +116,9 @@ class _homeState extends State<main_home_S> {
 
                       //ปฏิทิน
                       Container(
-                        height: 1000,
-                        width: 1500,
-                        margin: EdgeInsets.all(10),
+                        height: screenHeight * 0.9,
+                        width: screenWidth * 0.8,
+                        margin: EdgeInsets.all(5),
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(20)
@@ -133,16 +130,17 @@ class _homeState extends State<main_home_S> {
                               Padding(
                                 padding: EdgeInsets.all(10),
                                 child: SizedBox(
-                                  height: 470,
-                                  width: 1450,
+                                  height: screenHeight * 0.47,
+                                  width: screenWidth * 1.45,
                                   child: CalendarHome_S(username: widget.username), //calendar.dart
                                 ),
                               ),
 
                               //todolist
                               Container(
-                                height: 500,
-                                width: 1400,               
+                                height: screenHeight * 0.35,
+                                width: screenWidth * 1.4,           
+                                margin: EdgeInsets.fromLTRB(10, 0, 10, 10),
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(20),
                                 ),
@@ -153,13 +151,12 @@ class _homeState extends State<main_home_S> {
                         ),
                       ),
                     ],
-                  ),
                 )
-              ],
-            )
+              
+            
           ],
-        )
-      ),
+        ))
+      
     );
   }
 }

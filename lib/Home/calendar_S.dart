@@ -17,6 +17,7 @@ class _CalendarHomeState extends State<CalendarHome_S> {
   late List<Map<String, String>> _selectedEvents;
   late DateTime _selectedDay;
   List<Even_teacher> dataevent = [];
+  bool show2WeekButton = false;
 
 
 void fetchEvents() async {
@@ -72,7 +73,8 @@ void fetchEvents() async {
           }
 
           // อัปเดตเหตุการณ์ที่เลือกไว้สำหรับ UI
-          _selectedEvents = _events[_selectedDay] ?? [];
+          final todayKey = DateTime(_selectedDay.year, _selectedDay.month, _selectedDay.day);
+          _selectedEvents = _events[todayKey] ?? [];
         });
       } else {
         // ใช้ Snackbar เพื่อแจ้งข้อผิดพลาดให้ผู้ใช้
@@ -112,18 +114,20 @@ void fetchEvents() async {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 255, 255, 255),
       body: Column(
         children: [
           
           Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Container(
-                padding: EdgeInsets.fromLTRB(10,30,30,10),
-                height: 400,
-                width: 1000,
-                margin: EdgeInsets.all(5),
+                height: screenHeight * 0.45,
+                width: screenWidth * 0.55,
                 decoration: BoxDecoration(color: Colors.white),
                 child: TableCalendar(
                   firstDay: DateTime.utc(2020, 1, 1),
@@ -149,12 +153,17 @@ void fetchEvents() async {
                       shape: BoxShape.circle,
                     ),
                   ),
-                  
+                  headerStyle: HeaderStyle(
+                    formatButtonVisible: false, // ซ่อนปุ่มที่เกี่ยวกับการเปลี่ยนมุมมอง (สัปดาห์, เดือน)
+                    titleCentered: true, // จัดตำแหน่งหัวข้อให้ตรงกลาง
+                    leftChevronVisible: true, // แสดงปุ่มเลื่อนเดือนก่อนหน้า
+                    rightChevronVisible: true, // แสดงปุ่มเลื่อนเดือนถัดไป
+                  ),
                 ),
               ),
               Container(
-                height: 400,
-                width: 400,
+                height: screenHeight * 0.4,
+                width: screenWidth * 0.2,
                 margin: EdgeInsets.all(5),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(20),

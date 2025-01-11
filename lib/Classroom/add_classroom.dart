@@ -8,11 +8,13 @@ import 'dart:convert';
 import 'package:connectivity_plus/connectivity_plus.dart';
 
 class AddClassroom extends StatefulWidget {
+  final Examset exam;
   final String username;
   final String thfname;
   final String thlname;
   const AddClassroom({
     super.key, 
+    required this.exam,
     required this.username,
     required this.thfname,
     required this.thlname,

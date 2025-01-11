@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_esclass_2/Classroom/add_classroom.dart';
 import 'package:flutter_esclass_2/Classroom/dialog_searchStudents.dart';
+import 'package:flutter_esclass_2/Data/Data.dart';
 import 'package:flutter_esclass_2/Model/Menu_listclassroom_T.dart';
 import 'package:flutter_esclass_2/Model/appbar_teacher.dart';
 import 'package:http/http.dart' as http;
@@ -176,6 +177,10 @@ void sortStudentsremove() {
             thfname: widget.thfname,
             thlname: widget.thlname,
             username: widget.username,
+            classroomMajor: widget.classroomMajor, 
+            classroomName: widget.classroomName, 
+            classroomYear: widget.classroomYear, 
+            classroomNumRoom: widget.classroomNumRoom,
           ),
         ],
       ),
@@ -213,7 +218,7 @@ void sortStudentsremove() {
                                   // แสดง dialog เพิ่มห้องเรียน
                                   bool? result = await showDialog(
                                     context: context,
-                                    builder: (BuildContext context) => AddClassroom(username: widget.username,thfname: widget.thfname,thlname: widget.thlname,),
+                                    builder: (BuildContext context) => AddClassroom(username: widget.username,thfname: widget.thfname,thlname: widget.thlname,exam: Examset(autoId: 0, direction: '', fullMark: 0, deadline: '', time: '', type: '', closed: '', inspectionStatus: '', classroomId: 0, usertUsername: ''),),
                                   );
 
                                   // ถ้า result เป็น true (บันทึกสำเร็จ), รีเฟรชหน้าหลัก

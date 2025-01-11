@@ -34,11 +34,9 @@ class _CalendarHomeState extends State<CalendarHome_T> {
           dataevent.clear();
 
           for (var event in responseData['data_assignment']) {
-            // แปลงวันที่กำหนดส่งให้เป็น DateTime object
             DateTime eventDate = DateTime.parse(event['event_assignment_duedate']);
             final eventDateKey = DateTime(eventDate.year, eventDate.month, eventDate.day);
 
-            // เพิ่มข้อมูลเหตุการณ์ทั้งหมดไปยัง dataevent
             dataevent.add(Even_teacher(
               Title: event['event_assignment_title'] ?? '',
               Date: event['event_assignment_duedate'] ?? '',
@@ -50,7 +48,6 @@ class _CalendarHomeState extends State<CalendarHome_T> {
               ClassID: event['event_assignment_classID'] ?? '',
             ));
 
-            // จัดเก็บข้อมูลทั้งหมดสำหรับ UI
             if (_events[eventDateKey] == null) {
               _events[eventDateKey] = [];
             }
@@ -66,8 +63,9 @@ class _CalendarHomeState extends State<CalendarHome_T> {
             });
           }
 
-          // อัปเดตเหตุการณ์ที่เลือกไว้สำหรับ UI
-          _selectedEvents = _events[_selectedDay] ?? [];
+          // อัปเดตเหตุการณ์ที่เลือกไว้สำหรับวันที่ปัจจุบัน
+          final todayKey = DateTime(_selectedDay.year, _selectedDay.month, _selectedDay.day);
+          _selectedEvents = _events[todayKey] ?? [];
         });
       } else {
         print('Error: ${responseData['message']}');
@@ -79,6 +77,9 @@ class _CalendarHomeState extends State<CalendarHome_T> {
     print('Network error: $e');
   }
 }
+
+
+
 
 
 
@@ -95,17 +96,20 @@ class _CalendarHomeState extends State<CalendarHome_T> {
   
   @override
   Widget build(BuildContext context) {
+
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 255, 255, 255),
       body: Column(
         children: [
           Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Container(
-                padding: EdgeInsets.fromLTRB(10,30,30,10),
-                height: 400,
-                width: 1000,
-                margin: EdgeInsets.all(5),
+                height: screenHeight * 0.45,
+                width: screenWidth * 0.55,
                 decoration: BoxDecoration(color: Colors.white),
                 child: TableCalendar(
                   firstDay: DateTime.utc(2020, 1, 1),
@@ -130,12 +134,17 @@ class _CalendarHomeState extends State<CalendarHome_T> {
                       shape: BoxShape.circle,
                     ),
                   ),
+                  headerStyle: HeaderStyle(
+                    formatButtonVisible: false, // ซ่อนปุ่มที่เกี่ยวกับการเปลี่ยนมุมมอง (สัปดาห์, เดือน)
+                    titleCentered: true, // จัดตำแหน่งหัวข้อให้ตรงกลาง
+                    leftChevronVisible: true, // แสดงปุ่มเลื่อนเดือนก่อนหน้า
+                    rightChevronVisible: true, // แสดงปุ่มเลื่อนเดือนถัดไป
+                  ),
                 ),
               ),
               Container(
-                height: 400,
-                width: 400,
-                margin: EdgeInsets.all(5),
+                height: screenHeight * 0.4,
+                width: screenWidth * 0.2,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(20),
                   color: Color.fromARGB(255, 147, 185, 221),

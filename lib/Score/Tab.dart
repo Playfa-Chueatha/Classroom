@@ -30,11 +30,14 @@ class _TabScoreState extends State<TabScore> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
     return Padding(
-      padding: EdgeInsets.all(20),
+      padding: EdgeInsets.all(10),
       child: Container(
-        height: 500,
-        width: 500,
+        height: screenHeight * 0.5,
+        width: screenWidth * 0.5,
         decoration: BoxDecoration(
           color: const Color.fromARGB(255, 255, 255, 255),
           borderRadius: BorderRadius.circular(20),

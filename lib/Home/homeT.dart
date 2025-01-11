@@ -12,8 +12,12 @@ class main_home_T extends StatefulWidget {
   final String thfname;
   final String thlname;
   final String username;  // เพิ่มตัวแปร username
-
-  const main_home_T({super.key, required this.thfname, required this.thlname, required this.username});
+  const main_home_T({
+    super.key,
+    required this.thfname, 
+    required this.thlname, 
+    required this.username,
+    });
 
   @override
   State<main_home_T> createState() => _main_home_TState();
@@ -82,6 +86,10 @@ class _main_home_TState extends State<main_home_T> {
             thfname: widget.thfname,
             thlname: widget.thlname,
             username: widget.username,
+            classroomMajor: '',
+            classroomName:  '',
+            classroomNumRoom: '',
+            classroomYear: '',
           ),
         ],
       ),
@@ -102,19 +110,16 @@ class _main_home_TState extends State<main_home_T> {
             }
             return Scaffold(
               backgroundColor: Color.fromARGB(255, 195, 238, 250),
-              body: Column(
-                  children: [
-                    SizedBox(height: screenHeight * 0.003),
-                    Column(
+              body: SingleChildScrollView(
+                child: Column(
                       children: [
-                        SizedBox(height: screenHeight * 0.03),
-                        SingleChildScrollView(
-                          child: Row(
+                        SizedBox(height: screenHeight * 0.01),
+                          Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
+                            children: [                    
                               Container(
-                                height: 1000,
-                                width: 400,
+                                height: screenHeight * 0.9,
+                                width: screenWidth * 0.18,
                                 alignment: Alignment.topCenter,
                                 decoration: BoxDecoration(
                                   color: Color.fromARGB(255, 195, 238, 250),
@@ -126,27 +131,28 @@ class _main_home_TState extends State<main_home_T> {
                                 child: Menuu_class(thfname: widget.thfname, thlname: widget.thlname, username: widget.username,),
                               ),
                               Container(
-                                height: 1000,
-                                width: 1500,
-                                margin: EdgeInsets.all(10),
+                                height: screenHeight * 0.9,
+                                width: screenWidth * 0.8,
+                                margin: EdgeInsets.all(5),
                                 decoration: BoxDecoration(
                                   color: Colors.white,
                                   borderRadius: BorderRadius.circular(20),
                                 ),
-                                child: Center(
-                                  child: Column(
+                                child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       Padding(
-                                        padding: EdgeInsets.all(10),
+                                        padding: EdgeInsets.all(5),
                                         child: SizedBox(
-                                          height: 470,
-                                          width: 1450,
+                                          height: screenHeight * 0.47,
+                                          width: screenWidth * 1.45,
                                           child: CalendarHome_T(username: widget.username), 
                                         ),
                                       ),
                                       Container(
-                                        height: 500,
-                                        width: 1400,
+                                        height: screenHeight * 0.35,
+                                        width: screenWidth * 1.4,
+                                        margin: EdgeInsets.fromLTRB(10, 0, 10, 5),
                                         decoration: BoxDecoration(
                                           borderRadius: BorderRadius.circular(20),
                                         ),
@@ -154,15 +160,15 @@ class _main_home_TState extends State<main_home_T> {
                                       ),
                                     ],
                                   ),
-                                ),
+                                
                               ),
                             ],
                           ),
-                        ),
+                        
                       ],
                     ),
-                  ],
-                ),
+              )
+                
             );
           }
         },

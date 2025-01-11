@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_esclass_2/Data/Data.dart';
 import 'package:flutter_esclass_2/work/asign_work_T.dart';
 import 'package:flutter_esclass_2/work/auswer/ClassroomSearchDialog.dart';
 import 'package:intl/intl.dart';
@@ -7,6 +8,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class OneChoice_test extends StatefulWidget {
+  final Examset exam;
   final String username;
   final String thfname;
   final String thlname;
@@ -16,6 +18,7 @@ class OneChoice_test extends StatefulWidget {
   final String classroomNumRoom;
   const OneChoice_test({
     super.key, 
+    required this.exam,
     required this.username, 
     required this.thfname, 
     required this.thlname, 
@@ -186,6 +189,7 @@ void _submitAssignment() async {
             username: widget.username,
             thfname: widget.thfname,
             thlname: widget.thlname,
+            exam: widget.exam, 
             classroomMajor: widget.classroomMajor,
             classroomName: widget.classroomName,
             classroomNumRoom: widget.classroomNumRoom,

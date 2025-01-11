@@ -376,7 +376,7 @@ Widget build(BuildContext context) {
       ],
     ),
     content: SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
+      scrollDirection: Axis.vertical,
       child: FutureBuilder<List<HistoryCheckin>>(
         future: futureCheckins,
         builder: (context, snapshot) {
@@ -403,6 +403,8 @@ Widget build(BuildContext context) {
               ..sort((a, b) => DateTime.parse(a).compareTo(DateTime.parse(b)));
 
             return Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 DataTable(
                   columnSpacing: 20.0,
@@ -551,7 +553,7 @@ Widget build(BuildContext context) {
                 ),
                 
                 Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Padding(
                     padding: EdgeInsets.all(20),
@@ -597,6 +599,7 @@ Widget build(BuildContext context) {
               
               if (!_isStatusFound) // ถ้าสถานะไม่พบ 'found'
                 Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Padding(
                       padding: const EdgeInsets.all(8.0),
@@ -606,6 +609,7 @@ Widget build(BuildContext context) {
                       ),
                     ),
                     Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         SizedBox(
                           width: 200,

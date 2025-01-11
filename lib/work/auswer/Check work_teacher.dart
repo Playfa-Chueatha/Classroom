@@ -11,6 +11,10 @@ class CheckworkTeacher extends StatefulWidget {
   final String username;
   final String thfname;
   final String thlname;
+  final String classroomName;
+  final String classroomMajor;
+  final String classroomYear;
+  final String classroomNumRoom;
 
   const CheckworkTeacher({
     super.key,
@@ -19,6 +23,10 @@ class CheckworkTeacher extends StatefulWidget {
     required this.username, 
     required this.thfname, 
     required this.thlname, 
+    required this.classroomName, 
+    required this.classroomMajor, 
+    required this.classroomYear, 
+    required this.classroomNumRoom, 
   });
 
   @override
@@ -295,18 +303,7 @@ class _CheckworkTeacherState extends State<CheckworkTeacher> {
                       ),
                     );
 
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(builder: (context) => AssignWork_class_T(
-                        classroomMajor: '',
-                        classroomName: '',
-                        classroomNumRoom: '',
-                        classroomYear: '',
-                        thfname: widget.thfname,
-                        thlname: widget.thlname,
-                        username: widget.username,
-                      )),
-                    );
+                  Navigator.pop(context, 'refresh');
                   } catch (e) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(

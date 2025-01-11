@@ -139,11 +139,11 @@ class _ScorestudentsState extends State<Scorestudenstofrteacher> {
         futureData = fetchScoreData();  // ดึงข้อมูลใหม่เมื่อบันทึกคะแนน
       });
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('บันทึกคะแนนสำเร็จ!')),
+        SnackBar(content: Text('บันทึกคะแนนสำเร็จ!'),backgroundColor: Colors.green,),
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('เกิดข้อผิดพลาดในการบันทึกคะแนน!')),
+        SnackBar(content: Text('เกิดข้อผิดพลาดในการบันทึกคะแนน!'),backgroundColor: Colors.red,),
       );
     }
   }
@@ -293,25 +293,19 @@ Color getExamsetColor(String? type) {
 
               historyCheckins = historySnapshot.data!;
               data.userDetails.sort((a, b) => a.usersNumber.compareTo(b.usersNumber));
+              
 
               
               return SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
+
                 child: Column(
                   children: [                  
 
                     Container(
                       padding: EdgeInsets.all(8.0), 
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          color: Colors.black, 
-                          width: 2, 
-                        ),
-                        borderRadius: BorderRadius.circular(8.0), 
-                      ),
                       alignment: Alignment.center, 
                       child: Row(
-
+                        mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           Container(
                             height: 15,

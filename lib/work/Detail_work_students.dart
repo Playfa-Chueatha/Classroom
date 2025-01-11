@@ -36,13 +36,14 @@ class Detail_work_S extends StatefulWidget {
 class _Detail_workState extends State<Detail_work_S> {
   final List<String> links = [];
   List<Upfile> fileData = [];
-  List<AuswerQuestion> questionData = [];
+  List<AuswerQuestion> questions = [];
   List<PlatformFile> selectedFiles = [];
   bool hasSubmitted = false;
   bool isLoading = true;
   bool status = false;
   String submitTime = '';
   List<UpfileLink> linkData = [];
+  String? currentFileUrl;
 
   Future<void> _fetchData() async {
     final exam = widget.exam;
@@ -54,8 +55,7 @@ class _Detail_workState extends State<Detail_work_S> {
           'autoId': exam.autoId.toString(),
         },
       );
-      print(response.body);
-
+      
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
 
@@ -77,6 +77,15 @@ class _Detail_workState extends State<Detail_work_S> {
               ).cast<UpfileLink>();
             }
           }
+
+           if (exam.type == 'auswer') {
+            if (data.containsKey('auswer_question')) {
+              questions = List<AuswerQuestion>.from(
+                data['auswer_question'].map((item) => AuswerQuestion.fromJson(item)),
+              ).cast<AuswerQuestion>();
+            }
+          }
+        
         });
       } else {
         print('Failed to load data. Status code: ${response.statusCode}');
@@ -96,10 +105,9 @@ class _Detail_workState extends State<Detail_work_S> {
         'examId': widget.exam.autoId.toString(),
       },
     );
-
+    print(response.body);
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
-      print('Decoded Data: $data');
       
       // เก็บค่าจาก response
       hasSubmitted = data['exists'] == true;
@@ -116,10 +124,6 @@ class _Detail_workState extends State<Detail_work_S> {
     return false;
   }
 }
-
-
-
-
 
   void _openFile(Upfile file) async {
     final url = file.upfileUrl; 
@@ -160,7 +164,7 @@ void didUpdateWidget(covariant Detail_work_S oldWidget) {
       isLoading = true;
       hasSubmitted = false;
       fileData.clear();
-      questionData.clear();
+      questions.clear();
     });
     _fetchData();
     _checkSubmit().then((value) {
@@ -693,23 +697,35 @@ void didUpdateWidget(covariant Detail_work_S oldWidget) {
                                             children: [
                                               Text('คุณยังไม่ได้ส่งงาน'),
                                               OutlinedButton(
-                                                  onPressed: () {
-                                                    Navigator.push(
-                                                      context,
-                                                      MaterialPageRoute(
-                                                        builder: (context) => Doauswerstudents(
-                                                          thfname: widget.thfname,
-                                                          thlname: widget.thlname,
-                                                          username: widget.username,
-                                                          exam: widget.exam,
-                                                          questions: questionData,
-                                                        ),
+                                                onPressed: () {
+                                                  print('Exam Data: ${widget.exam}');
+                                                  print('Exam ID: ${widget.exam.autoId}');
+                                                  print('Exam Direction: ${widget.exam.direction}');
+
+                                                  Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                      builder: (context) => Doauswerstudents(
+                                                        thfname: widget.thfname,
+                                                        thlname: widget.thlname,
+                                                        username: widget.username,
+                                                        exam: widget.exam,
+                                                        questions: questions,
                                                       ),
-                                                    );
-                                                  },
-                                                  child: Text('ไปตอบคำถาม'),
-                                                ),
-                                              
+                                                    ),
+                                                  ).then((result) {
+                                                    // ตรวจสอบค่าที่ส่งกลับจากหน้า Doauswerstudents
+                                                    if (result == 'refresh') {
+                                                      setState(() {
+                                                        // รีเฟรชข้อมูลในหน้าแรก
+                                                        currentFileUrl = _checkSubmit() as String?; // หรือรีเซ็ตข้อมูลที่ต้องการ
+                                                        print('UI has been refreshed!');
+                                                      });
+                                                    }
+                                                  });
+                                                },
+                                                child: Text('ไปตอบคำถาม'),
+                                              )                                   
                                             ],
                                           );
                                         }
@@ -722,22 +738,33 @@ void didUpdateWidget(covariant Detail_work_S oldWidget) {
                                               children: [
                                                 Text('คุณยังไม่ได้ส่งงาน'),
                                                 OutlinedButton(
-                                                  onPressed: () {
-                                                    Navigator.push(
-                                                      context,
-                                                      MaterialPageRoute(
-                                                        builder: (context) => Doauswerstudents(
-                                                          thfname: widget.thfname,
-                                                          thlname: widget.thlname,
-                                                          username: widget.username,
-                                                          exam: widget.exam,
-                                                          questions: questionData,
-                                                        ),
+                                                onPressed: () {
+                                                  print('Exam ID: ${widget.exam.autoId}');
+                                                  print('Exam Direction: ${widget.exam.direction}');
+
+                                                  Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                      builder: (context) => Doauswerstudents(
+                                                        thfname: widget.thfname,
+                                                        thlname: widget.thlname,
+                                                        username: widget.username,
+                                                        exam: widget.exam,
+                                                        questions: questions,
                                                       ),
-                                                    );
-                                                  },
-                                                  child: Text('ไปตอบคำถาม'),
-                                                ),
+                                                    ),
+                                                  ).then((result) {
+                                                    // ตรวจสอบค่าที่ส่งกลับจากหน้า Doauswerstudents
+                                                    if (result == 'refresh') {
+                                                      setState(() {
+                                                        // รีเฟรชข้อมูลในหน้าแรก
+                                                        currentFileUrl =  _checkSubmit() as String?; // หรือรีเซ็ตข้อมูลที่ต้องการ
+                                                      });
+                                                    }
+                                                  });
+                                                },
+                                                child: Text('ไปตอบคำถาม'),
+                                              )
                                               ],
                                             );
                                           } else if (difference.inDays == 0){
@@ -745,19 +772,31 @@ void didUpdateWidget(covariant Detail_work_S oldWidget) {
                                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                             children: [
                                               Text('กำหนดส่งวันนี้วันสุดท้ายกรุณาส่งงานโดยเร็ว!', style: TextStyle(color: Colors.orange, fontSize: 14),),
-                                              IconButton(
-                                              onPressed: () async {
-                                                FilePickerResult? result = await FilePicker.platform.pickFiles(
-                                                  allowMultiple: true,
-                                                );
-                                                if (result != null) {
-                                                  setState(() {
-                                                    selectedFiles = result.files;
+                                              OutlinedButton(
+                                                onPressed: () {
+                                                  Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                      builder: (context) => Doauswerstudents(
+                                                        thfname: widget.thfname,
+                                                        thlname: widget.thlname,
+                                                        username: widget.username,
+                                                        exam: widget.exam,
+                                                        questions: questions,
+                                                      ),
+                                                    ),
+                                                  ).then((result) {
+                                                    // ตรวจสอบค่าที่ส่งกลับจากหน้า Doauswerstudents
+                                                    if (result == 'refresh') {
+                                                      setState(() {
+                                                        // รีเฟรชข้อมูลในหน้าแรก
+                                                        currentFileUrl =  _checkSubmit() as String?; // หรือรีเซ็ตข้อมูลที่ต้องการ
+                                                      });
+                                                    }
                                                   });
-                                                }
-                                              },
-                                              icon: Icon(Icons.upload, size: 30),
-                                            ),
+                                                },
+                                                child: Text('ไปตอบคำถาม'),
+                                              )
                                             ],
                                           );
                                           } else {
@@ -770,22 +809,29 @@ void didUpdateWidget(covariant Detail_work_S oldWidget) {
                                                   style: TextStyle(color: Colors.orange, fontSize: 14),
                                                 ),
                                                 OutlinedButton(
-                                                  onPressed: () {
-                                                    Navigator.push(
-                                                      context,
-                                                      MaterialPageRoute(
-                                                        builder: (context) => Doauswerstudents(
-                                                          thfname: widget.thfname,
-                                                          thlname: widget.thlname,
-                                                          username: widget.username,
-                                                          exam: widget.exam,
-                                                          questions: questionData,
-                                                        ),
+                                                onPressed: () {
+                                                  Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                      builder: (context) => Doauswerstudents(
+                                                        thfname: widget.thfname,
+                                                        thlname: widget.thlname,
+                                                        username: widget.username,
+                                                        exam: widget.exam,
+                                                        questions: questions,
                                                       ),
-                                                    );
-                                                  },
-                                                  child: Text('ไปตอบคำถาม'),
-                                                ),
+                                                    ),
+                                                  ).then((result) {
+                                                    
+                                                    if (result == 'refresh') {
+                                                      setState(() {
+                                                        currentFileUrl =  _checkSubmit() as String?; // หรือรีเซ็ตข้อมูลที่ต้องการ
+                                                      });
+                                                    }
+                                                  });
+                                                },
+                                                child: Text('ไปตอบคำถาม'),
+                                              )
                                               ],
                                             );
                                           }
@@ -937,18 +983,21 @@ void didUpdateWidget(covariant Detail_work_S oldWidget) {
                                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                             children: [
                                               Text('กำหนดส่งวันนี้วันสุดท้ายกรุณาทำข้อสอบโดยเร็ว!', style: TextStyle(color: Colors.orange, fontSize: 14),),
-                                              IconButton(
-                                              onPressed: () async {
-                                                FilePickerResult? result = await FilePicker.platform.pickFiles(
-                                                  allowMultiple: true,
+                                              OutlinedButton(
+                                              onPressed: () {
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) => Doonechoicestudents(
+                                                      exam: widget.exam,
+                                                      username: widget.username,
+                                                      thfname: widget.thfname,
+                                                      thlname: widget.thlname,
+                                                    ),
+                                                  ),
                                                 );
-                                                if (result != null) {
-                                                  setState(() {
-                                                    selectedFiles = result.files;
-                                                  });
-                                                }
                                               },
-                                              icon: Icon(Icons.upload, size: 30),
+                                              child: Text('ไปทำข้อสอบ'),
                                             ),
                                             ],
                                           );
@@ -1078,9 +1127,9 @@ void didUpdateWidget(covariant Detail_work_S oldWidget) {
                                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                             children: [
                                               Text('คุณยังไม่ได้ทำข้อสอบ'),
-                                              IconButton(
-                                                onPressed: () async {
-                                                  Navigator.push(
+                                              OutlinedButton(
+                                                  onPressed: () {
+                                                    Navigator.push(
                                                       context,
                                                       MaterialPageRoute(
                                                         builder: (context) => Domanychoicestudents(
@@ -1091,10 +1140,9 @@ void didUpdateWidget(covariant Detail_work_S oldWidget) {
                                                         ),
                                                       ),
                                                     );
-                                                  
-                                                },
-                                                icon: Icon(Icons.upload, size: 30),
-                                              ),
+                                                  },
+                                                  child: Text('ไปทำข้อสอบ'),
+                                                )
                                             ],
                                           );
                                         }
@@ -1132,19 +1180,22 @@ void didUpdateWidget(covariant Detail_work_S oldWidget) {
                                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                             children: [
                                               Text('กำหนดส่งวันนี้วันสุดท้ายกรุณาทำข้อสอบโดยเร็ว!', style: TextStyle(color: Colors.orange, fontSize: 14),),
-                                              IconButton(
-                                              onPressed: () async {
-                                                FilePickerResult? result = await FilePicker.platform.pickFiles(
-                                                  allowMultiple: true,
-                                                );
-                                                if (result != null) {
-                                                  setState(() {
-                                                    selectedFiles = result.files;
-                                                  });
-                                                }
-                                              },
-                                              icon: Icon(Icons.upload, size: 30),
-                                            ),
+                                              OutlinedButton(
+                                                  onPressed: () {
+                                                    Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                        builder: (context) => Domanychoicestudents(
+                                                          exam: widget.exam,
+                                                          username: widget.username,
+                                                          thfname: widget.thfname,
+                                                          thlname: widget.thlname,
+                                                        ),
+                                                      ),
+                                                    );
+                                                  },
+                                                  child: Text('ไปทำข้อสอบ'),
+                                                )
                                             ],
                                           );
 

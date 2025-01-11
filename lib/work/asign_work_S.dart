@@ -339,6 +339,9 @@ void initState() {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
     return Scaffold(
       backgroundColor: Color.fromARGB(255, 195, 238, 250),
       appBar: AppBar(
@@ -359,21 +362,16 @@ void initState() {
         ],
       ),
       body: SingleChildScrollView(
-        scrollDirection: Axis.vertical,
         child: Column(
           children: [
-            SizedBox(height: 10,),
-            Column(
-              children: [
-                SizedBox(height: 30),
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
+            SizedBox(height: screenHeight * 0.01),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       //menu
                       Container(
-                      height: 1000,
-                      width: 400,
+                      height: screenHeight * 0.9,
+                      width: screenWidth * 0.18,
                       alignment: Alignment.topCenter,
                       decoration: BoxDecoration(
                         color: Color.fromARGB(255, 195, 238, 250),
@@ -389,30 +387,40 @@ void initState() {
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
                             Container(
-                              height: 550,
-                              width: 350,
+                              height: screenHeight * 0.4,
+                              width: screenWidth * 0.35,
+                              padding: EdgeInsets.all(10),
                               decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(20),
+                                borderRadius: BorderRadius.only(
+                                  topRight: Radius.circular(20),
+                                  bottomRight: Radius.circular(20),
+                                ),
                                 color: Colors.white
                               ),
                               child: Column(
                                 children: [
                                   
                                   
-                                  SizedBox(
-                                    height: 500,
-                                    width: 350,
+                                  Container(
+                                    height: screenHeight * 0.37,
+                                    width: screenWidth * 0.3,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.only(
+                                        topRight: Radius.circular(20),
+                                        bottomRight: Radius.circular(20)
+                                      )
+                                    ),
                                     child: List_classroom_Sinclass(thfname: widget.thfname, thlname: widget.thlname, username: widget.username) // Menu_listclassroom.dart
                                   ),
 
                                 ],
                               ),
                             ),
-                            SizedBox(height: 20),
+                            SizedBox(height: screenHeight * 0.02,),
                           
                             Container(
-                                height: 420,
-                                width: 350,
+                                height: screenHeight * 0.475,
+                                width: screenWidth * 0.35,
                                 decoration: BoxDecoration(
                                   color: Colors.white,
                                   borderRadius: const BorderRadius.only(
@@ -487,8 +495,9 @@ void initState() {
 
                       //งานที่ได้รับ
                      Container(
-                      height: 1000,
-                      width: 600,
+                      height: screenHeight * 0.9,
+                      width: screenWidth * 0.32,
+                      margin: EdgeInsets.all(10),
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(20)
@@ -503,12 +512,12 @@ void initState() {
                           
                             //งานที่มอบหมาย
                             Container(
-                              width: 500,
+                              width: screenWidth * 0.5,
+                              margin: EdgeInsets.fromLTRB(20, 10, 20, 10),
                               padding: EdgeInsets.all(20),
-                              margin: EdgeInsets.fromLTRB(0, 0, 0, 20),
                               decoration: BoxDecoration(
                                 color: Color.fromARGB(255, 147, 185, 221),
-                                borderRadius: BorderRadius.circular(20),
+                                borderRadius: BorderRadius.circular(10),
                               ),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -600,12 +609,12 @@ void initState() {
 
                             //งานที่เลยกำหนด
                             Container(
-                              width: 500,
+                              width: screenWidth * 0.5,
+                              margin: EdgeInsets.fromLTRB(20, 10, 20, 10),
                               padding: EdgeInsets.all(20),
-                              margin: EdgeInsets.fromLTRB(0, 0, 0, 20),
                               decoration: BoxDecoration(
                                 color: Color.fromARGB(255, 147, 185, 221),
-                                borderRadius: BorderRadius.circular(20),
+                                borderRadius: BorderRadius.circular(10),
                               ),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -699,12 +708,12 @@ void initState() {
                                         ),
 
                                         Container(
-                                          width: 500,
+                                          width: screenWidth * 0.5,
+                                          margin: EdgeInsets.fromLTRB(20, 10, 20, 10),
                                           padding: EdgeInsets.all(20),
-                                          margin: EdgeInsets.fromLTRB(0, 0, 0, 20),
                                           decoration: BoxDecoration(
                                             color: Color.fromARGB(255, 147, 185, 221),
-                                            borderRadius: BorderRadius.circular(20),
+                                            borderRadius: BorderRadius.circular(10),
                                           ),
                                           child: Column(
                                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -728,7 +737,7 @@ void initState() {
                                                   ),
                                                 ],
                                               ),
-                                              const SizedBox(height: 10),
+ 
 
                                               // Content
                                               if (isExapandedcomplete)
@@ -806,14 +815,14 @@ void initState() {
                           ]
                         ),)
                       ),
-                      SizedBox(width: 50,),
 
 
 
                       //งายที่มอบหมาย รายละเอียด
                       Container(
-                        height: 1000,
-                        width: 800,
+                        height: screenHeight * 0.9,
+                        width: screenWidth * 0.45,
+                        margin: EdgeInsets.all(10),
                         alignment: Alignment.topCenter,
                         decoration: BoxDecoration(
                           color: Color.fromARGB(255, 152, 186, 218),
@@ -821,13 +830,13 @@ void initState() {
                         ),
                         child: Column(
                           children: [
-                            SizedBox(height: 50,),
+                            SizedBox(height: screenHeight * 0.05,),
                             Text("รายละเอียดงาน", style: TextStyle(fontSize: 30),),
                  
                             Container(
                               alignment: Alignment.center,
-                              height: 900,
-                              width: 700,
+                              height: screenHeight * 0.75,
+                              width: screenWidth * 0.4,
                               decoration: BoxDecoration(
                                 color: Colors.white,
                                 borderRadius: BorderRadius.circular(20)
@@ -844,14 +853,12 @@ void initState() {
                           ],
                         ),
                       ),
-                      SizedBox(width: 20)
                     ],
                   ),
-                )
               ],
             )
-          ],
-        ),
+          
+        
       )
     );
   }

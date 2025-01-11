@@ -77,20 +77,7 @@ class _DoauswerstudentsState extends State<Doauswerstudents> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('ส่งคำตอบสำเร็จ'), backgroundColor: Colors.green),
         );
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => work_body_S(
-              classroomMajor: '',
-              classroomName: '',
-              thfname: widget.thfname,
-              thlname: widget.thlname,
-              classroomNumRoom: '',
-              classroomYear: '',
-              username: widget.username,
-            ),
-          ),
-        );
+        Navigator.pop(context, 'refresh');
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('เกิดข้อผิดพลาดในการส่งคำตอบ'), backgroundColor: Colors.red),
@@ -107,6 +94,9 @@ class _DoauswerstudentsState extends State<Doauswerstudents> {
     );
   }
 }
+
+
+  
 
 
 
@@ -129,88 +119,82 @@ class _DoauswerstudentsState extends State<Doauswerstudents> {
 
 
   @override
-  Widget build(BuildContext context) {
-    final exam = widget.exam;
+Widget build(BuildContext context) {
+  final exam = widget.exam;
 
-    return Scaffold(
-      backgroundColor: Colors.white,
-
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-
-              Row(
-                children: [
-                   Text(
-                      ' ${exam.direction}',
-                      style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                    ),
-
-                    Text(' คะแนนเต็ม ${exam.fullMark} คะแนน', style: const TextStyle(fontSize: 18),),
-
-                ],
-              ),
-             
-              Text(
-                ' ข้อสอบทั้งหมดจำนวน ${widget.questions.length} ข้อ',
-                style: const TextStyle(fontSize: 14),
-              ),
-              Text(
-                ' ${exam.type}',
-                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 16),
-              ListView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: widget.questions.length,
-                itemBuilder: (context, index) {
-                  final question = widget.questions[index];
-                  return Card(
-                    color: const Color.fromARGB(255, 179, 207, 233),
-                    elevation: 2,
-                    margin: const EdgeInsets.symmetric(vertical: 10),
-                    child: Padding(
-                      padding: const EdgeInsets.all(10.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'คำถามที่ ${index + 1}: ${question.questionDetail} ( ${question.questionMark} คะแนน )',
-                            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-                          ),
-                          const SizedBox(height: 8),
-                          TextFormField(
-                              controller: _controllers[index],
-                              decoration: const InputDecoration(
-                                hintText: ' ',
-                              ),
-                            ),
-                        ],
-                      ),
-                    ),
-                  );
-                },
-              ),
-              const SizedBox(height: 20),
-              Center(
-                child: ElevatedButton(
-                  onPressed: (){
-                    _submitAnswers();
-
-                    
-
-                  },
-                  child: const Text('ส่งคำตอบ'),
+  return Scaffold(
+    backgroundColor: Colors.white,
+    body: SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Text(
+                  ' ${exam.direction}',
+                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
+                Text(' คะแนนเต็ม ${exam.fullMark} คะแนน', style: const TextStyle(fontSize: 18)),
+              ],
+            ),
+            Text(
+              ' ข้อสอบทั้งหมดจำนวน ${widget.questions.length} ข้อ',
+              style: const TextStyle(fontSize: 14),
+            ),
+            Text(
+              ' ${exam.type}',
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 16),
+            ListView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: widget.questions.length,
+              itemBuilder: (context, index) {
+                final question = widget.questions[index];
+                print("Question ${index + 1}: ${question.questionDetail}");
+
+                return Card(
+                  color: const Color.fromARGB(255, 179, 207, 233),
+                  elevation: 2,
+                  margin: const EdgeInsets.symmetric(vertical: 10),
+                  child: Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'คำถามที่ ${index + 1}: ${question.questionDetail} ( ${question.questionMark} คะแนน )',
+                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                        ),
+                        const SizedBox(height: 8),
+                        TextFormField(
+                          controller: _controllers[index],
+                          decoration: const InputDecoration(
+                            hintText: 'กรุณาตอบคำถาม',
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
+            const SizedBox(height: 20),
+            Center(
+              child: ElevatedButton(
+                onPressed: () {
+                  _submitAnswers();
+                },
+                child: const Text('ส่งคำตอบ'),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 }

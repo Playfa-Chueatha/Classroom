@@ -8,6 +8,7 @@ import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 
 class Auswer_Question extends StatefulWidget {
+  final Examset exam;
   final String username;
   final String thfname;
   final String thlname;
@@ -19,6 +20,7 @@ class Auswer_Question extends StatefulWidget {
   const 
   Auswer_Question({
     super.key,
+    required this.exam,
     required this.username,
     required this.thfname,
     required this.thlname,
@@ -59,15 +61,15 @@ class _Answer_QuestionState extends State<Auswer_Question> {
 
   
 Future<int?> saveAssignment({
-    required String direction,
-    required double fullMark,
-    required DateTime deadline,
-    required String username,
-    required String classroomName,
-    required String classroomMajor,
-    required String classroomYear,
-    required String classroomNumRoom, 
-    required String isClosed,
+  required String direction,
+  required double fullMark,
+  required DateTime deadline,
+  required String username,
+  required String classroomName,
+  required String classroomMajor,
+  required String classroomYear,
+  required String classroomNumRoom, 
+  required String isClosed,
 }) async {
   const String apiUrl = "https://www.edueliteroom.com/connect/auswer_direction.php";
 
@@ -87,11 +89,17 @@ Future<int?> saveAssignment({
       },
     );
 
-    print('Sending fullMark: ${fullMark.toString()}');
-    print(response.body);
+    // Print the raw response to debug
+    print('Raw response: ${response.body}');
 
     if (response.statusCode == 200) {
-      final data = json.decode(response.body);
+      // Remove leading dot if present
+      String responseBody = response.body.trim();
+      if (responseBody.startsWith('.')) {
+        responseBody = responseBody.substring(1); // Remove the leading dot
+      }
+
+      final data = json.decode(responseBody);
       if (data['success']) {
         final examsetsAuto = int.tryParse(data['examsets_auto']);
         if (examsetsAuto != null) {
@@ -106,10 +114,11 @@ Future<int?> saveAssignment({
       throw Exception("Server error: ${response.statusCode}");
     }
   } catch (error) {
-    print("Error: $error");
+    print("ErrorsaveAssignment: $error");
     return null;
   }
 }
+
 
 
 void _submitAssignmentsForClassrooms() async {
@@ -157,6 +166,7 @@ void _submitAssignmentsForClassrooms() async {
               classroomName: widget.classroomName,
               classroomNumRoom: widget.classroomNumRoom,
               classroomYear: widget.classroomYear,
+              exam: widget.exam,
             ),
           ),
         );
@@ -180,8 +190,8 @@ Future<void> _submitQuestions(int examsetsId) async {
     for (int i = 0; i < _questions.length; i++) {
       // ตรวจสอบว่า isChecked ถูกตั้งค่าแล้วหรือยัง
       final questionScore = isChecked
-          ? double.tryParse(defaultMark.text)?.toStringAsFixed(2) ?? '0.00' 
-          : double.tryParse(markControllers[i].text)?.toStringAsFixed(2) ?? '0.00'; 
+          ? double.tryParse(defaultMark.text)?.toStringAsFixed(2) ?? '0.00'
+          : double.tryParse(markControllers[i].text)?.toStringAsFixed(2) ?? '0.00';
 
       questionData.add({
         'question_detail': _questions[i],
@@ -200,10 +210,16 @@ Future<void> _submitQuestions(int examsetsId) async {
       }),
     );
 
-    print('Response body: ${response.body}');
+    print('Response body_submitQuestions: ${response.body}');
 
     if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
+      // จัดการข้อความก่อนแปลง JSON
+      String responseBody = response.body.trim();
+      if (responseBody.startsWith('.')) {
+        responseBody = responseBody.substring(1); // ตัด '.' ออก
+      }
+
+      final data = jsonDecode(responseBody);
       if (data['status'] == 'success') {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text('บันทึกคำสั่งงานเรียบร้อย'),
@@ -216,12 +232,13 @@ Future<void> _submitQuestions(int examsetsId) async {
       throw Exception('HTTP error: ${response.statusCode}');
     }
   } catch (e) {
-    print('Request error: $e');
+    print('Request error_submitQuestions: $e');
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
+      SnackBar(content: Text('Error_submitQuestions: $e'), backgroundColor: Colors.red),
     );
   }
 }
+
 
 
 
@@ -299,36 +316,7 @@ void updateTotalMarks() {
 }
 
 
-  // void _editQuestion(int index) {
-  //   questionController.text = _questions[index];
-  //   showDialog(
-  //     context: context,
-  //     builder: (context) {
-  //       return AlertDialog(
-  //         title: const Text('แก้ไขคำถาม'),
-  //         content: TextField(
-  //           controller: questionController,
-  //           decoration: const InputDecoration(labelText: 'แก้ไขคำถามของคุณ'),
-  //         ),
-  //         actions: [
-  //           TextButton(
-  //             onPressed: () {
-  //               setState(() {
-  //                 _questions[index] = questionController.text.trim();
-  //               });
-  //               Navigator.of(context).pop();
-  //             },
-  //             child: const Text('บันทึก'),
-  //           ),
-  //           TextButton(
-  //             onPressed: () => Navigator.of(context).pop(),
-  //             child: const Text('ยกเลิก'),
-  //           ),
-  //         ],
-  //       );
-  //     },
-  //   );
-  // }
+ 
 
   void _removeQuestion(int index) {
   setState(() {

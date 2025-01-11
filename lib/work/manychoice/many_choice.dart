@@ -10,6 +10,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class many_choice extends StatefulWidget {
+  final Examset exam;
   final String username;
   final String thfname;
   final String thlname;
@@ -20,6 +21,7 @@ class many_choice extends StatefulWidget {
 
   const many_choice({
     super.key,
+    required this.exam,
     required this.thfname,
     required this.thlname,
     required this.username,
@@ -203,6 +205,7 @@ class _many_choice extends State<many_choice> with SingleTickerProviderStateMixi
             classroomName: widget.classroomName,
             classroomNumRoom: widget.classroomNumRoom,
             classroomYear: widget.classroomYear,
+            exam: widget.exam,
           )),
         );
 

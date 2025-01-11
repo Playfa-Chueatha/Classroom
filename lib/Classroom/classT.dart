@@ -53,23 +53,38 @@ class ClassTState extends State<ClassT> {
   }
 
   Future<List<dynamic>> fetchPosts() async {
-    final response = await http.post(
-      Uri.parse('https://www.edueliteroom.com/connect/fetch_posts.php'),
-      body: {
-        'classroomName': widget.classroomName,
-        'classroomMajor': widget.classroomMajor,
-        'classroomYear': widget.classroomYear,
-        'classroomNumRoom': widget.classroomNumRoom,
-      },
-    );
-    print(response.body);
+  final response = await http.post(
+    Uri.parse('https://www.edueliteroom.com/connect/fetch_posts.php'),
+    body: {
+      'classroomName': widget.classroomName,
+      'classroomMajor': widget.classroomMajor,
+      'classroomYear': widget.classroomYear,
+      'classroomNumRoom': widget.classroomNumRoom,
+    },
+  );
+  print(response.body);
 
-    if (response.statusCode == 200) {
-      return json.decode(response.body);
-    } else {
-      throw Exception('Failed to load posts');
+  if (response.statusCode == 200) {
+    var responseJson = json.decode(response.body);
+  
+
+    // Check if the response is a map and contains an error
+    if (responseJson is Map<String, dynamic> && responseJson['error'] == 'No posts found') {
+      print('ไม่มีประกาศในห้องนี้');
+      return []; // Return an empty list when no posts are found
     }
+
+    // Check if the response is a list
+    if (responseJson is List<dynamic>) {
+      return responseJson;
+    } else {
+      throw Exception('Unexpected response format');
+    }
+  } else {
+    throw Exception('Failed to load posts');
   }
+}
+
   
 
   void _openFile(String fileUrl) {
@@ -204,6 +219,10 @@ Future<void> deletePost(String postId, String username) async {
   
   @override
   Widget build(BuildContext context) {
+    
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
     return Scaffold(
       backgroundColor: Color.fromARGB(255, 195, 238, 250),
       appBar: AppBar(
@@ -219,26 +238,26 @@ Future<void> deletePost(String postId, String username) async {
             thfname: widget.thfname,
             thlname: widget.thlname,
             username: widget.username,
+            classroomMajor: widget.classroomMajor, 
+            classroomName: widget.classroomName, 
+            classroomYear: widget.classroomYear, 
+            classroomNumRoom: widget.classroomNumRoom,
           ),
         ],
       ),
       body: SingleChildScrollView(
-        scrollDirection: Axis.vertical,
-        child: Column(
+        child:  Column(
           children: [
-            SizedBox(height: 10),
-            Column(
-              children: [
-                SizedBox(height: 30),
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: [
+            SizedBox(height: screenHeight * 0.01),
+              Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
                       Container(
-                        height: 1000,
-                        width: 400,
+                        height: screenHeight * 0.9,
+                        width: screenWidth * 0.18,
+                        alignment: Alignment.topCenter,
                         decoration: BoxDecoration(
-                          color: Color.fromARGB(255, 147, 185, 221),
+                          color: Color.fromARGB(255, 195, 238, 250),
                           borderRadius: BorderRadius.only(
                             topRight: Radius.circular(20),
                             bottomRight: Radius.circular(20),
@@ -249,55 +268,66 @@ Future<void> deletePost(String postId, String username) async {
                           thlname: widget.thlname,
                           username: widget.username,
                         ),
-                      ),
-                      SizedBox(width: 50),
-
-
-                      
+                      ),                     
                       Container(
-                        height: 1000,
-                        width: 1450,
+                        height: screenHeight * 0.9,
+                        width: screenWidth * 0.8,
+                        margin: EdgeInsets.all(5),
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Column(
                           children: [
-                            SizedBox(height: 20),
-                            Padding(
-                              padding: EdgeInsets.fromLTRB(1350,5,5,5),
-                              child:  IconButton(
-                                    color: Color.fromARGB(255, 0, 0, 0),
-                                    icon: const Icon(Icons.add),
-                                    iconSize: 30,
-                                    onPressed: () {
-                                      showDialog(
-                                        context: context,
-                                        builder: (BuildContext context) =>
-                                            AnnounceClass(
-                                          username: widget.username,
-                                          classroomMajor: widget.classroomMajor,
-                                          classroomName: widget.classroomName,
-                                          classroomNumRoom: widget.classroomNumRoom,
-                                          classroomYear: widget.classroomYear,
-                                          thfname: widget.thfname,
-                                          thlname: widget.thlname,
-                                        ),
-                                      );
-                                    },
-                                    style: IconButton.styleFrom(
-                                      backgroundColor: Color.fromARGB(255, 147, 185, 221),
-                                      highlightColor: Color.fromARGB(255, 56, 105, 151),
-                                    ),
-                                    tooltip: 'เพิ่มประกาศ',
+                            
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                SizedBox(width: 10),
+                                Padding(
+                                padding: EdgeInsets.fromLTRB(10, 5, 5, 5),
+                                child: IconButton(
+                                  color: Color.fromARGB(255, 0, 0, 0),
+                                  icon: const Icon(Icons.add),
+                                  iconSize: 30,
+                                  onPressed: () async {
+                                    // แสดง Dialog และรอฟังค่าที่ส่งกลับ
+                                    final result = await showDialog<bool>(
+                                      context: context,
+                                      builder: (BuildContext context) => AnnounceClass(
+                                        username: widget.username,
+                                        classroomMajor: widget.classroomMajor,
+                                        classroomName: widget.classroomName,
+                                        classroomNumRoom: widget.classroomNumRoom,
+                                        classroomYear: widget.classroomYear,
+                                        thfname: widget.thfname,
+                                        thlname: widget.thlname,
+                                      ),
+                                    );
+
+                                    // ถ้าค่าที่ส่งกลับเป็น true ให้รีโหลดข้อมูล
+                                    if (result == true) {
+                                      setState(() {
+                                        futurePosts = fetchPosts();
+                                      });
+                                    }
+                                  },
+                                  style: IconButton.styleFrom(
+                                    backgroundColor: Color.fromARGB(255, 147, 185, 221),
+                                    highlightColor: Color.fromARGB(255, 56, 105, 151),
                                   ),
+                                  tooltip: 'เพิ่มประกาศ',
+                                ),
+                              ),
+                              ],
                             ),
+                            
                             
                             Text(
                               "ประกาศ",
                               style: TextStyle(fontSize: 40),
                             ),
-                            SizedBox(height: 20),
+                            SizedBox( height: screenHeight * 0.02,),
                             widget.classroomName.isEmpty ||
                                 widget.classroomMajor.isEmpty ||
                                 widget.classroomYear.isEmpty ||
@@ -309,241 +339,229 @@ Future<void> deletePost(String postId, String username) async {
                                 ),
                               )
                             : Expanded(
-  child: FutureBuilder<List<dynamic>>(
-    future: futurePosts,
-    builder: (context, snapshot) {
-      if (snapshot.connectionState == ConnectionState.waiting) {
-        return const Center(child: CircularProgressIndicator());
-      } else if (snapshot.hasError) {
-        return Center(child: Text('Error: ${snapshot.error}'));
-      } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-        return const Center(child: Text('ยังไม่มีประกาศในห้องนี้.'));
-      } else {
-        final dataAnnounce = snapshot.data!;
-        return ListView.builder(
-          itemCount: dataAnnounce.length,
-          itemBuilder: (context, index) {
-            final post = dataAnnounce[index];
+                              child: FutureBuilder<List<dynamic>>(
+                                future: futurePosts,
+                                builder: (context, snapshot) {
+                                  if (snapshot.connectionState == ConnectionState.waiting) {
+                                    return const Center(child: CircularProgressIndicator());
+                                  } else if (snapshot.hasError) {
+                                    return Center(child: Text('Error: ${snapshot.error}'));
+                                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                                    return const Center(child: Text('ยังไม่มีประกาศในห้องนี้.'));
+                                  } else {
+                                    final dataAnnounce = snapshot.data!;
+                                    dataAnnounce.sort((a, b) => int.parse(b['posts_auto']).compareTo(int.parse(a['posts_auto'])));
+                                    return ListView.builder(
+                                      itemCount: dataAnnounce.length,
+                                      itemBuilder: (context, index) {
+                                        final post = dataAnnounce[index];
 
-            return Card(
-              margin: const EdgeInsets.all(30),
-              color: const Color.fromARGB(255, 152, 186, 218),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12.0),
-              ),
-              elevation: 8,
-              child: Stack(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(20.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Image.asset(
-                              "assets/images/ครู.png",
-                              height: 50,
-                              width: 50,
-                            ),
-                            Expanded(
-                              child: Padding(
-                                padding: const EdgeInsets.only(left: 10.0),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      "โดย ${post['usert_thfname']} ${post['usert_thlname']}",
-                                      style: const TextStyle(
-                                        fontSize: 14,
-                                        color: Color.fromARGB(255, 66, 65, 65),
-                                      ),
-                                    ),
-                                    const SizedBox(height: 10),
-                                    Container(
-                                      width: double.infinity,
-                                      padding: const EdgeInsets.all(20),
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(20),
-                                        color: Colors.white,
-                                      ),
-                                      child: Text(
-                                        post['posts_title'],
-                                        style: const TextStyle(fontSize: 20),
-                                      ),
-                                    ),
-                                    const SizedBox(height: 16),
-                                    const Text("ลิงค์ที่แนบมา:", style: TextStyle(fontSize: 18)),
-                                    const SizedBox(height: 10),
-                                    post['links'] != null && post['links'].isNotEmpty
-                                        ? ListView.builder(
-                                            shrinkWrap: true,
-                                            itemCount: post['links'].length,
-                                            physics: const NeverScrollableScrollPhysics(),
-                                            itemBuilder: (context, index) {
-                                              final link = post['links'][index];
-                                              final url = link['posts_link_url'];
-
-                                              return InkWell(
-                                                onTap: () => _launchURL(url),
-                                                child: ListTile(
-                                                  leading: const Icon(Icons.link, color: Colors.blue),
-                                                  title: Text(
-                                                    url,
-                                                    style: const TextStyle(color: Colors.blue, fontSize: 16),
-                                                  ),
-                                                ),
-                                              );
-                                            },
-                                          )
-                                        : const Text(
-                                            'ไม่มีลิงค์แนบ',
-                                            style: TextStyle(fontSize: 14, color: Color.fromARGB(255, 80, 79, 79)),
+                                        return Card(
+                                          margin: const EdgeInsets.all(30),
+                                          color: const Color.fromARGB(255, 152, 186, 218),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(12.0),
                                           ),
-                                    const SizedBox(height: 16),
-                                    const Text("ไฟล์ที่แนบมา:", style: TextStyle(fontSize: 18)),
-                                    const SizedBox(height: 10),
-                                    post['files'] != null && post['files'].isNotEmpty
-                                        ? ListView.builder(
-                                            shrinkWrap: true,
-                                            itemCount: post['files'].length,
-                                            physics: const NeverScrollableScrollPhysics(),
-                                            itemBuilder: (context, index) {
-                                              final file = post['files'][index];
-                                              final fileName = file['file_name'] ?? 'Unknown';
-                                              final fileSize = file['file_size'] ?? '';
-                                              final fileUrl = file['file_url'] ?? '';
+                                          elevation: 8,
+                                          child: Stack(
+                                            children: [
+                                              Padding(
+                                                padding: const EdgeInsets.all(20.0),
+                                                child: Column(
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  children: [
+                                                    Row(
+                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                      children: [
+                                                        Image.asset(
+                                                          "assets/images/ครู.png",
+                                                          height: 50,
+                                                          width: 50,
+                                                        ),
+                                                        Expanded(
+                                                          child: Padding(
+                                                            padding: const EdgeInsets.only(left: 10.0),
+                                                            child: Column(
+                                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                                              children: [
+                                                                Text(
+                                                                  "โดย ${post['usert_thfname']} ${post['usert_thlname']}",
+                                                                  style: const TextStyle(
+                                                                    fontSize: 14,
+                                                                    color: Color.fromARGB(255, 66, 65, 65),
+                                                                  ),
+                                                                ),
+                                                                const SizedBox(height: 10),
+                                                                Container(
+                                                                  width: double.infinity,
+                                                                  padding: const EdgeInsets.all(20),
+                                                                  decoration: BoxDecoration(
+                                                                    borderRadius: BorderRadius.circular(20),
+                                                                    color: Colors.white,
+                                                                  ),
+                                                                  child: Text(
+                                                                    post['posts_title'],
+                                                                    style: const TextStyle(fontSize: 20),
+                                                                  ),
+                                                                ),
+                                                                const SizedBox(height: 16),
+                                                                const Text("ลิงค์ที่แนบมา:", style: TextStyle(fontSize: 18)),
+                                                                const SizedBox(height: 10),
+                                                                post['links'] != null && post['links'].isNotEmpty
+                                                                    ? ListView.builder(
+                                                                        shrinkWrap: true,
+                                                                        itemCount: post['links'].length,
+                                                                        physics: const NeverScrollableScrollPhysics(),
+                                                                        itemBuilder: (context, index) {
+                                                                          final link = post['links'][index];
+                                                                          final url = link['posts_link_url'];
 
-                                              return ListTile(
-                                                leading: const Icon(Icons.file_copy),
-                                                title: Text(
-                                                  "$fileName ($fileSize)",
-                                                  style: const TextStyle(color: Colors.blue, fontSize: 16),
+                                                                          return InkWell(
+                                                                            onTap: () => _launchURL(url),
+                                                                            child: ListTile(
+                                                                              leading: const Icon(Icons.link, color: Colors.blue),
+                                                                              title: Text(
+                                                                                url,
+                                                                                style: const TextStyle(color: Colors.blue, fontSize: 16),
+                                                                              ),
+                                                                            ),
+                                                                          );
+                                                                        },
+                                                                      )
+                                                                    : const Text(
+                                                                        'ไม่มีลิงค์แนบ',
+                                                                        style: TextStyle(fontSize: 14, color: Color.fromARGB(255, 80, 79, 79)),
+                                                                      ),
+                                                                const SizedBox(height: 16),
+                                                                const Text("ไฟล์ที่แนบมา:", style: TextStyle(fontSize: 18)),
+                                                                const SizedBox(height: 10),
+                                                                post['files'] != null && post['files'].isNotEmpty
+                                                                    ? ListView.builder(
+                                                                        shrinkWrap: true,
+                                                                        itemCount: post['files'].length,
+                                                                        physics: const NeverScrollableScrollPhysics(),
+                                                                        itemBuilder: (context, index) {
+                                                                          final file = post['files'][index];
+                                                                          final fileName = file['file_name'] ?? 'Unknown';
+                                                                          final fileSize = file['file_size'] ?? '';
+                                                                          final fileUrl = file['file_url'] ?? '';
+
+                                                                          return ListTile(
+                                                                            leading: const Icon(Icons.file_copy),
+                                                                            title: Text(
+                                                                              "$fileName ($fileSize)",
+                                                                              style: const TextStyle(color: Colors.blue, fontSize: 16),
+                                                                            ),
+                                                                            onTap: () => _openFile(fileUrl),
+                                                                          );
+                                                                        },
+                                                                      )
+                                                                    : const Text(
+                                                                        'ไม่มีไฟล์แนบ',
+                                                                        style: TextStyle(fontSize: 14, color: Color.fromARGB(255, 80, 79, 79)),
+                                                                      ),
+                                                              ],
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ],
                                                 ),
-                                                onTap: () => _openFile(fileUrl),
-                                              );
-                                            },
-                                          )
-                                        : const Text(
-                                            'ไม่มีไฟล์แนบ',
-                                            style: TextStyle(fontSize: 14, color: Color.fromARGB(255, 80, 79, 79)),
+                                              ),
+                                              Positioned(
+                                                top: 8,
+                                                right: 8,
+                                                child: Row(
+                                                  children: [
+                                                    IconButton(
+                                                      icon: const Icon(Icons.edit, size: 25),
+                                                      onPressed: () {
+                                                        showEditDialog(
+                                                          context,
+                                                          post['posts_title'],
+                                                          (newTitle) {
+                                                            updatePostTitle(
+                                                              context, 
+                                                              post['posts_auto'], 
+                                                              newTitle, 
+                                                              widget.username,
+                                                              fetchPosts, 
+                                                            );
+                                                          },
+                                                        );
+                                                      },
+                                                    ),
+                                                    IconButton(
+                                                      icon: const Icon(Icons.delete, size: 25, color: Colors.red),
+                                                      onPressed: () {
+                                                        // แสดง Dialog ยืนยันการลบโพสต์
+                                                        showDialog(
+                                                          context: context,
+                                                          builder: (BuildContext context) {
+                                                            return AlertDialog(
+                                                              title: const Text('ยืนยันการลบโพสต์'),
+                                                              content: const Text('คุณแน่ใจว่าจะลบโพสต์นี้?'),
+                                                              actions: [
+                                                                // ปุ่มยกเลิก
+                                                                TextButton(
+                                                                  onPressed: () {
+                                                                    Navigator.of(context).pop(); // ปิด Dialog
+                                                                  },
+                                                                  child: const Text('ยกเลิก'),
+                                                                ),
+                                                                // ปุ่มยืนยันการลบ
+                                                                ElevatedButton(
+                                                                  onPressed: () async {
+                                                                    // ส่งคำขอลบโพสต์ไปยัง API
+                                                                    await deletePost(post['posts_auto'], widget.username);
+                                                                    Navigator.of(context).pop(); // ปิด Dialog หลังจากลบโพสต์
+                                                                  },
+                                                                  style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                                                                  child: const Text('ใช่'),
+                                                                ),
+                                                              ],
+                                                            );
+                                                          },
+                                                        );
+                                                      },
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                              Positioned(
+                                                bottom: 8,
+                                                right: 16,
+                                                child: IconButton(
+                                                  icon: const Icon(Icons.comment, size: 25),
+                                                  onPressed: () {
+                                                    showDialog(
+                                                      context: context,
+                                                      builder: (BuildContext context) => Comment_inclass(
+                                                        username: widget.username,
+                                                        postId: post['posts_auto'],
+                                                        ClassroomID: post['classroom_id'],
+                                                      ),
+                                                    );
+                                                  },
+                                                ),
+                                              ),
+                                            ],
                                           ),
-                                  ],
-                                ),
+                                        );
+                                      },
+                                    );
+                                  }
+                                },
                               ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                  Positioned(
-                    top: 8,
-                    right: 8,
-                    child: Row(
-                      children: [
-                        IconButton(
-                          icon: const Icon(Icons.edit, size: 25),
-                          onPressed: () {
-                            showEditDialog(
-                              context,
-                              post['posts_title'],
-                              (newTitle) {
-                                updatePostTitle(
-                                  context, 
-                                  post['posts_auto'], 
-                                  newTitle, 
-                                  widget.username,
-                                  fetchPosts, 
-                                );
-                              },
-                            );
-                          },
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.delete, size: 25, color: Colors.red),
-                          onPressed: () {
-                            // แสดง Dialog ยืนยันการลบโพสต์
-                            showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return AlertDialog(
-                                  title: const Text('ยืนยันการลบโพสต์'),
-                                  content: const Text('คุณแน่ใจว่าจะลบโพสต์นี้?'),
-                                  actions: [
-                                    // ปุ่มยกเลิก
-                                    TextButton(
-                                      onPressed: () {
-                                        Navigator.of(context).pop(); // ปิด Dialog
-                                      },
-                                      child: const Text('ยกเลิก'),
-                                    ),
-                                    // ปุ่มยืนยันการลบ
-                                    ElevatedButton(
-                                      onPressed: () async {
-                                        // ส่งคำขอลบโพสต์ไปยัง API
-                                        await deletePost(post['posts_auto'], widget.username);
-                                        Navigator.of(context).pop(); // ปิด Dialog หลังจากลบโพสต์
-                                      },
-                                      style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-                                      child: const Text('ใช่'),
-                                    ),
-                                  ],
-                                );
-                              },
-                            );
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-                  Positioned(
-                    bottom: 8,
-                    right: 16,
-                    child: IconButton(
-                      icon: const Icon(Icons.comment, size: 25),
-                      onPressed: () {
-                        showDialog(
-                          context: context,
-                          builder: (BuildContext context) => Comment_inclass(
-                            username: widget.username,
-                            postId: post['posts_auto'],
-                            ClassroomID: post['classroom_id'],
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                ],
-              ),
-            );
-          },
-        );
-      }
-    },
-  ),
-)
-
-
-
-
-
-
-
-
+                            )
                           ],
                         ),
                       ),
-                      SizedBox(width: 50),
                     ],
-                  ),
-                ),
-              ],
-            ),
+                  ),     
           ],
-        ),
-      ),
+      ))
     );
   }
 }

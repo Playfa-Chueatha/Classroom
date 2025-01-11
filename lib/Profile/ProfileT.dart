@@ -18,6 +18,7 @@ class _ProfiletState extends State<Profilet> {
   bool isEditing = false;
   final _formKey = GlobalKey<FormState>();
    String? selectedclassroom;
+   int? selectedRoom;
 
 
   // เพิ่มตัวควบคุมสำหรับฟิลด์ต่างๆ
@@ -114,10 +115,10 @@ class _ProfiletState extends State<Profilet> {
   }
 }
 
-  // ฟังก์ชันที่ใช้สลับสถานะการแก้ไขข้อมูล
+
   void toggleEditing() {
     setState(() {
-      isEditing = !isEditing; // สลับสถานะการแก้ไข
+      isEditing = !isEditing;
     });
   }
 
@@ -180,7 +181,6 @@ class _ProfiletState extends State<Profilet> {
                         ),
                       ),
                       const SizedBox(height: 50),
-                      // สร้างฟอร์มในการแก้ไขข้อมูล
                       isEditing ? _buildEditForm() : _buildProfileTable(),
                     ],
                   ),
@@ -190,31 +190,107 @@ class _ProfiletState extends State<Profilet> {
     );
   }
 
-  // ฟังก์ชันสร้างฟอร์มการแก้ไขข้อมูล
-  Widget _buildEditForm() {
+
+  // ฟังก์ชันสร้าง TextField สำหรับการแก้ไขข้อมูล
+  Widget _buildTextField(String label, TextEditingController controller, {String? Function(String?)? validator}) {
+  return TextFormField(
+    controller: controller,
+    decoration: InputDecoration(labelText: label),
+    validator: validator,
+  );
+}
+
+Widget _buildEditForm() {
   return Form(
     key: _formKey,
     child: Column(
       children: [
-        _buildTextField('ชื่อ(ภาษาไทย):', thfnameController),
-        _buildTextField('นามสกุล(ภาษาไทย):', thlnameController),
-        _buildTextField('ชื่อ(ภาษาอังกฤษ):', enfnameController),
-        _buildTextField('นามสกุล(ภาษาอังกฤษ):', enlnameController),
-        _buildTextField('อีเมล:', emailController),
-        _buildTextField('โทรศัพท์:', phoneController),
-        
-        
+        _buildTextField(
+          'ชื่อ(ภาษาไทย):',
+          thfnameController,
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'กรุณากรอกชื่อ(ภาษาไทย)';
+            }
+            if (!RegExp(r'^[ก-๏\s]+$').hasMatch(value)) {
+              return 'กรุณากรอกเฉพาะอักษรภาษาไทย';
+            }
+            return null;
+          },
+        ),
+        _buildTextField(
+          'นามสกุล(ภาษาไทย):',
+          thlnameController,
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'กรุณากรอกนามสกุล(ภาษาไทย)';
+            }
+            if (!RegExp(r'^[ก-๏\s]+$').hasMatch(value)) {
+              return 'กรุณากรอกเฉพาะอักษรภาษาไทย';
+            }
+            return null;
+          },
+        ),
+        _buildTextField(
+          'ชื่อ(ภาษาอังกฤษ):',
+          enfnameController,
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'กรุณากรอกชื่อ(ภาษาอังกฤษ)';
+            }
+            if (!RegExp(r'^[a-zA-Z\s]+$').hasMatch(value)) {
+              return 'กรุณากรอกเฉพาะอักษรภาษาอังกฤษ';
+            }
+            return null;
+          },
+        ),
+        _buildTextField(
+          'นามสกุล(ภาษาอังกฤษ):',
+          enlnameController,
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'กรุณากรอกนามสกุล(ภาษาอังกฤษ)';
+            }
+            if (!RegExp(r'^[a-zA-Z\s]+$').hasMatch(value)) {
+              return 'กรุณากรอกเฉพาะอักษรภาษาอังกฤษ';
+            }
+            return null;
+          },
+        ),
+        _buildTextField(
+          'อีเมล:',
+          emailController,
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'กรุณากรอกอีเมล';
+            }
+            if (!RegExp(r'^[a-zA-Z0-9._%+-]+@(gmail\.com|hotmail\.com)$').hasMatch(value)) {
+              return 'กรุณากรอกอีเมลที่ลงท้ายด้วย @gmail.com หรือ @hotmail.com';
+            }
+            return null;
+          },
+        ),
+        _buildTextField(
+          'โทรศัพท์:',
+          phoneController,
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'กรุณากรอกหมายเลขโทรศัพท์';
+            }
+            if (!RegExp(r'^[0-9]{10}$').hasMatch(value)) {
+              return 'กรุณากรอกหมายเลขโทรศัพท์ให้ครบ 10 หลัก';
+            }
+            return null;
+          },
+        ),
         DropdownButtonFormField<String>(
           decoration: const InputDecoration(
-            label: Text(
-              "กรุณาเลือกชั้นปีการศึกษา",
-              
-            ),
+            label: Text("กรุณาเลือกชั้นปีการศึกษา"),
           ),
-          value: selectedclassroom ?? userData!.usertClassroom, 
+          value: selectedclassroom ?? userData!.usertClassroom,
           items: [
-            "ชั้นมัธยมศึกษาปีที่ 4", 
-            "ชั้นมัธยมศึกษาปีที่ 5", 
+            "ชั้นมัธยมศึกษาปีที่ 4",
+            "ชั้นมัธยมศึกษาปีที่ 5",
             "ชั้นมัธยมศึกษาปีที่ 6"
           ].map((clasroom) {
             return DropdownMenuItem(
@@ -225,53 +301,59 @@ class _ProfiletState extends State<Profilet> {
           onChanged: (value) {
             setState(() {
               selectedclassroom = value;
-              classroomController.text = value!;  
+              classroomController.text = value!;
             });
           },
           validator: (value) => value == null ? 'กรุณาเลือกชั้นปีการศึกษา' : null,
         ),
-        
-        _buildTextField('ห้อง:', numroomController),
-        _buildTextField('ครูประจำวิชา:', subjectsController),
-        ElevatedButton(
-          onPressed: saveChanges,
-          child: Text('บันทึกการเปลี่ยนแปลง'),
+       DropdownButtonFormField<int>(
+          decoration: const InputDecoration(
+            label: Text('ห้อง:'),
+          ),
+          value: selectedRoom ?? int.tryParse(numroomController.text),
+          items: List.generate(30, (index) {
+            int roomNumber = index + 1;
+            return DropdownMenuItem(
+              value: roomNumber,
+              child: Text(roomNumber.toString()),
+            );
+          }),
+          onChanged: (value) {
+            setState(() {
+              selectedRoom = value ;
+              numroomController.text = value.toString();
+            });
+          },
+          validator: (value) => value == null ? 'กรุณาเลือกห้อง' : null,
         ),
+
+        _buildTextField('ครูประจำวิชา:', subjectsController),
+        Padding(padding: EdgeInsets.all(20),
+        child: ElevatedButton(
+          onPressed: () {
+            if (_formKey.currentState!.validate()) {
+              saveChanges();
+            }
+          },
+          child: Text('บันทึกการเปลี่ยนแปลง'),
+        )),
       ],
     ),
   );
 }
 
-
-  // ฟังก์ชันสร้าง TextField สำหรับการแก้ไขข้อมูล
-  Widget _buildTextField(String label, TextEditingController controller) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10.0),
-      child: TextFormField(
-        controller: controller,
-        decoration: InputDecoration(labelText: label),
-        validator: (value) {
-          if (value == null || value.isEmpty) {
-            return 'กรุณากรอกข้อมูล';
-          }
-          return null;
-        },
-      ),
-    );
-  }
-
   // ฟังก์ชันสร้างตาราง
   Widget _buildProfileTable() {
     return Center(
-      child: SingleChildScrollView(  // ใช้ SingleChildScrollView ห่อหุ้ม
+      child: SingleChildScrollView(  
         child: Table(
           columnWidths: {
             0: FixedColumnWidth(200),
             1: FixedColumnWidth(250),
           },
           children: [
-            _buildTableRowThai('ชื่อ(ภาษาไทย):', '${userData!.usertThfname} ${userData!.usertThlname}'),
-            _buildTableRowThai('ชื่อ(ภาษาอังกฤษ):', '${userData!.usertEnfname} ${userData!.usertEnlname}'),
+            _buildTableRow('ชื่อ(ภาษาไทย):', '${userData!.usertThfname} ${userData!.usertThlname}'),
+            _buildTableRow('ชื่อ(ภาษาอังกฤษ):', '${userData!.usertEnfname} ${userData!.usertEnlname}'),
             _buildTableRow('อีเมล:', userData!.usertEmail),
             _buildTableRow('โทรศัพท์:', userData!.usertPhone),
             _buildTableRow('ครูประจำชั้น:', userData!.usertClassroom),
@@ -302,31 +384,3 @@ class _ProfiletState extends State<Profilet> {
 }
 
 
-TableRow _buildTableRowThai(String title, String value, {bool isThaiOnly = false}) {
-  final isValueEmpty = value.isEmpty || value == "-" || value == "0" || value == " - ";
-  return TableRow(
-    children: [
-      Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-      isValueEmpty
-          ? TextField(
-              decoration: InputDecoration(
-                hintText: '*กรอกข้อมูล',
-                hintStyle: const TextStyle(color: Colors.red),
-                border: const OutlineInputBorder(),
-              ),
-              inputFormatters: isThaiOnly
-                  ? [
-                      FilteringTextInputFormatter(
-                        RegExp(r'[ก-๙\s]'), // อนุญาตเฉพาะตัวอักษรภาษาไทย
-                        allow: true,
-                      ),
-                    ]
-                  : null,
-            )
-          : Text(
-              value,
-              style: const TextStyle(fontSize: 18, color: Colors.black),
-            ),
-    ],
-  );
-}

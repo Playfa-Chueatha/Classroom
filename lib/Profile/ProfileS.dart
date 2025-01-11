@@ -17,6 +17,7 @@ class _ProfiletState extends State<Profiles> {
   bool isEditing = false;
   final _formKey = GlobalKey<FormState>();
    String? selectedclassroom;
+   int? selectedRoom;
 
 
   // เพิ่มตัวควบคุมสำหรับฟิลด์ต่างๆ
@@ -133,30 +134,30 @@ class _ProfiletState extends State<Profiles> {
           fetchUserData();
 
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('บันทึกข้อมูลสำเร็จ'))
+            SnackBar(content: Text('บันทึกข้อมูลสำเร็จ'),backgroundColor: Colors.green,)
           );
         } else {
           print('Error: ${data['error']}');
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('เกิดข้อผิดพลาด: ${data['error']}'))
+            SnackBar(content: Text('เกิดข้อผิดพลาด: ${data['error']}'),backgroundColor: Colors.red,)
           );
         }
       } catch (e) {
         print('JSON Decode Error: $e');
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('เกิดข้อผิดพลาดในการประมวลผลข้อมูล'))
+          SnackBar(content: Text('เกิดข้อผิดพลาดในการประมวลผลข้อมูล'),backgroundColor: Colors.red,)
         );
       }
     } else {
       print('Request failed with status: ${response.statusCode}');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้'))
+        SnackBar(content: Text('ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้'),backgroundColor: Colors.red,)
       );
     }
   } catch (e) {
     print('Request Error: $e');
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('เกิดข้อผิดพลาดในการส่งคำขอ'))
+      SnackBar(content: Text('เกิดข้อผิดพลาดในการส่งคำขอ'),backgroundColor: Colors.red,)
     );
   }
 }
@@ -221,10 +222,11 @@ class _ProfiletState extends State<Profiles> {
                             BoxShadow(
                                 color: Colors.black26,
                                 offset: Offset(2, 2),
-                                blurRadius: 10),
+                                blurRadius: 10
+                            ),
                           ],
                           image: const DecorationImage(
-                            image: AssetImage("assets/images/ครู.png"),
+                            image: AssetImage("assets/images/นักเรียน.png"),
                           ),
                         ),
                       ),
@@ -245,22 +247,106 @@ class _ProfiletState extends State<Profiles> {
     key: _formKey,
     child: Column(
       children: [
-        _buildTextField('ชื่อ(ภาษาไทย):', thfnameController),
-        _buildTextField('นามสกุล(ภาษาไทย):', thlnameController),
-        _buildTextField('ชื่อ(ภาษาอังกฤษ):', enfnameController),
-        _buildTextField('นามสกุล(ภาษาอังกฤษ):', enlnameController),
-        _buildTextField('อีเมล:', emailController),
-        _buildTextField('โทรศัพท์:', phoneController),
-        _buildTextField('โทรศัพท์ผู้ปกครอง:', parentPhoneController),
-        
-        
+        _buildTextField(
+          'ชื่อ(ภาษาไทย):',
+          thfnameController,
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'กรุณากรอกชื่อ(ภาษาไทย)';
+            }
+            if (!RegExp(r'^[ก-๏\s]+$').hasMatch(value)) {
+              return 'กรุณากรอกเฉพาะอักษรภาษาไทย';
+            }
+            return null;
+          },
+        ),
+        _buildTextField(
+          'นามสกุล(ภาษาไทย):',
+          thlnameController,
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'กรุณากรอกนามสกุล(ภาษาไทย)';
+            }
+            if (!RegExp(r'^[ก-๏\s]+$').hasMatch(value)) {
+              return 'กรุณากรอกเฉพาะอักษรภาษาไทย';
+            }
+            return null;
+          },
+        ),
+        _buildTextField(
+          'ชื่อ(ภาษาอังกฤษ):',
+          enfnameController,
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'กรุณากรอกชื่อ(ภาษาอังกฤษ)';
+            }
+            if (!RegExp(r'^[a-zA-Z\s]+$').hasMatch(value)) {
+              return 'กรุณากรอกเฉพาะอักษรภาษาอังกฤษ';
+            }
+            return null;
+          },
+        ),
+        _buildTextField(
+          'นามสกุล(ภาษาอังกฤษ):',
+          enlnameController,
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'กรุณากรอกนามสกุล(ภาษาอังกฤษ)';
+            }
+            if (!RegExp(r'^[a-zA-Z\s]+$').hasMatch(value)) {
+              return 'กรุณากรอกเฉพาะอักษรภาษาอังกฤษ';
+            }
+            return null;
+          },
+        ),
+        _buildTextField(
+          'อีเมล:',
+          emailController,
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'กรุณากรอกอีเมล';
+            }
+            if (!RegExp(r'^[a-zA-Z0-9._%+-]+@(gmail\.com|hotmail\.com)$').hasMatch(value)) {
+              return 'กรุณากรอกอีเมลที่ลงท้ายด้วย @gmail.com หรือ @hotmail.com';
+            }
+            return null;
+          },
+        ),
+        _buildTextField(
+          'โทรศัพท์:',
+          phoneController,
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'กรุณากรอกหมายเลขโทรศัพท์';
+            }
+            if (!RegExp(r'^[0-9]{10}$').hasMatch(value)) {
+              return 'กรุณากรอกหมายเลขโทรศัพท์ให้ครบ 10 หลัก';
+            }
+            return null;
+          },
+        ),
+
+         _buildTextField(
+          'โทรศัพท์:',
+          parentPhoneController,
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'กรุณากรอกหมายเลขโทรศัพท์';
+            }
+            if (!RegExp(r'^[0-9]{10}$').hasMatch(value)) {
+              return 'กรุณากรอกหมายเลขโทรศัพท์ให้ครบ 10 หลัก';
+            }
+            return null;
+          },
+        ),
+         
         DropdownButtonFormField<String>(
           decoration: const InputDecoration(
             label: Text(
               "กรุณาเลือกชั้นปีการศึกษา",
             ),
           ),
-          value: selectedclassroom ?? Student!.usersClassroom, // แสดงค่าจาก Student ถ้ามี
+          value: selectedclassroom ?? Student!.usersClassroom,
           items: [
             "ชั้นมัธยมศึกษาปีที่ 4", 
             "ชั้นมัธยมศึกษาปีที่ 5", 
@@ -279,31 +365,49 @@ class _ProfiletState extends State<Profiles> {
           },
           validator: (value) => value == null ? 'กรุณาเลือกชั้นปีการศึกษา' : null,
         ),
-
-        
-        _buildTextField('ห้อง:', numroomController),
-       DropdownButtonFormField<String>(
-      decoration: const InputDecoration(
-        label: Text(
-          "กรุณาเลือกแผนการเรียน",
+        DropdownButtonFormField<int>(
+          decoration: const InputDecoration(
+            label: Text('ห้อง:'),
+          ),
+          value: selectedRoom ?? int.tryParse(numroomController.text),
+          items: List.generate(30, (index) {
+            int roomNumber = index + 1;
+            return DropdownMenuItem(
+              value: roomNumber,
+              child: Text(roomNumber.toString()),
+            );
+          }),
+          onChanged: (value) {
+            setState(() {
+              selectedRoom = value ;
+              numroomController.text = value.toString();
+            });
+          },
+          validator: (value) => value == null ? 'กรุณาเลือกห้อง' : null,
         ),
+      
+       DropdownButtonFormField<String>(
+        decoration: const InputDecoration(
+          label: Text(
+            "กรุณาเลือกแผนการเรียน",
+          ),
+        ),
+        value: sectionOptions.contains(majorController.text)
+            ? majorController.text 
+            : null, // ใช้ค่าใน majorController แทน
+        items: sectionOptions.map((section) {
+          return DropdownMenuItem(
+            value: section,
+            child: Text(section),
+          );
+        }).toList(),
+        onChanged: (value) {
+          setState(() {
+            majorController.text = value ?? ""; 
+          });
+        },
+        validator: (value) => value == null ? 'กรุณาเลือกแผนการเรียน' : null,
       ),
-      value: sectionOptions.contains(majorController.text)
-          ? majorController.text 
-          : null, // ใช้ค่าใน majorController แทน
-      items: sectionOptions.map((section) {
-        return DropdownMenuItem(
-          value: section,
-          child: Text(section),
-        );
-      }).toList(),
-      onChanged: (value) {
-        setState(() {
-          majorController.text = value ?? ""; // อัปเดตค่าที่เลือกใน majorController
-        });
-      },
-      validator: (value) => value == null ? 'กรุณาเลือกแผนการเรียน' : null,
-    ),
 
     SizedBox(height: 20),
         Padding(
@@ -311,7 +415,11 @@ class _ProfiletState extends State<Profiles> {
           child: 
         
         ElevatedButton(
-          onPressed: saveChanges,
+          onPressed: () {
+            if (_formKey.currentState!.validate()) {
+              saveChanges();
+            }
+          },      
           child: Text('บันทึกการเปลี่ยนแปลง'),
         )),
       ],
@@ -321,26 +429,18 @@ class _ProfiletState extends State<Profiles> {
 
 
   // ฟังก์ชันสร้าง TextField สำหรับการแก้ไขข้อมูล
-  Widget _buildTextField(String label, TextEditingController controller) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10.0),
-      child: TextFormField(
-        controller: controller,
-        decoration: InputDecoration(labelText: label),
-        validator: (value) {
-          if (value == null || value.isEmpty) {
-            return 'กรุณากรอกข้อมูล';
-          }
-          return null;
-        },
-      ),
-    );
-  }
+  Widget _buildTextField(String label, TextEditingController controller, {String? Function(String?)? validator}) {
+  return TextFormField(
+    controller: controller,
+    decoration: InputDecoration(labelText: label),
+    validator: validator,
+  );
+}
 
   // ฟังก์ชันสร้างตาราง
   Widget _buildProfileTable() {
     return Center(
-      child: SingleChildScrollView(  // ใช้ SingleChildScrollView ห่อหุ้ม
+      child: SingleChildScrollView( 
         child: Table(
           columnWidths: {
             0: FixedColumnWidth(200),

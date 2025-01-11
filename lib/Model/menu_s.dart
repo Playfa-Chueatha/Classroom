@@ -117,6 +117,9 @@ class _MenuState extends State<Menuu_class_s> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
     return Scaffold(
       backgroundColor: Color.fromARGB(255, 195, 238, 250),
       body: Column(
@@ -126,8 +129,9 @@ class _MenuState extends State<Menuu_class_s> {
 
         //listclassroom
         Container(
-          height: 450,
-          width: 350,
+          height: screenHeight * 0.4,
+          width: screenWidth * 0.35,
+          padding: EdgeInsets.all(10),
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.only(
@@ -135,15 +139,9 @@ class _MenuState extends State<Menuu_class_s> {
               bottomRight: Radius.circular(20),
             )
           ),
-          child: Column(
-            children: [
-              Padding(
-                padding: EdgeInsets.fromLTRB(0, 20, 0, 10),
-                child: Text('ห้องเรียนของฉัน',style: TextStyle(fontSize: 20),),
-              ),     
-              Container(
-                height: 350,
-                width: 300,
+          child: Container(
+                height: screenHeight * 0.39,
+                width: screenWidth * 0.3,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.only(
                     topRight: Radius.circular(20),
@@ -152,17 +150,14 @@ class _MenuState extends State<Menuu_class_s> {
                 ),
                 child:  List_classroom_S(thfname: widget.thfname, thlname: widget.thlname, username: widget.username)
               ),
-              SizedBox(height: 5),
-            ],
-          ),
         ),
-        SizedBox(height: 20),
+       SizedBox(height: screenHeight * 0.02,),
 
 
 
         Container(
-                height: 530,
-                width: 350,
+                height: screenHeight * 0.475,
+                width: screenWidth * 0.35,
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: const BorderRadius.only(

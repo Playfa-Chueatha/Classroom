@@ -20,6 +20,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class AssignWork_class_T extends StatefulWidget {
+  final Examset exam;
   final String username;
   final String thfname;
   final String thlname;
@@ -29,6 +30,7 @@ class AssignWork_class_T extends StatefulWidget {
   final String classroomNumRoom;
   const AssignWork_class_T ({
     super.key, 
+    required this.exam,
     required this.username, 
     required this.thfname, 
     required this.thlname, 
@@ -269,6 +271,9 @@ Future<void> updateInspectionStatus(String autoId, bool isChecked) async {
       final data = json.decode(response.body);
       if (data['success'] == true) {
         print("Status updated successfully.");
+        setState(() {
+          loadExamsets();
+        });
       } else {
         throw Exception(data['message']);
       }
@@ -315,6 +320,10 @@ void initState() {
 
   @override
   Widget build(BuildContext context) {
+
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
     return Scaffold(
       backgroundColor: Color.fromARGB(255, 195, 238, 250),
       appBar: AppBar(
@@ -330,25 +339,24 @@ void initState() {
             thfname: widget.thfname,
             thlname: widget.thlname,
             username: widget.username,
+            classroomMajor: widget.classroomMajor,
+            classroomName: widget.classroomName,
+            classroomNumRoom: widget.classroomNumRoom,
+            classroomYear: widget.classroomYear,
           ),
         ],
       ),
       body: SingleChildScrollView(
-        scrollDirection:Axis.vertical,
-        child: Column(
-          children: [
-            SizedBox(height: 10,),
-            Column(
+          child:  Column(
               children: [
-                SizedBox(height: 30),
-                SingleChildScrollView(
-                  scrollDirection:Axis.horizontal,
-                  child: Row(
+                SizedBox(height: screenHeight * 0.01),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       //menu
                       Container(
-                      height: 1000,
-                      width: 400,
+                      height: screenHeight * 0.9,
+                      width: screenWidth * 0.18,
                       alignment: Alignment.topCenter,
                       decoration: BoxDecoration(
                         color: Color.fromARGB(255, 195, 238, 250),
@@ -364,44 +372,44 @@ void initState() {
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
                             Container(
-                              height: 550,
-                              width: 350,
+                              height: screenHeight * 0.4,
+                              width: screenWidth * 0.35,
+                              padding: EdgeInsets.all(10),
                               decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(20),
+                                borderRadius: BorderRadius.only(
+                                  topRight: Radius.circular(20),
+                                  bottomRight: Radius.circular(20),
+                                ),
                                 color: Colors.white
                               ),
                               child: Column(
                                 children: [
-                                  Padding(
-                                    padding: EdgeInsets.fromLTRB(300, 10, 10, 0),
-                                    child: IconButton(
-                                      tooltip: 'ตั้งค่าห้องเรียน',
-                                      onPressed: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) => SettingCalss(thfname: widget.thfname, thlname: widget.thlname, username: widget.username,classroomMajor: '',classroomName: '',classroomNumRoom: '',classroomYear: '',),
-                                          ),
-                                        );
-                                      },
-                                      icon: Icon(Icons.settings),
-                                    ),
-                                  ),
                                   
-                                  SizedBox(
-                                    height: 500,
-                                    width: 350,
-                                    child: List_classroom_Assignwork(thfname: widget.thfname, thlname: widget.thlname, username: widget.username,), // Menu_listclassroom.dart
+                                  
+                                  Container(
+                                    height: screenHeight * 0.37,
+                                    width: screenWidth * 0.3,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.only(
+                                        topRight: Radius.circular(20),
+                                        bottomRight: Radius.circular(20)
+                                      )
+                                    ),
+                                    child: List_classroom_Assignwork(
+                                      thfname: widget.thfname, 
+                                      thlname: widget.thlname, 
+                                      username: widget.username,
+                                    ), // Menu_listclassroom.dart
                                   ),
 
                                 ],
                               ),
                             ),
-                            SizedBox(height: 20),
+                            SizedBox(height: screenHeight * 0.02,),
                           
                             Container(
-                              height: 420,
-                              width: 350,
+                              height: screenHeight * 0.475,
+                              width: screenWidth * 0.35,
                               decoration: BoxDecoration(
                                 color: Colors.white,
                                 borderRadius: BorderRadius.only(
@@ -472,69 +480,75 @@ void initState() {
 
                       )
                       ),
-                      SizedBox(width: 50,),
 
                       //งานที่มอบหมาย
                       Container(
-                      height: 1000,
-                      width: 600,
+                      height: screenHeight * 0.9,
+                      width: screenWidth * 0.32,
+                      margin: EdgeInsets.all(10),
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(20)
-                        ),
-                        
+                        ),         
                         child: SingleChildScrollView(
                           child: 
                           Column(
                           children: [
-                            Padding(
-                              padding: EdgeInsets.fromLTRB(550, 5, 5, 5),
-                              child: IconButton(
-                                onPressed: (widget.classroomName.isNotEmpty &&
-                                        widget.classroomMajor.isNotEmpty &&
-                                        widget.classroomYear.isNotEmpty &&
-                                        widget.classroomNumRoom.isNotEmpty)
-                                    ? () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) => Type_work(
-                                              username: widget.username,
-                                              thfname: widget.thfname,
-                                              thlname: widget.thlname,
-                                              classroomName: widget.classroomName,
-                                              classroomMajor: widget.classroomMajor,
-                                              classroomNumRoom: widget.classroomNumRoom,
-                                              classroomYear: widget.classroomYear,
-                                            ),
-                                          ),
-                                        );
-                                      }
-                                    : null, // Disable the button if any value is empty
-                                style: IconButton.styleFrom(
-                                  backgroundColor: (widget.classroomName.isNotEmpty &&
-                                          widget.classroomMajor.isNotEmpty &&
-                                          widget.classroomYear.isNotEmpty &&
-                                          widget.classroomNumRoom.isNotEmpty)
-                                      ? Color.fromARGB(255, 147, 185, 221) // Original color
-                                      : Colors.grey, // Grey color when disabled
-                                  highlightColor: Color.fromARGB(255, 56, 105, 151),
-                                ),
-                                tooltip: 'มอบหมายงาน',
-                                icon: const Icon(Icons.add),
-                                iconSize: 30,
-                                color: Colors.black,
-                              ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                SizedBox(width: 8),
+                                Padding(
+                                    padding: EdgeInsets.fromLTRB(5, 5, 5, 5),
+                                    child: IconButton(
+                                      onPressed: (widget.classroomName.isNotEmpty &&
+                                              widget.classroomMajor.isNotEmpty &&
+                                              widget.classroomYear.isNotEmpty &&
+                                              widget.classroomNumRoom.isNotEmpty)
+                                          ? () {
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) => Type_work(
+                                                    username: widget.username,
+                                                    thfname: widget.thfname,
+                                                    thlname: widget.thlname,
+                                                    exam: widget.exam, 
+                                                    classroomName: widget.classroomName,
+                                                    classroomMajor: widget.classroomMajor,
+                                                    classroomNumRoom: widget.classroomNumRoom,
+                                                    classroomYear: widget.classroomYear,
+                                                  ),
+                                                ),
+                                              );
+                                            }
+                                          : null, // Disable the button if any value is empty
+                                      style: IconButton.styleFrom(
+                                        backgroundColor: (widget.classroomName.isNotEmpty &&
+                                                widget.classroomMajor.isNotEmpty &&
+                                                widget.classroomYear.isNotEmpty &&
+                                                widget.classroomNumRoom.isNotEmpty)
+                                            ? Color.fromARGB(255, 147, 185, 221) // Original color
+                                            : Colors.grey, // Grey color when disabled
+                                        highlightColor: Color.fromARGB(255, 56, 105, 151),
+                                      ),
+                                      tooltip: 'มอบหมายงาน',
+                                      icon: const Icon(Icons.add),
+                                      iconSize: 30,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                              ],
                             ),
-
+                            
                             //งานที่มอบหมาย
                             Container(
-                              width: 500,
+                              width: screenWidth * 0.5,
+                              margin: EdgeInsets.fromLTRB(20, 10, 20, 10),
                               padding: EdgeInsets.all(20),
-                              margin: EdgeInsets.fromLTRB(0, 0, 0, 20),
                               decoration: BoxDecoration(
                                 color: Color.fromARGB(255, 147, 185, 221),
-                                borderRadius: BorderRadius.circular(20),
+                                borderRadius: BorderRadius.circular(10),
                               ),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -559,7 +573,6 @@ void initState() {
                                       ),
                                     ],
                                   ),
-                                  const SizedBox(height: 10),
 
                                  
                                   if (isExpandedFuture)
@@ -614,7 +627,7 @@ void initState() {
                                                                         });
 
                                                                         ScaffoldMessenger.of(context).showSnackBar(
-                                                                          SnackBar(content: Text('สถานะเปลี่ยนเป็น "ตรวจงานครบแล้ว"')),
+                                                                          SnackBar(content: Text('สถานะเปลี่ยนเป็น "ตรวจงานครบแล้ว"'),backgroundColor: Colors.green,),
                                                                         );
                                                                       },
                                                                     );
@@ -665,12 +678,12 @@ void initState() {
 
                             //งานที่เลยกำหนด
                             Container(
-                              width: 500,
+                              width: screenWidth * 0.5,
+                              margin: EdgeInsets.fromLTRB(20, 10, 20, 10),
                               padding: EdgeInsets.all(20),
-                              margin: EdgeInsets.fromLTRB(0, 0, 0, 20),
                               decoration: BoxDecoration(
                                 color: Color.fromARGB(255, 147, 185, 221),
-                                borderRadius: BorderRadius.circular(20),
+                                borderRadius: BorderRadius.circular(10),
                               ),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -696,7 +709,7 @@ void initState() {
                                       ),
                                     ],
                                   ),
-                                  const SizedBox(height: 10),
+
 
                                   // Content
                                   if (isExpandedPast)
@@ -798,12 +811,12 @@ void initState() {
 
                                         //งานที่ตรวจสอบแล้วทั้งหมด
                                         Container(
-                                          width: 500,
+                                          width: screenWidth * 0.5,
+                                          margin: EdgeInsets.fromLTRB(20, 10, 20, 10),
                                           padding: EdgeInsets.all(20),
-                                          margin: EdgeInsets.fromLTRB(0, 0, 0, 20),
                                           decoration: BoxDecoration(
                                             color: Color.fromARGB(255, 147, 185, 221),
-                                            borderRadius: BorderRadius.circular(20),
+                                            borderRadius: BorderRadius.circular(10),
                                           ),
                                           child: Column(
                                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -827,7 +840,6 @@ void initState() {
                                                   ),
                                                 ],
                                               ),
-                                              const SizedBox(height: 10),
 
                                               // Content
                                               if (isExapandedcomplete)
@@ -884,7 +896,7 @@ void initState() {
                                                                                     });
 
                                                                                     ScaffoldMessenger.of(context).showSnackBar(
-                                                                                      SnackBar(content: Text('สถานะเปลี่ยนเป็น "ยังตรวจงานไม่ครบ"')),
+                                                                                      SnackBar(content: Text('สถานะเปลี่ยนเป็น "ยังตรวจงานไม่ครบ"'),backgroundColor: Colors.green,),
                                                                                     );
                                                                                   },
                                                                                 );
@@ -932,13 +944,12 @@ void initState() {
                                       ]
                                     ),)
                                   ),
-                                  SizedBox(width: 20,),
-
                             
                       //งายที่มอบหมาย รายละเอียด
                       Container(
-                        height: 1000,
-                        width: 800,
+                        height: screenHeight * 0.9,
+                        width: screenWidth * 0.45,
+                        margin: EdgeInsets.all(10),
                         alignment: Alignment.topCenter,
                         decoration: BoxDecoration(
                           color: Color.fromARGB(255, 152, 186, 218),
@@ -946,13 +957,13 @@ void initState() {
                         ),
                         child: Column(
                           children: [
-                            SizedBox(height: 50,),
+                            SizedBox(height: screenHeight * 0.05,),
                             Text("รายละเอียดงาน", style: TextStyle(fontSize: 30),),
                  
                             Container(
                               alignment: Alignment.center,
-                              height: 900,
-                              width: 700,
+                              height: screenHeight * 0.75,
+                              width: screenWidth * 0.4,
                               decoration: BoxDecoration(
                                 color: Colors.white,
                                 borderRadius: BorderRadius.circular(20)
@@ -964,25 +975,22 @@ void initState() {
                                           exam: selectedExam!,
                                           thfname: widget.thfname,
                                           thlname: widget.thlname,
-                                          username: widget.username,                                
+                                          username: widget.username, 
+                                          classroomMajor: widget.classroomMajor,
+                                          classroomName: widget.classroomName,
+                                          classroomNumRoom: widget.classroomNumRoom,
+                                          classroomYear: widget.classroomYear,                               
                                         ),
                                       )
                                     : Center(child: Text("กรุณาเลือกงาน")),
-                              
-                              
                             ),
                           ],
                         ),
                       ),
-                      SizedBox(width: 20)
                     ],
                   ),
-                )
               ],
-            )
-          ],
-        ),
-      )
+            )),  
     );
   }
 }

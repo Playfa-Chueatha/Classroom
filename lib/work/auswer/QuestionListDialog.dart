@@ -194,16 +194,22 @@ class _QuestionListDialogState extends State<QuestionListDialog> {
                       title: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          
-                          Row(
-                            children: [
+                           
                               Text(
                                 'ข้อที่ ${index + 1}: ',
                                 style: TextStyle(fontWeight: FontWeight.bold),
                               ),
-                              Text(questions[index].questionDetail),
-                            ],                                            
-                          ),
+                              Padding(padding: EdgeInsets.all(10),
+                              child: 
+                              SizedBox(
+                                width: 1700,
+                                child: Text(
+                                questions[index].questionDetail,
+                                maxLines: 5,  // กำหนดให้แสดงได้สูงสุด 2 บรรทัด
+                                overflow: TextOverflow.ellipsis, // ถ้าข้อความยาวเกินจะตัดข้อความให้แสดง ...
+                              )),
+                              ),
+                        
                           Text('คะแนน: ${questions[index].questionMark.toString()}', style: TextStyle(color: const Color.fromARGB(255, 11, 70, 119)),)
                         ],
                       ),

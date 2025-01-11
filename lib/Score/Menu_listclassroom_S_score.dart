@@ -59,6 +59,9 @@ class _List_classroomState extends State<MenuListclassroomSScore> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -83,8 +86,8 @@ class _List_classroomState extends State<MenuListclassroomSScore> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
-                  height: 50,
-                  width: 300,
+                  height: screenHeight * 0.05,
+                  width: screenWidth * 0.2,
                   decoration: BoxDecoration(
                     color: Color.fromARGB(255, 195, 238, 250),
                     borderRadius: BorderRadius.circular(20),
@@ -113,12 +116,12 @@ class _List_classroomState extends State<MenuListclassroomSScore> {
                       children: [
                         Row(
                           children: [
-                            Text("${classrooms[index]['classroom_name']}", style: TextStyle(fontSize: 16)),
-                            SizedBox(width: 8),
-                            Text("${classrooms[index]['classroom_major']}", style: TextStyle(fontSize: 14, color: Color.fromARGB(255, 77, 77, 77))),
+                            Text("${classrooms[index]['classroom_name']}", style: TextStyle(fontSize: MediaQuery.of(context).size.width * 0.009,)),
+                            SizedBox(width:  screenWidth * 0.008,),
+                            // Text("${classrooms[index]['classroom_major']}", style: TextStyle(fontSize: 14, color: Color.fromARGB(255, 77, 77, 77))),
                           ],
                         ),
-                        Text("ม.${classrooms[index]['classroom_year']} ห้อง ${classrooms[index]['classroom_numroom']}", style: TextStyle(fontSize: 14, color: const Color.fromARGB(255, 77, 77, 77))),
+                        Text("ม.${classrooms[index]['classroom_year']} ห้อง ${classrooms[index]['classroom_numroom']}", style: TextStyle(fontSize: MediaQuery.of(context).size.width * 0.007, color: const Color.fromARGB(255, 77, 77, 77))),
                       ],
                     ),
                   ),

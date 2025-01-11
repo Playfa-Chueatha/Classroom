@@ -313,6 +313,8 @@ Text _getStatusText(String status) {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
     
     return Scaffold(
       backgroundColor: Color.fromARGB(255, 195, 238, 250),
@@ -334,20 +336,14 @@ Text _getStatusText(String status) {
         ],
       ),
       body: SingleChildScrollView(
-        scrollDirection: Axis.vertical,
         child: Column(
           children: [
-            SizedBox(height: 10),
-            Column(
-              children: [
-                SizedBox(height: 30),
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
+            SizedBox(height: screenHeight * 0.01),
+             Row(
                     children: [
                       Container(
-                        height: 1000,
-                        width: 400,
+                        height: screenHeight * 0.9,
+                        width: screenWidth * 0.18,
                         alignment: Alignment.topCenter,
                         decoration: BoxDecoration(
                           color: Color.fromARGB(255, 195, 238, 250),
@@ -362,8 +358,9 @@ Text _getStatusText(String status) {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Container(
-                              height: 550,
-                              width: 350,
+                              height: screenHeight * 0.4,
+                              width: screenWidth * 0.35,
+                              padding: EdgeInsets.all(10),
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(20),
                                 color: Colors.white
@@ -372,19 +369,25 @@ Text _getStatusText(String status) {
                                 children: [
                                   
                                   
-                                  SizedBox(
-                                    height: 500,
-                                    width: 350,
+                                  Container(
+                                    height: screenHeight * 0.37,
+                                    width: screenWidth * 0.3,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.only(
+                                        topRight: Radius.circular(20),
+                                        bottomRight: Radius.circular(20)
+                                      )
+                                    ),
                                     child: MenuListclassroomSScore(thfname: widget.thfname, thlname: widget.thlname, username: widget.username) // Menu_listclassroom.dart
                                   ),
 
                                 ],
                               ),
                             ),
-                            SizedBox(height: 20),
+                            SizedBox(height: screenHeight * 0.02,),
                             Container(
-                                height: 420,
-                                width: 350,
+                                height: screenHeight * 0.475,
+                                width: screenWidth * 0.35,
                                 decoration: BoxDecoration(
                                   color: Colors.white,
                                   borderRadius: const BorderRadius.only(
@@ -455,10 +458,11 @@ Text _getStatusText(String status) {
 
                       )
                       ),
-                      SizedBox(width: 50,),
+
                       Container(
-                                height: 1000,
-                                width: 1440,
+                                height: screenHeight * 0.9,
+                                width: screenWidth * 0.8,
+                                margin: EdgeInsets.all(5),
                                 decoration: BoxDecoration(
                                   color: Colors.white,
                                   borderRadius: BorderRadius.circular(20),
@@ -490,6 +494,7 @@ Text _getStatusText(String status) {
                                     : Padding(
                                       padding: EdgeInsets.all(20),
                                       child: Column(
+                                        mainAxisAlignment: MainAxisAlignment.start,
                                         children: [
                                           
                                          FutureBuilder<ScoreForStudents>(
@@ -521,13 +526,12 @@ Text _getStatusText(String status) {
                                                 }
 
                                                 return SingleChildScrollView(
-                                                  scrollDirection: Axis.horizontal,
                                                   child: DataTable(
                                                     columnSpacing: 5.0,
                                                     columns: [
                                                       DataColumn(label: Container(
-                                                        width: 1000,
-                                                        height: 50,
+                                                        width: screenWidth * 0.55,
+                                                        height: screenHeight * 0.05,
                                                         alignment: Alignment.center,
                                                         decoration: BoxDecoration(
                                                           color: const Color.fromARGB(255, 71, 136, 190),
@@ -535,8 +539,8 @@ Text _getStatusText(String status) {
                                                         child: Text('รายละเอียดงาน',style: TextStyle(color: Colors.white),)),
                                                       ), 
                                                       DataColumn(label: Container(
-                                                        width: 150,
-                                                        height: 50,
+                                                        width: screenWidth * 0.08,
+                                                        height: screenHeight * 0.05,
                                                         alignment: Alignment.center,
                                                         decoration: BoxDecoration(
                                                           color: const Color.fromARGB(255, 71, 136, 190),
@@ -544,8 +548,8 @@ Text _getStatusText(String status) {
                                                         child: Text('คะแนนเต็ม',style: TextStyle(color: Colors.white),)),
                                                       ),
                                                       DataColumn(label: Container(
-                                                        width: 150,
-                                                        height: 50,
+                                                        width: screenWidth * 0.08,
+                                                        height: screenHeight * 0.05,
                                                         alignment: Alignment.center,
                                                         decoration: BoxDecoration(
                                                           color: const Color.fromARGB(255, 71, 136, 190),
@@ -559,7 +563,7 @@ Text _getStatusText(String status) {
                                                         return DataRow(cells: [
                                                           DataCell(
                                                             SizedBox(
-                                                              width: 1000,
+                                                              width: screenWidth * 0.55,
                                                               child: Text(
                                                                 data['direction'] ?? '-',
                                                                 textAlign: TextAlign.left,
@@ -570,7 +574,7 @@ Text _getStatusText(String status) {
                                                           ),
                                                           DataCell(
                                                             Container(
-                                                              width: 150,
+                                                              width: screenWidth * 0.08,
                                                               alignment: Alignment.center,
                                                               child:  Text(
                                                               (data['fullmark'] == null || data['fullmark'] == 0)
@@ -580,7 +584,7 @@ Text _getStatusText(String status) {
                                                           DataCell(
                                                             Container(
                                                               alignment: Alignment.center,
-                                                              width: 150,
+                                                              width: screenWidth * 0.08,
                                                               child: Text(
                                                                 (data['scoreTotal'] == null) 
                                                                     ? '-' 
@@ -593,8 +597,8 @@ Text _getStatusText(String status) {
                                                       DataRow(cells: [
                                                         DataCell(
                                                           Container(
-                                                            width: 1000,
-                                                            height: 50,
+                                                            width: screenWidth * 0.55,
+                                                            height: screenHeight * 0.05,
                                                             alignment: Alignment.center,
                                                             decoration: BoxDecoration(
                                                               color: const Color.fromARGB(255, 71, 136, 190),
@@ -604,8 +608,8 @@ Text _getStatusText(String status) {
                                                         ),
                                                          DataCell(
                                                           Container(
-                                                            width: 150,
-                                                            height: 50,
+                                                            width: screenWidth * 0.08,
+                                                            height: screenHeight * 0.05,
                                                             alignment: Alignment.center,
                                                             decoration: BoxDecoration(
                                                               color: const Color.fromARGB(255, 71, 136, 190),
@@ -615,8 +619,8 @@ Text _getStatusText(String status) {
                                                         ),
                                                         DataCell(
                                                           Container(
-                                                            width: 150,
-                                                            height: 50,
+                                                            width: screenWidth * 0.08,
+                                                            height: screenHeight * 0.05,
                                                             alignment: Alignment.center,
                                                             decoration: BoxDecoration(
                                                               color: const Color.fromARGB(255, 71, 136, 190),
@@ -632,13 +636,13 @@ Text _getStatusText(String status) {
                                               }
                                             },
                                           ),
-                                          SizedBox(height: 20),
+                                          SizedBox(height: screenHeight * 0.05,),
                                           Text('สถานะการเช็คชื่อ:',style: TextStyle(
                                             fontSize: 20
                                           ),),
-
+                                          SizedBox(height: screenHeight * 0.05,),
                                           Row(
-                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                           children: [
                                             // ตารางแสดงประวัติการเช็คชื่อ
                                             FutureBuilder<List<AffectiveForStudents>>(
@@ -658,7 +662,7 @@ Text _getStatusText(String status) {
                                                   final data = snapshot.data!;
 
                                                   return SingleChildScrollView(
-                                                    scrollDirection: Axis.horizontal,
+                                                    scrollDirection: Axis.vertical,
                                                     child: DataTable(
                                                       columnSpacing: 20.0,
                                                       columns: [
@@ -685,12 +689,12 @@ Text _getStatusText(String status) {
                                               },
                                             ),
 
-                                            const SizedBox(width: 50),
+                                             SizedBox(height: screenHeight * 0.05),
 
                                             // ตารางแสดงจำนวนสถานะการเช็คชื่อ
                                             Container(
-                                              height: 200,
-                                              width: 400,
+                                              height: screenHeight * 0.2,
+                                              width: screenWidth * 0.4,
                                               alignment: Alignment.center,
                                               decoration: BoxDecoration(
                                                 borderRadius: BorderRadius.circular(20),
@@ -756,8 +760,8 @@ Text _getStatusText(String status) {
                               ),
                             ],
                           ),
-                        ),]
-                      ),
+            
+                    
                     ],
                   ),
                 )

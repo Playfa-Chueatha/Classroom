@@ -260,7 +260,8 @@ class _CheckinclassroomState extends State<Checkinclassroom> {
       return false;
     }
 
-    dataliststudents.sort((a, b) => a.studentNumber.compareTo(b.studentNumber));
+    dataliststudents.sort((a, b) => int.parse(a.studentNumber) - int.parse(b.studentNumber));
+    
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -295,7 +296,7 @@ class _CheckinclassroomState extends State<Checkinclassroom> {
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
+          scrollDirection: Axis.vertical,
           child: Column(
             children: [
               DataTable(

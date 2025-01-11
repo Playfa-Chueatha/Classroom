@@ -15,12 +15,20 @@ class appbarteacher extends StatefulWidget {
   final String thfname;
   final String thlname;
   final String username;
+  final String classroomName;
+  final String classroomMajor;
+  final String classroomYear;
+  final String classroomNumRoom;
 
   const appbarteacher({
     super.key,
     required this.thfname,
     required this.thlname,
     required this.username,
+    required this.classroomName, 
+    required this.classroomMajor, 
+    required this.classroomYear, 
+    required this.classroomNumRoom, 
   });
 
   @override
@@ -33,10 +41,18 @@ class _appbarteacherState extends State<appbarteacher> {
 
   Future<void> showNotifications() async {
   Notification notificationService = Notification();
-  List<NotificationData_sumit> fetchedNotifications = await notificationService.fetchNotifications(widget.username);
+  List<NotificationData_sumit> fetchedNotifications =
+      await notificationService.fetchNotifications(widget.username);
 
   // ใช้ setState เพื่ออัปเดตข้อมูล
   setState(() {
+    // จัดเรียง notifications: notread ด้านบน และเรียง id มากไปน้อย
+    fetchedNotifications.sort((a, b) {
+      if (a.readStatus == b.readStatus) {
+        return b.id.compareTo(a.id); // เรียง id มากไปน้อย
+      }
+      return a.readStatus ? 1 : -1; // notread อยู่ด้านบน
+    });
     notifications = fetchedNotifications;
   });
 
@@ -54,19 +70,45 @@ class _appbarteacherState extends State<appbarteacher> {
               itemCount: notifications.length,
               itemBuilder: (BuildContext context, int index) {
                 final notification = notifications[index];
-                return ListTile(
-                  leading: Icon(
-                    Icons.notifications,
-                    color: Colors.grey,
+                return Container(
+                  decoration: BoxDecoration(
+                    color: notification.readStatus
+                        ? Colors.white // สีพื้นหลังสำหรับ Alreadyread
+                        : Colors.blue[50], // สีพื้นหลังสำหรับ notread
+                    border: Border.all(
+                      color: notification.readStatus
+                          ? Colors.grey
+                          : Colors.blue, // กรอบสีน้ำเงินสำหรับ notread
+                      width: 1,
+                    ),
+                    borderRadius: BorderRadius.circular(8),
                   ),
-                  title: Text('มีการส่งงานใหม่ของนักเรียน'),
-                  subtitle: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(notification.title),
-                      Text('เวลา: ${notification.time}'),
-                      Text('วิชา: ${notification.classroomName} (${notification.classroomYear}/${notification.classroomNumRoom})'),
-                    ],
+                  margin: const EdgeInsets.symmetric(vertical: 4),
+                  child: ListTile(
+                    leading: Icon(
+                      Icons.notifications,
+                      color: notification.readStatus
+                          ? Colors.grey
+                          : Colors.blue, // ไอคอนสีน้ำเงินสำหรับ notread
+                    ),
+                    title: Text(
+                      'มีการส่งงานใหม่ของนักเรียน',
+                      style: TextStyle(
+                        fontWeight: notification.readStatus
+                            ? FontWeight.normal
+                            : FontWeight.bold, // ตัวหนาสำหรับ notread
+                      ),
+                    ),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(notification.title),
+                        Text('เวลา: ${notification.time}'),
+                        Text(
+                          'วิชา: ${notification.classroomName} (${notification.classroomYear}/${notification.classroomNumRoom})',
+                        ),
+                      ],
+                    ),
                   ),
                 );
               },
@@ -88,6 +130,7 @@ class _appbarteacherState extends State<appbarteacher> {
     );
   });
 }
+
 
 Future<void> markAllNotificationsAsRead() async {
   const String url = 'https://www.edueliteroom.com/connect/update_notificationassubmit_status.php';
@@ -245,7 +288,16 @@ Future<void> fetchUnreadNotifications() async {
                     onPressed: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => AssignWork_class_T(thfname: widget.thfname, thlname: widget.thlname, username: widget.username, classroomMajor: '', classroomName: '', classroomYear: '', classroomNumRoom: '')),
+                        MaterialPageRoute(builder: (context) => AssignWork_class_T(
+                          thfname: widget.thfname, 
+                          thlname: widget.thlname, 
+                          username: widget.username,
+                          exam: Examset(autoId: 0, direction: '', fullMark: 0, deadline: '', time: '', type: '', closed: '', inspectionStatus: '', classroomId: 0, usertUsername: ''),
+                          classroomMajor: widget.classroomMajor, 
+                          classroomName: widget.classroomName, 
+                          classroomYear: widget.classroomYear, 
+                          classroomNumRoom: widget.classroomNumRoom
+                        )),
                       );
                     },
                     icon: const Icon(Icons.edit_document),
@@ -256,7 +308,16 @@ Future<void> fetchUnreadNotifications() async {
                     style: IconButton.styleFrom(
                       highlightColor: const Color.fromARGB(255, 170, 205, 238),
                     ),
-                    onPressed: () => navigateTo(Score_T_body(thfname: widget.thfname, thlname: widget.thlname, username: widget.username, classroomMajor: '', classroomName: '', classroomYear: '', classroomNumRoom: '')), 
+                    onPressed: () => navigateTo(Score_T_body(
+                      thfname: widget.thfname, 
+                      thlname: widget.thlname, 
+                      username: widget.username, 
+                      classroomMajor: widget.classroomMajor,
+                      classroomName: widget.classroomName,
+                      classroomNumRoom: widget.classroomNumRoom,
+                      classroomYear: widget.classroomYear,
+                      exam: Examset(autoId: 0, direction: '', fullMark: 0, deadline: '', time: '', type: '', closed: '', inspectionStatus: '', classroomId: 0, usertUsername: ''),
+                      )), 
                     icon: const Icon(Icons.list_alt),
                     tooltip: 'รายชื่อนักเรียน',
                   ),

@@ -56,9 +56,23 @@ class _class_S_bodyState extends State<classS> {
       },
     );
 
-    if (response.statusCode == 200) {
-      return json.decode(response.body);
+     if (response.statusCode == 200) {
+    var responseJson = json.decode(response.body);
+  
+
+    // Check if the response is a map and contains an error
+    if (responseJson is Map<String, dynamic> && responseJson['error'] == 'No posts found') {
+      print('ไม่มีประกาศในห้องนี้');
+      return []; // Return an empty list when no posts are found
+    }
+
+    // Check if the response is a list
+    if (responseJson is List<dynamic>) {
+      return responseJson;
     } else {
+      throw Exception('Unexpected response format');
+    }
+  } else {
       throw Exception('Failed to load posts');
     }
   }
@@ -102,6 +116,9 @@ Future<void> _getUnreadNotifications() async {
     
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
     return Scaffold(
       backgroundColor: Color.fromARGB(255, 195, 238, 250),
       appBar: AppBar(
@@ -122,40 +139,35 @@ Future<void> _getUnreadNotifications() async {
         ],
       ),
       body: SingleChildScrollView(
-        scrollDirection:Axis.vertical,
-        child: Column(
+        child:  Column(
           children: [
-            SizedBox(height: 10,),
-            Column(
-              children: [
-                SizedBox(height: 30),
-                SingleChildScrollView(
-                  scrollDirection:Axis.horizontal,
-                  child: Row(
+            SizedBox(height: screenHeight * 0.01),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-
-
                       //menu
                       Container(
-                      height: 1000,
-                      width: 400,
+                      height: screenHeight * 0.9,
+                      width: screenWidth * 0.18,
                       alignment: Alignment.topCenter,
                       decoration: BoxDecoration(
-                        color: Color.fromARGB(255, 147, 185, 221),
+                        color: Color.fromARGB(255, 195, 238, 250),
                         borderRadius: BorderRadius.only(
                           topRight:Radius.circular(20),
                           bottomRight: Radius.circular(20)
                         ),
                       ),
-                      child: Menuu_class_s(thfname: widget.thfname, thlname: widget.thlname, username: widget.username),//menu.dart,
+                      child: Menuu_class_s(
+                        thfname: widget.thfname, 
+                        thlname: widget.thlname, 
+                        username: widget.username),//menu.dart,
                       ),
-                      SizedBox(width: 50,),
-
 
                       //ประกาศ
                       Container(
-                      height: 1000,
-                      width: 1450,
+                      height: screenHeight * 0.9,
+                      width: screenWidth * 0.8,
+                      margin: EdgeInsets.all(5),
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(20)
@@ -163,9 +175,9 @@ Future<void> _getUnreadNotifications() async {
                         
                         child: Column(
                           children: [
-                            SizedBox(height: 20),
+                            SizedBox( height: screenHeight * 0.02,),
                             Text("ประกาศ", style: TextStyle(fontSize: 40)),
-                            SizedBox(height: 20),
+                            SizedBox( height: screenHeight * 0.02,),
                             widget.classroomName.isEmpty ||
                                 widget.classroomMajor.isEmpty ||
                                 widget.classroomYear.isEmpty ||
@@ -188,6 +200,7 @@ Future<void> _getUnreadNotifications() async {
                                     return const Center(child: Text('ยังไม่มีประกาศในห้องนี้.'));
                                   } else {
                                     final dataAnnounce = snapshot.data!;
+                                    dataAnnounce.sort((a, b) => int.parse(b['posts_auto']).compareTo(int.parse(a['posts_auto'])));
                                     return ListView.builder(
                                       itemCount: dataAnnounce.length,
                                       itemBuilder: (context, index) {
@@ -327,17 +340,13 @@ Future<void> _getUnreadNotifications() async {
                                 }
                               )
                               ),
-
-
-                      
-                      SizedBox(width: 20)
                     ],
                   ),
                 )
               ],
             )
           
-                )])]))
+          ]))
     );
   }
 }

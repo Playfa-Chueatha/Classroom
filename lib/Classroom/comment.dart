@@ -103,7 +103,7 @@ class _CommentState extends State<Comment_inclass> {
       'comment_auto': commentAuto.toString(),
     },
   );
-  print(response.body);
+
 
   if (response.statusCode == 200) {
     // ตรวจสอบว่าตอบกลับเป็น JSON หรือไม่
@@ -153,8 +153,9 @@ class _CommentState extends State<Comment_inclass> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
+                  Text('ความคิดเห็น', style: TextStyle(fontSize:  20),),
                   Container(
-                    height: screenHeight * 0.6,
+                    height: screenHeight * 0.7,
                     width: screenWidth * 0.75,
                     decoration: BoxDecoration(
                       color: Color.fromARGB(255, 152, 186, 218),
@@ -162,7 +163,14 @@ class _CommentState extends State<Comment_inclass> {
                     ),
                     child: isLoading 
                       ? Center(child: CircularProgressIndicator())
-                      : ListView.builder(
+                      : comments.isEmpty
+                        ? Center(
+                            child: Text(
+                              '- ยังไม่มีการแสดงความคิดเห็น -',
+                              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                            ),
+                          )
+                        : ListView.builder(
                           itemCount: comments.length,
                           itemBuilder: (context, index) {
 

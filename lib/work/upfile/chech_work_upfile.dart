@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_esclass_2/Data/Data.dart';
+import 'package:flutter_esclass_2/work/Detail_work_teacher.dart';
 import 'package:flutter_esclass_2/work/asign_work_T.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -13,6 +14,10 @@ class ChechWorkUpfile extends StatefulWidget {
   final String username;
   final String thfname;
   final String thlname;
+  final String classroomName;
+  final String classroomMajor;
+  final String classroomYear;
+  final String classroomNumRoom;
 
   const ChechWorkUpfile({
     super.key,
@@ -21,6 +26,10 @@ class ChechWorkUpfile extends StatefulWidget {
     required this.username,
     required this.thfname,
     required this.thlname,
+    required this.classroomName, 
+    required this.classroomMajor, 
+    required this.classroomYear, 
+    required this.classroomNumRoom, 
   });
 
   @override
@@ -146,25 +155,8 @@ class _ChechWorkUpfileState extends State<ChechWorkUpfile> {
           );
 
           if (saveResponse.statusCode == 200) {
-            Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => AssignWork_class_T( 
-                            thfname: widget.thfname,
-                            thlname: widget.thlname,
-                            username: widget.username, 
-                            classroomMajor: '',
-                            classroomName: '',
-                            classroomNumRoom: '',     
-                            classroomYear: '',                               
-                          ),        
-                        ),
-                      ).then((_) {
-                        // รีเซ็ตข้อมูลเมื่อกลับมาจากหน้า CheckWorkUpfile
-                        setState(() {
-                          currentFileUrl = null;  // รีเซ็ต URL ของไฟล์
-                        });
-                      });
+            
+           Navigator.pop(context, 'refresh');
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text('บันทึกข้อมูลสำเร็จ'),backgroundColor: Colors.green,),
             );
