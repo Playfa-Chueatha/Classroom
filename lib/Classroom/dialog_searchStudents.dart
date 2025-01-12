@@ -203,21 +203,25 @@ class _DialogSearchstudentsState extends State<DialogSearchstudents> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
     return AlertDialog(
       backgroundColor: Colors.white,
       title: Text(
         'ค้นหานักเรียน ${widget.classroomName} ${widget.classroomYear}/${widget.classroomNumRoom} (${widget.classroomMajor})',
       ),
-      content: SizedBox(
-        height: 800,
-        width: 1200,
+      content: SingleChildScrollView(
+        child: SizedBox(
+        height: screenHeight * 1,
+        width: screenWidth * 1,
         child: Column(
           children: [
             _buildSearchFields(),
+            SizedBox(height: screenHeight * 0.01),
             _buildStudentList(),
           ],
         ),
-      ),
+      )),
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
@@ -228,9 +232,12 @@ class _DialogSearchstudentsState extends State<DialogSearchstudents> {
   }
 
   Widget _buildSearchFields() {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
     return Container(
-      height: 250,
-      width: 1000,
+        height: screenHeight * 0.26,
+        width: screenWidth * 0.9,
+        alignment: Alignment.center,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
         color: const Color.fromARGB(255, 121, 192, 219),
@@ -288,10 +295,11 @@ class _DialogSearchstudentsState extends State<DialogSearchstudents> {
   }
 
   Widget _buildStudentList() {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
     return Container(
-      height: 450,
-      width: 1000,
-      margin: const EdgeInsets.all(20),
+        height: screenHeight * 0.7,
+        width: screenWidth * 0.9,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
         color: const Color.fromARGB(255, 147, 185, 221),
@@ -361,9 +369,11 @@ class _DialogSearchstudentsState extends State<DialogSearchstudents> {
 
 
   Widget _buildTextField({required TextEditingController controller, required String label}) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
     return Container(
-      height: 60,
-      width: 200,
+      height: screenHeight * 0.06,
+      width: screenWidth * 0.2,
       margin: const EdgeInsets.all(10),
       child: TextField(
         controller: controller,

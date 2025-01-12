@@ -165,6 +165,9 @@ void sortStudentsremove() {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 195, 238, 250),
       appBar: AppBar(
@@ -185,22 +188,19 @@ void sortStudentsremove() {
         ],
       ),
       body: SingleChildScrollView(
-        scrollDirection: Axis.vertical,
-        child: Column(
-          children: [
-            const SizedBox(height: 10),
+        child: 
             Column(
               children: [
-                const SizedBox(height: 30),
+                SizedBox(height: screenHeight * 0.01),
                 SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
                   child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       // เมนูห้องเรียน
                       Container(
                         alignment: Alignment.topLeft,
-                        height: 1000,
-                        width: 350,
+                        height: screenHeight * 0.9,
+                        width: screenWidth * 0.19,
                         decoration: BoxDecoration(
                           color: const Color.fromARGB(255, 147, 185, 221),
                           borderRadius: const BorderRadius.only(
@@ -211,57 +211,35 @@ void sortStudentsremove() {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Padding(
-                              padding: const EdgeInsets.fromLTRB(170, 5, 5, 5),
-                              child: ElevatedButton.icon(
-                                onPressed: () async {
-                                  // แสดง dialog เพิ่มห้องเรียน
-                                  bool? result = await showDialog(
-                                    context: context,
-                                    builder: (BuildContext context) => AddClassroom(username: widget.username,thfname: widget.thfname,thlname: widget.thlname,exam: Examset(autoId: 0, direction: '', fullMark: 0, deadline: '', time: '', type: '', closed: '', inspectionStatus: '', classroomId: 0, usertUsername: ''),),
-                                  );
-
-                                  // ถ้า result เป็น true (บันทึกสำเร็จ), รีเฟรชหน้าหลัก
-                                  if (result == true) {
-                                    setState(() {
-                                      // ที่นี่คุณสามารถรีเฟรชข้อมูลที่แสดงในหน้าแรกได้
-                                    });
-                                  }
-                                },
-                                icon: const Icon(Icons.add),
-                                label: const Text(
-                                  "เพิ่มห้องเรียน",
-                                  style: TextStyle(fontSize: 16, color: Colors.black),
-                                ),
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: const Color.fromARGB(255, 203, 212, 216),
-                                ),
-                              ),
-                            ),
+                            
                             Container(
-                              height: 900,
-                              width: 300,
+                              height: screenHeight * 0.87,
+                              width: screenWidth * 0.17,
+                              alignment: Alignment.center,
+                              margin: EdgeInsets.fromLTRB(0, 10, 10, 10),
                               decoration: const BoxDecoration(
                                 color: Color.fromARGB(255, 147, 185, 221),
+                                borderRadius: BorderRadius.only(
+                                  topRight: Radius.circular(20),
+                                  bottomRight: Radius.circular(20),
+                                ),
                               ),
                               child: List_classroom(username: widget.username, thfname: widget.thfname, thlname: widget.thlname),
                             ),
                           ],
                         ),
                       ),
-                      const SizedBox(width: 50),
 
                       // ข้อมูลนักเรียน
                       Container(
-                        height: 1000,
-                        width: 1440,
-                        margin: const EdgeInsets.all(20),
+                        height: screenHeight * 0.9,
+                        width: screenWidth * 0.75, 
+                        margin: EdgeInsets.all(10),
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: SingleChildScrollView(
-                          scrollDirection: Axis.vertical,
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -321,7 +299,7 @@ void sortStudentsremove() {
                                                   child: Text('เพิ่มนักเรียน'),
                                                 ),
 
-                                                SizedBox(width: 10),
+                                                SizedBox(width: screenWidth * 0.01),
 
                                               DropdownButton<String>(
                                                 value: sortOption,
@@ -340,7 +318,7 @@ void sortStudentsremove() {
                                                   );
                                                 }).toList(),
                                               ),
-
+                                              SizedBox(width: screenWidth * 0.01),
                                         
                                               ],
                                             ),
@@ -505,7 +483,7 @@ void sortStudentsremove() {
                                                     }).toList(),
                                                   ),
                                                 ),
-                                                SizedBox(height: 50)
+                                               
                                   
                                 
                               
@@ -517,9 +495,7 @@ void sortStudentsremove() {
                   ),
                 ),
               ],
-            ),
-          ],
-        ),
+            )      
       ),
     );
   }

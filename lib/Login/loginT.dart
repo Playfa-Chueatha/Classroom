@@ -113,15 +113,12 @@ class _Login_TState extends State<Login_T> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                SizedBox(height: height * 0.05),
-                Text(
-                  "Login",
-                  style: TextStyle(fontSize: height * 0.05), 
-                ),
+                Padding(padding: EdgeInsets.all(10),
+                  child: Text("Login", style: TextStyle(fontSize: height * 0.05))),
                 SizedBox(height: height * 0.03),
                 Image.asset(
                   'assets/images/ครู.png',
-                  height: height * 0.2, // ความสูงของรูปภาพ 30% ของความสูงหน้าจอ
+                  height: height * 0.2, 
                 ),
                 SizedBox(height: height * 0.05),
                 Padding(
@@ -182,19 +179,19 @@ class _Login_TState extends State<Login_T> {
                     backgroundColor: Color.fromARGB(255, 10, 82, 104),
                     padding: EdgeInsets.symmetric(
                       vertical: height * 0.02,
-                      horizontal: width * 0.1,
+                      horizontal: width * 0.07,
                     ),
                   ),
                   child: Text("เข้าสู่ระบบ", style: TextStyle(fontSize: height * 0.03)),
                 ),
                 SizedBox(height: height * 0.08),
-                FilledButton(
-                  onPressed: loginWithPredefinedCredentials,
-                  style: FilledButton.styleFrom(
-                    backgroundColor: Color.fromARGB(255, 82, 104, 10),
-                  ),
-                  child: Text("Login"),
-                ),
+                // FilledButton(
+                //   onPressed: loginWithPredefinedCredentials,
+                //   style: FilledButton.styleFrom(
+                //     backgroundColor: Color.fromARGB(255, 82, 104, 10),
+                //   ),
+                //   child: Text("Login"),
+                // ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [

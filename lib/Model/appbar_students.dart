@@ -302,7 +302,8 @@ Future<void> fetchUnreadNotifications() async {
           hoverColor: const Color.fromARGB(255, 235, 137, 130),
         ),
         onPressed: () {
-          Navigator.push(
+          // ใช้ Navigator.pushReplacement เพื่อแทนที่หน้าปัจจุบันด้วยหน้าที่ไป
+          Navigator.pushReplacement(
             context,
             MaterialPageRoute(builder: (context) => const Login_class()),
           );
@@ -310,6 +311,7 @@ Future<void> fetchUnreadNotifications() async {
         icon: const Icon(Icons.logout),
         tooltip: 'ออกจากระบบ',
       ),
+
       const SizedBox(width: 50),
       ]
     );

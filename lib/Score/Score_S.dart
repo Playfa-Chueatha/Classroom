@@ -191,7 +191,7 @@ class _Score_SState extends State<Score_S> {
         'username': username,
       }),
     );
-    // print(response.body);
+    print(response.body);
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
@@ -588,7 +588,7 @@ Text _getStatusText(String status) {
                                                               child: Text(
                                                                 (data['scoreTotal'] == null) 
                                                                     ? '-' 
-                                                                    : data['scoreTotal'].toString(), 
+                                                                    : data['scoreTotal'].toStringAsFixed(2),
                                                               ))),
                                                         ]);
                                                       }),

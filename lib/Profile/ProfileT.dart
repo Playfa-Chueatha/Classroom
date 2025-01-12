@@ -284,33 +284,36 @@ Widget _buildEditForm() {
           },
         ),
         DropdownButtonFormField<String>(
-          decoration: const InputDecoration(
-            label: Text("กรุณาเลือกชั้นปีการศึกษา"),
+            decoration: const InputDecoration(
+              label: Text("กรุณาเลือกชั้นปีการศึกษา"),
+            ),
+            value: selectedclassroom == "0" || selectedclassroom == null
+                ? null  // หากค่าเป็น "0" หรือ null ให้ค่า value เป็น null
+                : selectedclassroom ?? (userData?.usertClassroom),
+            items: [
+              "ชั้นมัธยมศึกษาปีที่ 4",
+              "ชั้นมัธยมศึกษาปีที่ 5",
+              "ชั้นมัธยมศึกษาปีที่ 6"
+            ].map((classroom) {
+              return DropdownMenuItem(
+                value: classroom,
+                child: Text(classroom),
+              );
+            }).toList(),
+            onChanged: (value) {
+              setState(() {
+                selectedclassroom = value;
+                classroomController.text = value ?? ''; // ใช้ค่า '' ถ้าเป็น null
+              });
+            },
+            validator: (value) =>
+                value == null ? 'กรุณาเลือกชั้นปีการศึกษา' : null,
           ),
-          value: selectedclassroom ?? userData!.usertClassroom,
-          items: [
-            "ชั้นมัธยมศึกษาปีที่ 4",
-            "ชั้นมัธยมศึกษาปีที่ 5",
-            "ชั้นมัธยมศึกษาปีที่ 6"
-          ].map((clasroom) {
-            return DropdownMenuItem(
-              value: clasroom,
-              child: Text(clasroom),
-            );
-          }).toList(),
-          onChanged: (value) {
-            setState(() {
-              selectedclassroom = value;
-              classroomController.text = value!;
-            });
-          },
-          validator: (value) => value == null ? 'กรุณาเลือกชั้นปีการศึกษา' : null,
-        ),
-       DropdownButtonFormField<int>(
+          DropdownButtonFormField<int>(
           decoration: const InputDecoration(
-            label: Text('ห้อง:'),
+            label: Text('กรุณาเลือกห้อง:'),
           ),
-          value: selectedRoom ?? int.tryParse(numroomController.text),
+          value: selectedRoom == 0 ? null : selectedRoom, // กำหนดค่าเป็น null เมื่อ selectedRoom เป็น 0
           items: List.generate(30, (index) {
             int roomNumber = index + 1;
             return DropdownMenuItem(
@@ -320,12 +323,17 @@ Widget _buildEditForm() {
           }),
           onChanged: (value) {
             setState(() {
-              selectedRoom = value ;
-              numroomController.text = value.toString();
+              selectedRoom = value ?? 0; // ถ้าเลือกห้องเป็น null ให้ตั้งค่าเป็น 0
+              numroomController.text = value?.toString() ?? ''; // กรอกหมายเลขห้อง
             });
           },
           validator: (value) => value == null ? 'กรุณาเลือกห้อง' : null,
         ),
+
+
+
+
+
 
         _buildTextField('ครูประจำวิชา:', subjectsController),
         Padding(padding: EdgeInsets.all(20),

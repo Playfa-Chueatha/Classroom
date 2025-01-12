@@ -38,7 +38,7 @@ class _List_classroomState extends State<MenuListclassroomSScore> {
         Set<String> seen = {};
 
         for (var classroom in data) {
-          String identifier = "${classroom['classroom_name']}-${classroom['classroom_major']}-${classroom['classroom_year']}-${classroom['classroom_numroom']}";
+          String identifier = "${classroom['classroom_name']}-${classroom['classroom_major']}-${classroom['classroom_year']}-${classroom['classroom_numroom']}-${classroom['classroom_subjectsID']}";
 
           if (!seen.contains(identifier)) {
             seen.add(identifier);
@@ -117,8 +117,8 @@ class _List_classroomState extends State<MenuListclassroomSScore> {
                         Row(
                           children: [
                             Text("${classrooms[index]['classroom_name']}", style: TextStyle(fontSize: MediaQuery.of(context).size.width * 0.009,)),
-                            SizedBox(width:  screenWidth * 0.008,),
-                            // Text("${classrooms[index]['classroom_major']}", style: TextStyle(fontSize: 14, color: Color.fromARGB(255, 77, 77, 77))),
+                            SizedBox(width:  screenWidth * 0.002,),
+                            Text("(${classrooms[index]['classroom_subjectsID']})", style: TextStyle(fontSize: MediaQuery.of(context).size.width * 0.007,  color: Color.fromARGB(255, 77, 77, 77))),
                           ],
                         ),
                         Text("ม.${classrooms[index]['classroom_year']} ห้อง ${classrooms[index]['classroom_numroom']}", style: TextStyle(fontSize: MediaQuery.of(context).size.width * 0.007, color: const Color.fromARGB(255, 77, 77, 77))),

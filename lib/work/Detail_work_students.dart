@@ -259,7 +259,8 @@ void didUpdateWidget(covariant Detail_work_S oldWidget) {
       backgroundColor: Colors.white,
       body: Padding(
         padding: EdgeInsets.all(16.0),
-        child: Column(
+        child: SingleChildScrollView(
+          child:  Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
@@ -1239,7 +1240,7 @@ void didUpdateWidget(covariant Detail_work_S oldWidget) {
         
           ],
         ),
-      ),
+      ))
     );
   }
 }

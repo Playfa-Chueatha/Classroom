@@ -108,6 +108,7 @@ class _AddClassroomState extends State<AddClassroom> {
           height: screenSize.height * 0.7,
           width: screenSize.width * 0.5,
           child: SingleChildScrollView(
+            scrollDirection: Axis.vertical,
             child: Column(
               children: [
                 Container(

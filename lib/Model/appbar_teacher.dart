@@ -326,13 +326,19 @@ Future<void> fetchUnreadNotifications() async {
         ),
                  
         IconButton(
-          style: IconButton.styleFrom(
-            hoverColor: const Color.fromARGB(255, 235, 137, 130),
-          ),
-          onPressed: () => navigateTo(const Login_class()),
-          icon: const Icon(Icons.logout),
-          tooltip: 'ออกจากระบบ',
+        style: IconButton.styleFrom(
+          hoverColor: const Color.fromARGB(255, 235, 137, 130),
         ),
+        onPressed: () {
+          // ใช้ Navigator.pushReplacement เพื่อแทนที่หน้าปัจจุบันด้วยหน้าที่ไป
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const Login_class()),
+          );
+        },
+        icon: const Icon(Icons.logout),
+        tooltip: 'ออกจากระบบ',
+      ),
       ],
     );
   }
