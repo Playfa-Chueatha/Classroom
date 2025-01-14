@@ -58,7 +58,7 @@ class _AssignWork_class_TState extends State<AssignWork_class_T> {
   final today = DateTime.now();
   Examset? selectedExam;
   List<bool> successChecks =[];
-  bool isExpandedFuture = false;
+  bool isExpandedFuture = true;
   bool isExpandedPast = false;
   bool isExapandedcomplete = false;
   bool hasTodayEvent = false;
@@ -650,14 +650,16 @@ void initState() {
                                                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                               children: [
                                                                 Text("คะแนนเต็ม: ${exam.fullMark}"),
-                                                                IconButton(
-                                                                  onPressed: () {
-                                                                    setState(() {
-                                                                      selectedExam = exam;
-                                                                    });
-                                                                  },
-                                                                  icon: Icon(Icons.search),
-                                                                ),
+                                                                TextButton.icon(
+                                                                    onPressed: () {
+                                                                      setState(() {
+                                                                        selectedExam = exam;
+                                                                      });
+                                                                    },
+                                                                    icon: Icon(Icons.search, size: 24),  // ขนาดของไอคอน
+                                                                    label: Text("รายละเอียด", style: TextStyle(fontSize: 16)),  // ข้อความที่จะแสดง
+                                                                  )
+
                                                               ],
                                                             )
                                                           ],
@@ -790,13 +792,15 @@ void initState() {
                                                                 MainAxisAlignment.spaceBetween,
                                                             children: [
                                                               Text("คะแนนเต็ม: ${exam.fullMark}"),
-                                                              IconButton(
-                                                                  onPressed: () {
-                                                                    setState(() {
-                                                                      selectedExam = exam;
-                                                                    });
-                                                                  },
-                                                                  icon: Icon(Icons.search))
+                                                              TextButton.icon(
+                                                                onPressed: () {
+                                                                  setState(() {
+                                                                    selectedExam = exam;
+                                                                  });
+                                                                },
+                                                                icon: Icon(Icons.search, size: 24),  // ขนาดของไอคอน
+                                                                label: Text("รายละเอียด", style: TextStyle(fontSize: 16)),  // ข้อความที่จะแสดง
+                                                              )
                                                             ],
                                                           )
                                                         ],
@@ -921,14 +925,15 @@ void initState() {
                                                                               MainAxisAlignment.spaceBetween,
                                                                           children: [
                                                                             Text("คะแนนเต็ม: ${exam.fullMark}"),
-                                                                            IconButton(
+                                                                            TextButton.icon(
                                                                               onPressed: () {
                                                                                 setState(() {
                                                                                   selectedExam = exam;
                                                                                 });
                                                                               },
-                                                                              icon: Icon(Icons.search),
-                                                                            ),
+                                                                              icon: Icon(Icons.search, size: 24),  // ขนาดของไอคอน
+                                                                              label: Text("รายละเอียด", style: TextStyle(fontSize: 16)),  // ข้อความที่จะแสดง
+                                                                            )
                                                                           ],
                                                                         ),
                                                                       ],

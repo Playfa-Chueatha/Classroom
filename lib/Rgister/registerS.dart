@@ -42,38 +42,47 @@ class _FormState extends State<AddForm_Register_S> {
   String msg = '';
 
 
-//check user ว่ามีอยู่แล้วหรือไม่
-  Future<void> checkUser() async {
-  String url = "https://www.edueliteroom.com/connect/check_user_students.php";
 
-  // ข้อมูลที่ส่งไปในคำขอ
-  final Map<String, dynamic> body = {
-    "users_username": username.text,  // ใช้ค่า .text
-  };
 
-  try {
-    // เปลี่ยนจาก GET เป็น POST
-    http.Response response = await http.post(
-      Uri.parse(url),
-      headers: {'Content-Type': 'application/json'}, // เพิ่ม headers
-      body: jsonEncode(body), // ส่งข้อมูลในรูปแบบ JSON
-    );
+Future<void> checkUser() async {
+    String url = "https://www.edueliteroom.com/connect/check_user_students.php";
 
-    if (response.statusCode == 200) {
-      var checkEmailS = jsonDecode(response.body);
-      setState(() {
-        if (checkEmailS.isEmpty) {
-          msg = "สามารถใช้ User นี้ได้";
-        } else {
-          msg = "User นี้มีผู้ใช้แล้ว";
-        }
-      });
-    } else {
-      print("Error: ${response.statusCode}");
-    }
-  } catch (error) {
-    print("Error: $error");
+    final Map<String, dynamic> queryParams = {
+      "users_username": username.text,
+      "thaifirstname": name.text,
+      "thailastname": surname.text,
+      "email": email.text,
+    };
+
+    try {
+  http.Response response =
+      await http.get(Uri.parse(url).replace(queryParameters: queryParams));
+
+  // ตรวจสอบเนื้อหาที่ตอบกลับจากเซิร์ฟเวอร์
+  print("Response body: ${response.body}");
+
+  if (response.statusCode == 200) {
+    var responseBody = jsonDecode(response.body);  // ลองแปลงเป็น JSON
+    setState(() {
+      if (responseBody['status'] == "available") {
+        msg = "สามารถใช้ User นี้ได้";
+      } else if (responseBody['status'] == "duplicate_name") {
+        msg = "ชื่อและนามสกุลซ้ำในระบบ";
+      } else if (responseBody['status'] == "duplicate_username") {
+        msg = "User นี้มีผู้ใช้แล้ว";
+      } else if (responseBody['status'] == "duplicate_email") {
+        msg = "อีเมลนี้มีผู้ใช้งานแล้ว";
+      }
+    });
+  } else {
+    print("Error: ${response.statusCode}");
   }
+} catch (error) {
+  print("Error: $error");
+  setState(() {
+    msg = "เกิดข้อผิดพลาดในการเชื่อมต่อ";
+  });
+}
 }
 
 
@@ -95,8 +104,6 @@ Future<void> saveProfileS(context) async {
     'users_number': number.text,
     'users_major': clasroom_major.text,
     'users_email': email.text,
-    
-
     'users_enfname': engfirstname,
     'users_enlname': englastname,
     'usert_username' : teacher_name,
@@ -142,14 +149,21 @@ Future<void> saveProfileS(context) async {
 
 
 
-
-  String? validateEmail(String? value) {
+String? validateEmail(String? value) {
     if (value == null || value.isEmpty) {
       return 'กรุณากรอก E-mail';
     }
-    final emailRegex = RegExp(r'^[^@]+@gmail\.com$');
+
+    // ตรวจสอบภาษาไทยในอีเมล
+    final thaiRegex = RegExp(r'[\u0E00-\u0E7F]');
+    if (thaiRegex.hasMatch(value)) {
+      return 'ไม่สามารถกรอกภาษาไทยใน E-mail ได้';
+    }
+
+    // ตรวจสอบรูปแบบอีเมลที่รองรับ @gmail.com หรือ @hotmail.com
+    final emailRegex = RegExp(r'^[^@]+@(gmail\.com|hotmail\.com)$');
     if (!emailRegex.hasMatch(value)) {
-      return 'กรุณากรอก E-mail ที่ถูกต้อง';
+      return 'กรุณากรอก E-mail ที่ถูกต้อง (ใช้ @gmail.com หรือ @hotmail.com)';
     }
     return null;
   }
@@ -265,12 +279,8 @@ Widget build(BuildContext context) {
                   style: TextStyle(fontSize: 20),
                 ),
               ),
-              validator: (val) {
-                if (val == null || val.isEmpty) {
-                  return 'กรุณากรอกระบุชื่อจริง';
-                }
-                return null;
-              },
+              validator: (val) =>
+                  validateThaiCharacters(val, 'กรุณากรอกระบุชื่อจริง'),
               controller: name,
             ),
             SizedBox(height: screenHeight * 0.02),
@@ -286,12 +296,8 @@ Widget build(BuildContext context) {
                       style: TextStyle(fontSize: 20),
                     ),
                   ),
-                  validator: (val) {
-                    if (val == null || val.isEmpty) {
-                      return 'กรุณากรอกระบุนามสกุล';
-                    }
-                    return null;
-                  },
+                  validator: (val) =>
+                    validateThaiCharacters(val, 'กรุณากรอกระบุนามสกุล'),
                   controller: surname,
                 ),
                 SizedBox(height:  screenHeight * 0.02),
@@ -456,7 +462,7 @@ Widget build(BuildContext context) {
                   decoration: InputDecoration(
                     suffixIcon: IconButton(
                         padding: const EdgeInsetsDirectional.all(10.0),
-                        icon: _isObscurd ? const Icon(Icons.visibility) : const Icon(Icons.visibility_off),
+                        icon: _isObscurd ? const Icon(Icons.visibility_off) : const Icon(Icons.visibility),
                         onPressed: (){
                           setState(() {
                           _isObscurd =!_isObscurd;
@@ -483,7 +489,7 @@ Widget build(BuildContext context) {
                   decoration: InputDecoration(
                     suffixIcon: IconButton(
                         padding: const EdgeInsetsDirectional.all(10.0),
-                        icon: _isObscurd2 ? const Icon(Icons.visibility) : const Icon(Icons.visibility_off),
+                        icon: _isObscurd2 ? const Icon(Icons.visibility_off) : const Icon(Icons.visibility),
                         onPressed: (){
                           setState(() {
                           _isObscurd2 =!_isObscurd2;
@@ -509,20 +515,17 @@ Widget build(BuildContext context) {
               height: 30,
             ),
             ElevatedButton(
-              onPressed: () {
-                checkUser();
-                if (formKey.currentState!.validate()) {
+              onPressed: () async {
+                await checkUser();
+                if (msg == "สามารถใช้ User นี้ได้" && formKey.currentState!.validate()) {
                   saveProfileS(context);
-
-                  print('Selected Prefix: ${prefix.text}');
-                  print('Thai First Name: ${name.text}');
-                  print('Thai Last Name: ${surname.text}');
-                  print('Email: ${email.text}');
-                  print('Username: ${username.text}');
-                  print('Password: ${pass.text}');
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text(msg)),
+                  );
                 }
               },
-              child: Text(
+              child: const Text(
                 "สมัครสมาชิก",
                 style: TextStyle(fontSize: 20),
               ),
@@ -535,7 +538,5 @@ Widget build(BuildContext context) {
 }
 
               
-          
-      
- 
+        
   }

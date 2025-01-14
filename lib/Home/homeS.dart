@@ -18,7 +18,14 @@ class main_home_S extends StatefulWidget {
   final String thfname;
   final String thlname;
   final String username;
-  const main_home_S({super.key, required this.thfname, required this.thlname, required this.username});
+
+  const main_home_S({
+    super.key, 
+    required this.thfname,
+    required this.thlname, 
+    required this.username,
+    });
+
 
   @override
   State<main_home_S> createState() => _homeState();
@@ -89,6 +96,10 @@ class _homeState extends State<main_home_S> {
             thlname: widget.thlname,
             username: widget.username,
             unreadCount: unreadCount, 
+            classroomMajor: '',
+            classroomName: '',
+            classroomNumRoom: '',
+            classroomYear: '',
           ),
         ],
       ),

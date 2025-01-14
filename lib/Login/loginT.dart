@@ -29,7 +29,7 @@ class _Login_TState extends State<Login_T> {
 
   void loginWithPredefinedCredentials() {
     usert_username.text = "paiyfa11";  
-    usert_password.text = "mild39840";  
+    usert_password.text = "123456";  
     signIn();  
   }
 
@@ -150,8 +150,8 @@ class _Login_TState extends State<Login_T> {
                       suffixIcon: IconButton(
                         padding: const EdgeInsetsDirectional.all(10.0),
                         icon: _isObscured
-                            ? const Icon(Icons.visibility)
-                            : const Icon(Icons.visibility_off),
+                            ? const Icon(Icons.visibility_off)
+                            : const Icon(Icons.visibility),
                         onPressed: () {
                           setState(() {
                             _isObscured = !_isObscured;

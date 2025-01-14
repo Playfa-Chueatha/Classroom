@@ -119,6 +119,8 @@ final List<String> sectionOptions = [
     'สายศิลป์-อังกฤษ',
     'วิทยาศาสตร์คอมพิวเตอร์',
     'วิทยาศาสตร์สิ่งแวดล้อม',
+    'ศิลป์-ทั่วไป',
+    'ศิลป์​-พาณิชย์​'
   ];
 
 
@@ -723,17 +725,27 @@ class Upfile_submit {
     required this.upfileUrl,
   });
 
-  factory Upfile_submit.fromJson(Map<String, dynamic> json) {
-    return Upfile_submit(
-      upfileAuto: int.parse(json['submit_upfile_auto']),
-      examsetsId: int.parse(json['examsets_id']),
-      upfileName: json['submit_upfile_name'],
-      upfileSize: int.parse(json['submit_upfile_size']),
-      upfileType: json['submit_upfile_type'],
-      upfileUrl: json['submit_upfile_url'],
-    );
+  // Safe parsing of integers with default value of 0
+  static int _parseInt(dynamic value) {
+    if (value == null) return 0; // Default to 0 if value is null
+    return int.tryParse(value.toString()) ?? 0; // Return 0 if parsing fails
   }
+
+  factory Upfile_submit.fromJson(Map<String, dynamic> json) {
+  print('Parsing JSON: $json'); // พิมพ์ข้อมูล JSON ที่จะถูกแปลง
+  return Upfile_submit(
+    upfileAuto: _parseInt(json['submit_upfile_auto']),
+    examsetsId: _parseInt(json['examsets_id']),
+    upfileName: json['submit_upfile_name'],
+    upfileSize: _parseInt(json['submit_upfile_size']),
+    upfileType: json['submit_upfile_type'],
+    upfileUrl: json['submit_upfile_url'],
+  );
 }
+
+}
+
+
 
 //-------------------------------------------------------
 
@@ -1611,4 +1623,119 @@ class Studentclass {
     usertUsername: json['usert_username'] ?? '',
   );
 }
+}
+//---------------------------------------------------------------------------
+
+class UserTeacher {
+  final int userAuto;
+  final String username;
+  final String password;
+  final String prefix;
+  final String thFName;
+  final String thLName;
+  final String enFName;
+  final String enLName;
+  final String classroom;
+  final String numRoom;
+  final String phone;
+  final String email;
+  final String subjects;
+
+  UserTeacher({
+    required this.userAuto,
+    required this.username,
+    required this.password,
+    required this.prefix,
+    required this.thFName,
+    required this.thLName,
+    required this.enFName,
+    required this.enLName,
+    required this.classroom,
+    required this.numRoom,
+    required this.phone,
+    required this.email,
+    required this.subjects,
+  });
+
+  // ฟังก์ชันสำหรับแปลง JSON เป็นอ็อบเจกต์
+  factory UserTeacher.fromJson(Map<String, dynamic> json) {
+  return UserTeacher(
+    userAuto: int.tryParse(json['usert_auto'].toString()) ?? 0, // แปลง String เป็น int
+    username: json['usert_username'] ?? '',
+    password: json['usert_password'] ?? '',
+    prefix: json['usert_prefix'] ?? '',
+    thFName: json['usert_thfname'] ?? '',
+    thLName: json['usert_thlname'] ?? '',
+    enFName: json['usert_enfname'] ?? '',
+    enLName: json['usert_enlname'] ?? '',
+    classroom: json['usert_classroom'] ?? '',
+    numRoom: json['usert_numroom'] ?? '',
+    phone: json['usert_phone'] ?? '',
+    email: json['usert_email'] ?? '',
+    subjects: json['usert_subjects'] ?? '',
+  );
+}
+}
+//---------------------------------------------------------------------------------
+class UserStudents {
+  final int usersAuto;
+  final String usersUsername;
+  final String usersPassword;
+  final String usersId;
+  final String usersPrefix;
+  final String usersThfname;
+  final String usersThlname;
+  final String usersEnfname;
+  final String usersEnlname;
+  final String usersClassroom;
+  final String usersNumroom;
+  final String usersNumber;
+  final String usersMajor;
+  final String usersPhone;
+  final String usersParentphone;
+  final String usersEmail;
+  final String usertUsername;
+
+  UserStudents({
+    required this.usersAuto,
+    required this.usersUsername,
+    required this.usersPassword,
+    required this.usersId,
+    required this.usersPrefix,
+    required this.usersThfname,
+    required this.usersThlname,
+    required this.usersEnfname,
+    required this.usersEnlname,
+    required this.usersClassroom,
+    required this.usersNumroom,
+    required this.usersNumber,
+    required this.usersMajor,
+    required this.usersPhone,
+    required this.usersParentphone,
+    required this.usersEmail,
+    required this.usertUsername,
+  });
+
+  // สร้างเมธอด factory เพื่อแปลงข้อมูล JSON เป็นอ็อบเจ็กต์ UserStudents
+  factory UserStudents.fromJson(Map<String, dynamic> json) {
+    return UserStudents(
+      usersAuto: int.tryParse(json['users_auto'].toString()) ?? 0,
+      usersUsername: json['users_username'],
+      usersPassword: json['users_password'],
+      usersId: json['users_id'],
+      usersPrefix: json['users_prefix'],
+      usersThfname: json['users_thfname'],
+      usersThlname: json['users_thlname'],
+      usersEnfname: json['users_enfname'],
+      usersEnlname: json['users_enlname'],
+      usersClassroom: json['users_classroom'],
+      usersNumroom: json['users_numroom'],
+      usersNumber: json['users_number'],
+      usersMajor: json['users_major'],
+      usersPhone: json['users_phone'],
+      usersParentphone: json['users_parentphone'],
+      usersEmail: json['users_email'],
+      usertUsername: json['usert_username'],
+    );
+  }
 }

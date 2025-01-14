@@ -18,6 +18,10 @@ class appbarstudents extends StatefulWidget {
   final String thlname;
   final String username;
   final int unreadCount;
+  final String classroomName;
+  final String classroomMajor;
+  final String classroomYear;
+  final String classroomNumRoom;
 
   const appbarstudents(
     {super.key,
@@ -25,6 +29,10 @@ class appbarstudents extends StatefulWidget {
     required this.thlname,
     required this.username,
     required this.unreadCount,
+    required this.classroomName, 
+    required this.classroomMajor, 
+    required this.classroomYear, 
+    required this.classroomNumRoom, 
   });
 
   @override
@@ -262,8 +270,16 @@ Future<void> fetchUnreadNotifications() async {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) =>  classS(thfname: widget.thfname, thlname: widget.thlname, username: widget.username,classroomMajor: '', classroomName: '', classroomYear: '', classroomNumRoom: '',)),
-                );
+                  MaterialPageRoute(builder: (context) =>  classS(
+                    thfname: widget.thfname, 
+                    thlname: widget.thlname, 
+                    username: widget.username,
+                    classroomMajor: widget.classroomMajor,
+                    classroomName: widget.classroomName,
+                    classroomNumRoom: widget.classroomNumRoom,
+                    classroomYear: widget.classroomYear,
+                    )),
+                ); 
               },
               icon: const Icon(Icons.class_outlined),
               tooltip: 'ห้องเรียน',
@@ -275,7 +291,15 @@ Future<void> fetchUnreadNotifications() async {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => work_body_S(thfname: widget.thfname, thlname: widget.thlname, username: widget.username, classroomMajor: '', classroomName: '', classroomYear: '', classroomNumRoom: '')),
+                  MaterialPageRoute(builder: (context) => work_body_S(
+                    thfname: widget.thfname, 
+                    thlname: widget.thlname, 
+                    username: widget.username, 
+                    classroomMajor: widget.classroomMajor,
+                    classroomName: widget.classroomName,
+                    classroomNumRoom: widget.classroomNumRoom,
+                    classroomYear: widget.classroomYear,
+                    )),
                 );
               },
               icon: const Icon(Icons.edit_document),
@@ -288,7 +312,15 @@ Future<void> fetchUnreadNotifications() async {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => Score_S(thfname: widget.thfname, thlname: widget.thlname, username: widget.username, classroomMajor: '', classroomName: '', classroomYear: '', classroomNumRoom: '')),
+                  MaterialPageRoute(builder: (context) => Score_S(
+                    thfname: widget.thfname, 
+                    thlname: widget.thlname, 
+                    username: widget.username, 
+                    classroomMajor: widget.classroomMajor,
+                    classroomName: widget.classroomName,
+                    classroomNumRoom: widget.classroomNumRoom,
+                    classroomYear: widget.classroomYear,
+                    )),
                 );
               },
               icon: const Icon(Icons.list_alt),

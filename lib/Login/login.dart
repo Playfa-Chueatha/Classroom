@@ -38,7 +38,7 @@ class _Login_classState extends State<Login_class> {
                 width: screenWidth * 0.4, // ขนาดของรูปภาพเป็น 30% ของความกว้างหน้าจอ
               ),
               Text(
-                "Wellcome to Eduelite",
+                "Edueliteroom",
                 style: TextStyle(fontSize: screenWidth * 0.02), // ขนาดตัวอักษร 8% ของความกว้างหน้าจอ
               ),
               SizedBox(height: screenHeight * 0.01), // ระยะห่างระหว่างข้อความกับปุ่ม

@@ -51,6 +51,7 @@ class _CheckworkTeacherState extends State<CheckworkTeacher> {
   required double total,
 }) async {
   final url = Uri.parse('https://www.edueliteroom.com/connect/submit_score_auswer.php');
+  
 
   // แปลงคะแนนเป็นทศนิยม 2 ตำแหน่ง
   String formattedScore = double.tryParse(checkworkScore) != null
@@ -392,6 +393,7 @@ class ApiService {
         'auto_id': examAutoId, // ส่งค่า examAutoId ในคำขอ
       },
     );
+    print(response.body);
 
 
     if (response.statusCode == 200) {

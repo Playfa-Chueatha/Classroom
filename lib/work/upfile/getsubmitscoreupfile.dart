@@ -22,13 +22,21 @@ class _ChcekworkaftersubmitscoreupfileState extends State<Getsubmitscoreupfile> 
   List<CheckworkUpfile> checkworkData = [];
 
 
-Future<List<Upfile_submit>> fetchUpfileSubmits(int examsetsId) async {
-  final response = await http.get(Uri.parse('https://www.edueliteroom.com/connect/get_submit_upfile.php?examsets_id=$examsetsId'));
+Future<List<Upfile_submit>> fetchFileData(int examsetsId, String username) async {
+  try {
+    final response = await http.get(Uri.parse('https://www.edueliteroom.com/connect/get_submit_upfile.php?examsets_id=$examsetsId&username=$username'));
 
-  if (response.statusCode == 200) {
-    List jsonResponse = json.decode(response.body);
-    return jsonResponse.map((data) => Upfile_submit.fromJson(data)).toList();
-  } else {
+    print('Response status: ${response.statusCode}');
+    print('Response body: ${response.body}');
+
+    if (response.statusCode == 200) {
+      List jsonResponse = json.decode(response.body);
+      return jsonResponse.map((data) => Upfile_submit.fromJson(data)).toList();
+    } else {
+      throw Exception('Failed to load files. Status code: ${response.statusCode}');
+    }
+  } catch (e) {
+    print('Error fetching file data: $e');
     throw Exception('Failed to load submit files');
   }
 }
@@ -39,11 +47,13 @@ Future<List<Upfile_submit>> fetchUpfileSubmits(int examsetsId) async {
   @override
   void initState() {
     super.initState();
-    fetchUpfileSubmits(widget.exam.autoId).then((files) {
-      setState(() {
-        fileData = files;
-      });
+    fetchFileData(widget.exam.autoId, widget.username).then((files) {
+    setState(() {
+      fileData = files;
     });
+  }).catchError((e) {
+    print('Error loading files: $e');
+  });
   }
 
   void _openFile(Upfile_submit file) async {

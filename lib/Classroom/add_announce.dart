@@ -324,36 +324,51 @@ class _AnnounceClassState extends State<AnnounceClass> {
     );
   }
 
-  void _showLinkDialog() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text("เพิ่มลิงค์"),
-          content: TextField(
-            controller: linkController,
-            decoration: InputDecoration(hintText: 'ใส่ลิงค์ที่นี่'),
+ void _showLinkDialog() {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text("เพิ่มลิงค์"),
+        content: StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+            return TextField(
+              controller: linkController,
+              decoration: InputDecoration(
+                hintText: 'ใส่ลิงค์ที่นี่',
+                counterText: '${linkController.text.length}/200', // แสดงจำนวนตัวอักษรที่กรอก
+                errorText: linkController.text.length > 100
+                    ? 'ลิงค์ของคุณยาวเกินไป'
+                    : null, // ข้อความเตือนเมื่อเกิน 200 ตัวอักษร
+              ),
+              onChanged: (text) {
+                setState(() {}); // รีเฟรชหน้าจอเพื่ออัปเดต counterText
+              },
+            );
+          },
+        ),
+        actions: <Widget>[
+          TextButton(
+            onPressed: linkController.text.length > 100
+                ? null
+                : () {
+                    setState(() {
+                      links.add(linkController.text);
+                    });
+                    linkController.clear();
+                    Navigator.of(context).pop();
+                  },
+            child: Text("ตกลง"),
           ),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                setState(() {
-                  links.add(linkController.text); 
-                });
-                linkController.clear();
-                Navigator.of(context).pop();
-              },
-              child: Text("ตกลง"),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text("ยกเลิก"),
-            ),
-          ],
-        );
-      },
-    );
-  }
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: Text("ยกเลิก"),
+          ),
+        ],
+      );
+    },
+  );
+}
 }

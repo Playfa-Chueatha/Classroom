@@ -172,7 +172,7 @@ class _TodocalssState extends State<Todocalss_S> {
               Padding(padding: EdgeInsets.all(10),
               child: 
               Text(
-                'สิ่งที่ต้องทำ',
+                'To Do List',
                 style: TextStyle(
                   fontSize: 20,
                   color: Colors.black,

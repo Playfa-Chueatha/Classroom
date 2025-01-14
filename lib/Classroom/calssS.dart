@@ -135,6 +135,10 @@ Future<void> _getUnreadNotifications() async {
             thlname: widget.thlname,
             username: widget.username,
             unreadCount: unreadCount,
+            classroomMajor: widget.classroomMajor,
+            classroomName: widget.classroomName,
+            classroomNumRoom: widget.classroomNumRoom,
+            classroomYear: widget.classroomYear,
           ),
         ],
       ),
@@ -258,24 +262,31 @@ Future<void> _getUnreadNotifications() async {
                                                                 const SizedBox(height: 16),
                                                                 const Text("ลิงค์ที่แนบมา:", style: TextStyle(fontSize: 18)),
                                                                 const SizedBox(height: 10),
-                                                                InkWell(
-                                                                  onTap: post['posts_link'] != null ? () => _launchURL(post['posts_link']) : null,
-                                                                  child: post['posts_link'] != null
-                                                                      ? ListTile(
-                                                                          leading: const Icon(Icons.link, color: Colors.blue),
-                                                                          title: Text(
-                                                                            post['posts_link'],
-                                                                            style: TextStyle(
-                                                                              color: Colors.blue,
-                                                                              fontSize: 16,
+                                                                 post['links'] != null && post['links'].isNotEmpty
+                                                                    ? ListView.builder(
+                                                                        shrinkWrap: true,
+                                                                        itemCount: post['links'].length,
+                                                                        physics: const NeverScrollableScrollPhysics(),
+                                                                        itemBuilder: (context, index) {
+                                                                          final link = post['links'][index];
+                                                                          final url = link['posts_link_url'];
+
+                                                                          return InkWell(
+                                                                            onTap: () => _launchURL(url),
+                                                                            child: ListTile(
+                                                                              leading: const Icon(Icons.link, color: Colors.blue),
+                                                                              title: Text(
+                                                                                url,
+                                                                                style: const TextStyle(color: Colors.blue, fontSize: 16),
+                                                                              ),
                                                                             ),
-                                                                          ),
-                                                                        )
-                                                                      : const Text(
-                                                                          'ไม่มีลิงค์แนบ',
-                                                                          style: TextStyle(fontSize: 14, color: Color.fromARGB(255, 80, 79, 79)),
-                                                                        ),
-                                                                ),
+                                                                          );
+                                                                        },
+                                                                      )
+                                                                    : const Text(
+                                                                        'ไม่มีลิงค์แนบ',
+                                                                        style: TextStyle(fontSize: 14, color: Color.fromARGB(255, 80, 79, 79)),
+                                                                      ),
                                                                 const SizedBox(height: 16),
                                                                 const Text("ไฟล์ที่แนบมา:", style: TextStyle(fontSize: 18)),
                                                                 const SizedBox(height: 10),

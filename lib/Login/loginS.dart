@@ -77,7 +77,8 @@ class _LogintState extends State<Login_S> {
                   builder: (context) => main_home_S(
                       thfname: thfnames,
                       thlname: thlnames,
-                      username: username!)),
+                      username: username!,
+                      )),
             );
           } else {
             print("Username is null");
@@ -154,8 +155,8 @@ class _LogintState extends State<Login_S> {
                       suffixIcon: IconButton(
                         padding: const EdgeInsetsDirectional.all(10.0),
                         icon: _isObscurd
-                            ? const Icon(Icons.visibility)
-                            : const Icon(Icons.visibility_off),
+                            ? const Icon(Icons.visibility_off)
+                            : const Icon(Icons.visibility),
                         onPressed: () {
                           setState(() {
                             _isObscurd = !_isObscurd;

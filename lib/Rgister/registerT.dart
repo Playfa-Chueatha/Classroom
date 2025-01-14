@@ -36,23 +36,31 @@ class _FormState extends State<Registert_T> {
 
     
     //check user ว่ามีอยู่แล้วหรือไม่
-    Future<void> checkUser() async {
+  Future<void> checkUser() async {
     String url = "https://edueliteroom.com/connect/check_user_teacher.php";
 
     final Map<String, dynamic> queryParams = {
       "usert_username": username.text,
+      "thaifirstname": thaifirstname.text,
+      "thailastname": thailastname.text,
+      "email": email.text,
     };
+
     try {
       http.Response response =
           await http.get(Uri.parse(url).replace(queryParameters: queryParams));
 
       if (response.statusCode == 200) {
-        var checkEmailT = jsonDecode(response.body);
+        var responseBody = jsonDecode(response.body);
         setState(() {
-          if (checkEmailT.isEmpty) {
+          if (responseBody['status'] == "available") {
             msg = "สามารถใช้ User นี้ได้";
-          } else {
+          } else if (responseBody['status'] == "duplicate_name") {
+            msg = "ชื่อและนามสกุลซ้ำในระบบ";
+          } else if (responseBody['status'] == "duplicate_username") {
             msg = "User นี้มีผู้ใช้แล้ว";
+          } else if (responseBody['status'] == "duplicate_email") {
+            msg = "อีเมลนี้มีผู้ใช้งานแล้ว";
           }
         });
       } else {
@@ -62,6 +70,8 @@ class _FormState extends State<Registert_T> {
       print("Error: $error");
     }
   }
+
+
 
 
   // ฟังก์ชัน saveProfileT
@@ -133,12 +143,22 @@ Future<void> saveProfileT(context) async {
     if (value == null || value.isEmpty) {
       return 'กรุณากรอก E-mail';
     }
-    final emailRegex = RegExp(r'^[^@]+@gmail\.com$');
+
+    // ตรวจสอบภาษาไทยในอีเมล
+    final thaiRegex = RegExp(r'[\u0E00-\u0E7F]');
+    if (thaiRegex.hasMatch(value)) {
+      return 'ไม่สามารถกรอกภาษาไทยใน E-mail ได้';
+    }
+
+    // ตรวจสอบรูปแบบอีเมลที่รองรับ @gmail.com หรือ @hotmail.com
+    final emailRegex = RegExp(r'^[^@]+@(gmail\.com|hotmail\.com)$');
     if (!emailRegex.hasMatch(value)) {
-      return 'กรุณากรอก E-mail ที่ถูกต้อง';
+      return 'กรุณากรอก E-mail ที่ถูกต้อง (ใช้ @gmail.com หรือ @hotmail.com)';
     }
     return null;
   }
+
+
 
   String? validateThaiCharacters(String? value, String errorMessage) {
     final thaiRegex = RegExp(r'^[\u0E00-\u0E7F]+$');
@@ -283,8 +303,8 @@ Widget build(BuildContext context) {
                 suffixIcon: IconButton(
                   padding: const EdgeInsetsDirectional.all(10.0),
                   icon: _isObscurd
-                      ? const Icon(Icons.visibility)
-                      : const Icon(Icons.visibility_off),
+                      ? const Icon(Icons.visibility_off)
+                      : const Icon(Icons.visibility),
                   onPressed: () {
                     setState(() {
                       _isObscurd = !_isObscurd;
@@ -312,8 +332,8 @@ Widget build(BuildContext context) {
                 suffixIcon: IconButton(
                   padding: const EdgeInsetsDirectional.all(10.0),
                   icon: _isObscurd2
-                      ? const Icon(Icons.visibility)
-                      : const Icon(Icons.visibility_off),
+                      ? const Icon(Icons.visibility_off)
+                      : const Icon(Icons.visibility),
                   onPressed: () {
                     setState(() {
                       _isObscurd2 = !_isObscurd2;
@@ -337,10 +357,14 @@ Widget build(BuildContext context) {
             ),
             SizedBox(height: 30),
             ElevatedButton(
-              onPressed: () {
-                checkUser();
-                if (formKey.currentState!.validate()) {
+              onPressed: () async {
+                await checkUser();
+                if (msg == "สามารถใช้ User นี้ได้" && formKey.currentState!.validate()) {
                   saveProfileT(context);
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text(msg)),
+                  );
                 }
               },
               child: const Text(
@@ -348,6 +372,7 @@ Widget build(BuildContext context) {
                 style: TextStyle(fontSize: 20),
               ),
             ),
+
           ],
         ),
       ),

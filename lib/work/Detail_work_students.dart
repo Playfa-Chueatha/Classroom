@@ -414,6 +414,7 @@ void didUpdateWidget(covariant Detail_work_S oldWidget) {
                                                   exam: widget.exam,
                                                   username: widget.username,
                                                 ); 
+                                                
                                               },
                                             );
                                           },
@@ -466,7 +467,7 @@ void didUpdateWidget(covariant Detail_work_S oldWidget) {
                                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                             children: [
                                               Text('คุณยังไม่ได้ส่งงาน'),
-                                              IconButton(
+                                              TextButton.icon(
                                                 onPressed: () async {
                                                   FilePickerResult? result = await FilePicker.platform.pickFiles(
                                                     allowMultiple: true,
@@ -478,7 +479,9 @@ void didUpdateWidget(covariant Detail_work_S oldWidget) {
                                                   }
                                                 },
                                                 icon: Icon(Icons.upload, size: 30),
-                                              ),
+                                                label: Text("ส่งไฟล์"),
+                                              )
+
                                             ],
                                           );
                                         }
@@ -514,19 +517,21 @@ void didUpdateWidget(covariant Detail_work_S oldWidget) {
                                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                             children: [
                                               Text('กำหนดส่งวันนี้วันสุดท้ายกรุณาส่งงานโดยเร็ว!', style: TextStyle(color: Colors.orange, fontSize: 14),),
-                                              IconButton(
-                                              onPressed: () async {
-                                                FilePickerResult? result = await FilePicker.platform.pickFiles(
-                                                  allowMultiple: true,
-                                                );
-                                                if (result != null) {
-                                                  setState(() {
-                                                    selectedFiles = result.files;
-                                                  });
-                                                }
-                                              },
-                                              icon: Icon(Icons.upload, size: 30),
-                                            ),
+                                              TextButton.icon(
+                                                onPressed: () async {
+                                                  FilePickerResult? result = await FilePicker.platform.pickFiles(
+                                                    allowMultiple: true,
+                                                  );
+                                                  if (result != null) {
+                                                    setState(() {
+                                                      selectedFiles = result.files;
+                                                    });
+                                                  }
+                                                },
+                                                icon: Icon(Icons.upload, size: 30),
+                                                label: Text("ส่งไฟล์"),
+                                              )
+
                                             ],
                                           );
 
@@ -535,7 +540,7 @@ void didUpdateWidget(covariant Detail_work_S oldWidget) {
                                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                           children: [
                                             Text('เลยวันครบกำหนดมา ${difference.inDays} วันแล้วรีบส่งงานโดยเร็ว!', style: TextStyle(color: Colors.orange, fontSize: 14),),
-                                            IconButton(
+                                            TextButton.icon(
                                               onPressed: () async {
                                                 FilePickerResult? result = await FilePicker.platform.pickFiles(
                                                   allowMultiple: true,
@@ -547,7 +552,9 @@ void didUpdateWidget(covariant Detail_work_S oldWidget) {
                                                 }
                                               },
                                               icon: Icon(Icons.upload, size: 30),
-                                            ),
+                                              label: Text("ส่งไฟล์"),
+                                            )
+
                                             
 
                                           ],);

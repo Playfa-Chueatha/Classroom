@@ -12,17 +12,17 @@ class Alert_addtodo extends StatelessWidget {
     final TextEditingController detailController = TextEditingController();
 
     return AlertDialog(
-      title: Text('เพิ่ม To-Do'),
+      title: Text('เพิ่ม To Do List'),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           TextField(
             controller: titleController,
-            decoration: InputDecoration(labelText: 'ชื่อ To-Do'),
+            decoration: InputDecoration(labelText: 'ชื่อ To Do List'),
           ),
           TextField(
             controller: detailController,
-            decoration: InputDecoration(labelText: 'รายละเอียด (ถ้าไม่มี ให้เป็น -)'),
+            decoration: InputDecoration(labelText: 'รายละเอียด (ไม่จำเป็นต้องใส่)'),
           ),
         ],
       ),
@@ -43,7 +43,7 @@ class Alert_addtodo extends StatelessWidget {
             } else {
               // แสดงข้อความเตือนถ้าชื่อเป็นค่าว่าง
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('กรุณากรอกชื่อ To-Do')),
+                SnackBar(content: Text('กรุณากรอกชื่อ To Do List')),
               );
             }
           },

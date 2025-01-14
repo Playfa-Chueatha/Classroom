@@ -38,6 +38,7 @@ class appbarteacher extends StatefulWidget {
 class _appbarteacherState extends State<appbarteacher> {
   List<NotificationData_sumit> notifications = [];
   int unreadCount = 0;
+  int selectedIndex = 0;
 
   Future<void> showNotifications() async {
   Notification notificationService = Notification();
@@ -188,149 +189,166 @@ Future<void> fetchUnreadNotifications() async {
 
 
 
-  void navigateTo(Widget page) {
+  void navigateTo(int index, Widget page) {
+    setState(() {
+      selectedIndex = index; // เปลี่ยนสถานะของปุ่มที่ถูกเลือก
+    });
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => page),
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Text(
-          "${widget.thfname} ${widget.thlname}",
-          style: const TextStyle(fontSize: 20),
-        ),
-        IconButton(
-          onPressed: () => navigateTo(Profilet(
-                  username: widget.username,
-          )),
-          icon: Image.asset("assets/images/ครู.png"),
-          iconSize: 30,
-        ),
-        Stack(
-          children: [
-            IconButton(
-              style: IconButton.styleFrom(
-                highlightColor: const Color.fromARGB(255, 170, 205, 238),
-              ),
-              onPressed: () {
-                showNotifications();
-              },
-              icon: const Icon(Icons.notifications),
-              tooltip: 'แจ้งเตือน',
-            ),
-            if (unreadCount > 0)
-              Positioned(
-                right: 0,
-                top: 0,
-                child: Container(
-                  padding: EdgeInsets.all(4),
-                  decoration: BoxDecoration(
-                    color: Colors.red,
-                    borderRadius: BorderRadius.circular(12),
+ @override
+Widget build(BuildContext context) {
+  return Row(
+    children: [
+      Text(
+        "${widget.thfname} ${widget.thlname}",
+        style: const TextStyle(fontSize: 20),
+      ),
+      IconButton(
+        onPressed: () => navigateTo(0, Profilet(username: widget.username)),
+        icon: Image.asset("assets/images/ครู.png"),
+        iconSize: 30,
+      ),
+      Stack(
+        children: [
+          IconButton(
+            onPressed: () {
+              showNotifications();
+            },
+            icon: const Icon(Icons.notifications),
+            tooltip: 'แจ้งเตือน',
+          ),
+          if (unreadCount > 0)
+            Positioned(
+              right: 0,
+              top: 0,
+              child: Container(
+                padding: const EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                  color: Colors.red,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                constraints: const BoxConstraints(
+                  minWidth: 18,
+                  minHeight: 18,
+                ),
+                child: Text(
+                  '$unreadCount',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
                   ),
-                  constraints: BoxConstraints(
-                    minWidth: 18,
-                    minHeight: 18,
-                  ),
-                  child: Text(
-                    '$unreadCount',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
+                  textAlign: TextAlign.center,
                 ),
               ),
+            ),
+        ],
+      ),
+      Container(
+        height: 45,
+        decoration: BoxDecoration(
+          color: const Color.fromARGB(255, 71, 136, 190),
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Row(
+          children: [
+            // ปุ่มหน้าหลัก
+            IconButton(
+              onPressed: () => navigateTo(1, main_home_T(
+                thfname: widget.thfname,
+                thlname: widget.thlname,
+                username: widget.username,
+              )),
+              icon: Icon(
+                Icons.home,
+                color: selectedIndex == 1 ? Color.fromARGB(255, 250, 250, 250) : Colors.black,
+              ),
+              tooltip: 'หน้าหลัก',
+            ),
+            // ปุ่มห้องเรียน
+            IconButton(
+              onPressed: () => navigateTo(2, ClassT(
+                thfname: widget.thfname,
+                thlname: widget.thlname,
+                username: widget.username,
+                classroomMajor: widget.classroomMajor,
+                classroomName: widget.classroomName,
+                classroomNumRoom: widget.classroomNumRoom,
+                classroomYear: widget.classroomYear,
+              )),
+              icon: Icon(
+                Icons.class_outlined,
+                color: selectedIndex == 2 ? Color.fromARGB(255, 250, 250, 250) : Colors.black,
+              ),
+              tooltip: 'ห้องเรียน',
+            ),
+            // ปุ่มงานที่มอบหมาย
+            IconButton(
+              onPressed: () => navigateTo(3, AssignWork_class_T(
+                thfname: widget.thfname,
+                thlname: widget.thlname,
+                username: widget.username,
+                exam: Examset(
+                  autoId: 0,
+                  direction: '',
+                  fullMark: 0,
+                  deadline: '',
+                  time: '',
+                  type: '',
+                  closed: '',
+                  inspectionStatus: '',
+                  classroomId: 0,
+                  usertUsername: '',
+                ),
+                classroomMajor: widget.classroomMajor,
+                classroomName: widget.classroomName,
+                classroomYear: widget.classroomYear,
+                classroomNumRoom: widget.classroomNumRoom,
+              )),
+              icon: Icon(
+                Icons.edit_document,
+                color: selectedIndex == 3 ? Color.fromARGB(255, 250, 250, 250) : Colors.black,
+              ),
+              tooltip: 'งานที่มอบหมาย',
+            ),
+            // ปุ่มรายชื่อนักเรียน
+            IconButton(
+              onPressed: () => navigateTo(4, Score_T_body(
+                thfname: widget.thfname,
+                thlname: widget.thlname,
+                username: widget.username,
+                classroomMajor: widget.classroomMajor,
+                classroomName: widget.classroomName,
+                classroomNumRoom: widget.classroomNumRoom,
+                classroomYear: widget.classroomYear,
+                exam: Examset(
+                  autoId: 0,
+                  direction: '',
+                  fullMark: 0,
+                  deadline: '',
+                  time: '',
+                  type: '',
+                  closed: '',
+                  inspectionStatus: '',
+                  classroomId: 0,
+                  usertUsername: '',
+                ),
+              )),
+              icon: Icon(
+                Icons.list_alt,
+                color: selectedIndex == 4 ? Color.fromARGB(255, 250, 250, 250) : Colors.black,
+              ),
+              tooltip: 'รายชื่อนักเรียน',
+            ),
           ],
         ),
-        
-        Container(
-           height: 45,
-           decoration: BoxDecoration(
-              color: const Color.fromARGB(255, 71, 136, 190),
-              borderRadius: BorderRadius.circular(20),
-            ),
-          child: Row(
-            children: [
-              IconButton(
-                onPressed: () => navigateTo(main_home_T(
-                  thfname: widget.thfname,
-                  thlname: widget.thlname,
-                  username: widget.username,
-                )),
-                icon: const Icon(Icons.home),
-                tooltip: 'หน้าหลัก',
-              ),
-              IconButton(
-                onPressed: () => navigateTo(ClassT(
-                  thfname: widget.thfname,
-                  thlname: widget.thlname,
-                  username: widget.username,
-                  classroomName: '',
-                  classroomMajor: '',
-                  classroomYear: '',
-                  classroomNumRoom: '',
-                )),
-                icon: const Icon(Icons.class_outlined),
-                tooltip: 'ห้องเรียน',
-              ),
-
-              IconButton(
-                    style: IconButton.styleFrom(
-                      highlightColor: const Color.fromARGB(255, 170, 205, 238),
-                    ),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => AssignWork_class_T(
-                          thfname: widget.thfname, 
-                          thlname: widget.thlname, 
-                          username: widget.username,
-                          exam: Examset(autoId: 0, direction: '', fullMark: 0, deadline: '', time: '', type: '', closed: '', inspectionStatus: '', classroomId: 0, usertUsername: ''),
-                          classroomMajor: widget.classroomMajor, 
-                          classroomName: widget.classroomName, 
-                          classroomYear: widget.classroomYear, 
-                          classroomNumRoom: widget.classroomNumRoom
-                        )),
-                      );
-                    },
-                    icon: const Icon(Icons.edit_document),
-                    tooltip: 'งานที่มอบหมาย',
-                  ),
-
-              IconButton(
-                    style: IconButton.styleFrom(
-                      highlightColor: const Color.fromARGB(255, 170, 205, 238),
-                    ),
-                    onPressed: () => navigateTo(Score_T_body(
-                      thfname: widget.thfname, 
-                      thlname: widget.thlname, 
-                      username: widget.username, 
-                      classroomMajor: widget.classroomMajor,
-                      classroomName: widget.classroomName,
-                      classroomNumRoom: widget.classroomNumRoom,
-                      classroomYear: widget.classroomYear,
-                      exam: Examset(autoId: 0, direction: '', fullMark: 0, deadline: '', time: '', type: '', closed: '', inspectionStatus: '', classroomId: 0, usertUsername: ''),
-                      )), 
-                    icon: const Icon(Icons.list_alt),
-                    tooltip: 'รายชื่อนักเรียน',
-                  ),
-            ],
-          ),
-        ),
-                 
-        IconButton(
-        style: IconButton.styleFrom(
-          hoverColor: const Color.fromARGB(255, 235, 137, 130),
-        ),
+      ),
+      IconButton(
         onPressed: () {
-          // ใช้ Navigator.pushReplacement เพื่อแทนที่หน้าปัจจุบันด้วยหน้าที่ไป
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(builder: (context) => const Login_class()),
@@ -339,10 +357,9 @@ Future<void> fetchUnreadNotifications() async {
         icon: const Icon(Icons.logout),
         tooltip: 'ออกจากระบบ',
       ),
-      ],
-    );
-  }
-}
+    ],
+  );
+}}
 
 
 class Notification {

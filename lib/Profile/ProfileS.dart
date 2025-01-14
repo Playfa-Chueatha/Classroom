@@ -327,7 +327,7 @@ class _ProfiletState extends State<Profiles> {
         ),
 
          _buildTextField(
-          'โทรศัพท์:',
+          'โทรศัพท์ผู้ปกครอง:',
           parentPhoneController,
           validator: (value) {
             if (value == null || value.isEmpty) {

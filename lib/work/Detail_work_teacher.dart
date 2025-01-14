@@ -361,7 +361,7 @@ void didUpdateWidget(covariant Detail_work oldWidget) {
                   Duration difference = submitDate.difference(deadlineDate);
 
                   // กรณีส่งงานก่อนกำหนด (ไม่แสดงข้อความ "เลยกำหนด")
-                  if (difference.isNegative) {
+                  if (difference.isNegative || difference.inDays == 0) {
                     return Padding(
                       padding: const EdgeInsets.symmetric(vertical: 8.0),
                       child: ListTile(
@@ -592,7 +592,7 @@ void didUpdateWidget(covariant Detail_work oldWidget) {
                         DateTime submitDate = DateFormat('yyyy-MM-dd HH:mm:ss').parse(student['submit_time']); 
 
                         Duration difference = submitDate.difference(deadlineDate);
-                        if (difference.isNegative) {
+                        if (difference.isNegative || difference.inDays == 0) {
                           return Padding(
                             padding: const EdgeInsets.symmetric(vertical: 8.0),
                             child: ListTile(
