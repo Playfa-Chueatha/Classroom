@@ -28,6 +28,7 @@ class _FormState extends State<AddForm_Register_S> {
   TextEditingController clasroom_major = TextEditingController();
   TextEditingController username = TextEditingController();
   TextEditingController number = TextEditingController();
+  TextEditingController phone = TextEditingController();
 
 
   String type = '1';
@@ -36,7 +37,6 @@ class _FormState extends State<AddForm_Register_S> {
   String? selectedmajor;
   String engfirstname = '-';
   String englastname = '-';
-  String phone = '-';
   String parentphone = '-';
   String teacher_name = '-';
   String msg = '';
@@ -107,7 +107,7 @@ Future<void> saveProfileS(context) async {
     'users_enfname': engfirstname,
     'users_enlname': englastname,
     'usert_username' : teacher_name,
-    'users_phone': phone,
+    'users_phone': phone.text,
     'users_parentphone': parentphone,
   };
 
@@ -146,6 +146,27 @@ Future<void> saveProfileS(context) async {
   }
 }
 
+
+
+String? validatenumber(String? value) {
+  if (value == null || value.isEmpty) {
+    return 'กรุณากรอกเบอร์โทร';
+  }
+
+  // ตรวจสอบว่ามีตัวอักษรไทยหรือไม่
+  final thaiRegex = RegExp(r'[\u0E00-\u0E7F]');
+  if (thaiRegex.hasMatch(value)) {
+    return 'ไม่สามารถกรอกภาษาไทยในเบอร์โทรได้';
+  }
+
+  // ตรวจสอบว่าเป็นตัวเลขทั้งหมดและมีความยาว 10 หลัก
+  final phoneRegex = RegExp(r'^[0-9]{10}$');
+  if (!phoneRegex.hasMatch(value)) {
+    return 'กรุณากรอกเบอร์โทรให้ถูกต้อง (10 หลัก)';
+  }
+
+  return null;
+}
 
 
 
@@ -439,6 +460,19 @@ Widget build(BuildContext context) {
                   controller: email,
                 ),
 
+                TextFormField(
+                  maxLength: 10,
+                  decoration: InputDecoration(
+                    counterText: "",
+                    label: Text(
+                      "กรุณากรอกเบอร์โทร",
+                      style: TextStyle(fontSize: 20),
+                    ),
+                  ),
+                  validator: validatenumber,
+                  controller: phone,
+                ),
+
 
 
                 //ชื่อผู้ใช้
@@ -451,9 +485,19 @@ Widget build(BuildContext context) {
                       style: TextStyle(fontSize: 20),
                     ),
                   ),
-                  validator: (val) => validateEnglishAndNumbers(val, 'กรุณากรอกชื่อผู้ใช้ของคุณ'),
+                  validator: (val) {
+                    String trimmedValue = val?.replaceAll(' ', '') ?? '';
+                    return validateEnglishAndNumbers(trimmedValue, 'กรุณากรอกชื่อผู้ใช้ของคุณ');
+                  },
                   controller: username,
+                  onChanged: (val) {
+                    username.text = val.replaceAll(' ', '');
+                    username.selection = TextSelection.fromPosition(
+                      TextPosition(offset: username.text.length),
+                    );
+                  },
                 ),
+
 
                 //รหัสผ่าน
                  TextFormField(

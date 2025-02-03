@@ -24,11 +24,11 @@ class _FormState extends State<Registert_T> {
   TextEditingController password = TextEditingController();
   TextEditingController email = TextEditingController();
   TextEditingController prefix = TextEditingController();
+  TextEditingController phone = TextEditingController();
 
   String? selectedPrefix;
   String engfirstname = "-";
   String englastname = "-";
-  String phone = "-";
   String subject = "-";
   int room = 0;
   int numroom = 0;
@@ -90,7 +90,7 @@ Future<void> saveProfileT(context) async {
       'usert_email': email.text,
       'usert_classroom': room.toString(),
       'usert_numroom': numroom.toString(),
-      'usert_phone': phone,
+      'usert_phone': phone.text,
       'usert_subjects': subject,
     };
 
@@ -138,6 +138,26 @@ Future<void> saveProfileT(context) async {
       );
     }
   }
+
+  String? validatenumber(String? value) {
+  if (value == null || value.isEmpty) {
+    return 'กรุณากรอกเบอร์โทร';
+  }
+
+  // ตรวจสอบว่ามีตัวอักษรไทยหรือไม่
+  final thaiRegex = RegExp(r'[\u0E00-\u0E7F]');
+  if (thaiRegex.hasMatch(value)) {
+    return 'ไม่สามารถกรอกภาษาไทยในเบอร์โทรได้';
+  }
+
+  // ตรวจสอบว่าเป็นตัวเลขทั้งหมดและมีความยาว 10 หลัก
+  final phoneRegex = RegExp(r'^[0-9]{10}$');
+  if (!phoneRegex.hasMatch(value)) {
+    return 'กรุณากรอกเบอร์โทรให้ถูกต้อง (10 หลัก)';
+  }
+
+  return null;
+}
 
   String? validateEmail(String? value) {
     if (value == null || value.isEmpty) {
@@ -283,6 +303,18 @@ Widget build(BuildContext context) {
               validator: validateEmail,
               controller: email,
             ),
+            TextFormField(
+                  maxLength: 10,
+                  decoration: InputDecoration(
+                    counterText: "",
+                    label: Text(
+                      "กรุณากรอกเบอร์โทร",
+                      style: TextStyle(fontSize: 20),
+                    ),
+                  ),
+                  validator: validatenumber,
+                  controller: phone,
+                ),
             TextFormField(
               maxLength: 20,
               decoration: const InputDecoration(

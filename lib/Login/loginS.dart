@@ -190,13 +190,13 @@ class _LogintState extends State<Login_S> {
                   child: Text("เข้าสู่ระบบ", style: TextStyle(fontSize: height * 0.03)),
                 ),
                   SizedBox(height: height * 0.08),
-                  FilledButton(
-                    onPressed: loginWithPredefinedCredentials,
-                    style: FilledButton.styleFrom(
-                      backgroundColor: Color.fromARGB(255, 82, 104, 10),
-                    ),
-                    child: Text("Login"),
-                  ),
+                  // FilledButton(
+                  //   onPressed: loginWithPredefinedCredentials,
+                  //   style: FilledButton.styleFrom(
+                  //     backgroundColor: Color.fromARGB(255, 82, 104, 10),
+                  //   ),
+                  //   child: Text("Login"),
+                  // ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [

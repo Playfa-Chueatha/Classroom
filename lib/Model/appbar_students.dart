@@ -324,7 +324,7 @@ Future<void> fetchUnreadNotifications() async {
                 );
               },
               icon: const Icon(Icons.list_alt),
-              tooltip: 'รายชื่อนักเรียน',
+              tooltip: 'คะแนนของฉััน',
             ),
           ],
         ),

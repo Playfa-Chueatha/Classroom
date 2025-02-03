@@ -186,25 +186,15 @@ class _CommentState extends State<Comment_inclass> {
                               child: Stack(
                                 children: [
                                   // ส่วนของ Row ที่มีข้อมูลของคอมเมนต์
-                                  Column(
-                                    children: [
-                                      Row(
-                                        children: [
-                                          Padding(
-                                            padding: EdgeInsets.fromLTRB(20, 5, 0, 5),
-                                            child: Image.asset("assets/images/นักเรียน.png", height: 50, width: 50),
-                                          ),
-                                          Column(
+                                          Padding(padding: EdgeInsets.all(10),
+                                          child:  Column(
                                             crossAxisAlignment: CrossAxisAlignment.start,
                                             children: [
                                               Text('By: ${comments[index]["thfname"]} ${comments[index]["thlname"]}', style: TextStyle(fontSize: 14, fontStyle: FontStyle.italic)),
                                               Text(comments[index]["comment_title"], style: TextStyle(fontSize: 20)),
                                             ],
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
+                                          )),
+                                        
                                   
                                   // ปุ่มลบที่มุมขวาล่าง
                                   if (canDelete)
