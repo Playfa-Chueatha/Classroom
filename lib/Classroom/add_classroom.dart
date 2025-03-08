@@ -44,6 +44,7 @@ class _AddClassroomState extends State<AddClassroom> {
       'classroom_major': Section_class,
       'classroom_year': Room_year,
       'classroom_numroom': Room_No,
+      'classroom_schoolyear':School_year,
       'classroom_detail': Detail,
       'usert_username': widget.username,
     };

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_esclass_2/Data/Data.dart';
 import 'package:flutter_esclass_2/Login/loginS.dart';
 import 'package:flutter_esclass_2/Login/loginT.dart';
@@ -260,6 +261,7 @@ Widget build(BuildContext context) {
                   style: TextStyle(fontSize: 20),
                 ),
               ),
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
               validator: (val) => val == null || val.isEmpty ? 'กรุณากรอกรหัสนักเรียน' : null,
               controller: studentid,
             ),
@@ -456,6 +458,9 @@ Widget build(BuildContext context) {
                       style: TextStyle(fontSize: 20),
                     ),
                   ),
+                   inputFormatters: [
+                    FilteringTextInputFormatter.allow(RegExp(r'^[a-zA-Z0-9!@#\$%^&*()_+={}[\]:;<>,.?/~\-]+$')),
+                  ],
                   validator: validateEmail,
                   controller: email,
                 ),
@@ -519,6 +524,9 @@ Widget build(BuildContext context) {
                       style: TextStyle(fontSize: 20),
                     ),
                   ),
+                   inputFormatters: [
+                    FilteringTextInputFormatter.allow(RegExp(r'^[a-zA-Z0-9!@#\$%^&*()_+={}[\]:;<>,.?/~\-]+$')),
+                  ],
                   validator: (val) {
                     if (val!.isEmpty) {
                       return 'กรุณากรอกรหัสผ่าน';
@@ -540,12 +548,16 @@ Widget build(BuildContext context) {
                         });
                         }, 
                     ),
+                    
                     counterText: "",
                     label: Text(
                       "กรุณายืนยันรหัสผ่าน",
                       style: TextStyle(fontSize: 20),
                     ),
                   ),
+                  inputFormatters: [
+                    FilteringTextInputFormatter.allow(RegExp(r'^[a-zA-Z0-9!@#\$%^&*()_+={}[\]:;<>,.?/~\-]+$')),
+                  ],
                   validator: (val) {
                     if (val!.isEmpty) {
                       return 'กรุณากรอกยืนยันรหัสผ่าน';

@@ -1,5 +1,6 @@
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_esclass_2/Login/loginT.dart';
 import 'dart:async';
 import 'dart:convert';
@@ -300,6 +301,9 @@ Widget build(BuildContext context) {
                   style: TextStyle(fontSize: 20),
                 ),
               ),
+              inputFormatters: [
+                    FilteringTextInputFormatter.allow(RegExp(r'^[a-zA-Z0-9!@#\$%^&*()_+={}[\]:;<>,.?/~\-]+$')),
+                  ],
               validator: validateEmail,
               controller: email,
             ),
@@ -349,6 +353,9 @@ Widget build(BuildContext context) {
                   style: TextStyle(fontSize: 20),
                 ),
               ),
+              inputFormatters: [
+                    FilteringTextInputFormatter.allow(RegExp(r'^[a-zA-Z0-9!@#\$%^&*()_+={}[\]:;<>,.?/~\-]+$')),
+                  ],
               validator: (val) {
                 if (val == null || val.isEmpty) {
                   return 'กรุณากรอกรหัสผ่าน';
@@ -378,6 +385,9 @@ Widget build(BuildContext context) {
                   style: TextStyle(fontSize: 20),
                 ),
               ),
+              inputFormatters: [
+                    FilteringTextInputFormatter.allow(RegExp(r'^[a-zA-Z0-9!@#\$%^&*()_+={}[\]:;<>,.?/~\-]+$')),
+                  ],
               validator: (val) {
                 if (val!.isEmpty) {
                   return 'กรุณากรอกยืนยันรหัสผ่าน';
